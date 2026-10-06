@@ -3,533 +3,759 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MESA Fiber Solutions - ERP System</title>
-    
-    <!-- Tailwind CSS (Framework UI) -->
+    <title>MESA Fiber Solutions — Suite Operativa</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome (Icone) -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .module-enter { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Scrollbar custom */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        #map { height: 260px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        @media (min-width: 768px) { #map { height: 350px; } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
 
-    <!-- ROOT CONTAINER PER L'APP (Viene popolato da JavaScript) -->
-    <div id="app-root" class="flex-1 flex flex-col w-full h-full"></div>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-3 sm:mb-4 text-2xl font-bold border border-sky-500/20 shadow-lg">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">MESA Fiber Solutions</h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Suite Operativa & Cloud</p>
+            </div>
 
-    <!-- NOTIFICHE TOAST -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+            <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="login-username" required placeholder="es. admin, tecnico" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-[11px] sm:text-xs text-slate-400 space-y-1">
+                    <div class="font-semibold text-slate-300">Accessi predefiniti:</div>
+                    <div>• Admin: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
+                    <div>• Tecnico: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2.5 text-center"></div>
+
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                    <span>Accedi al Portale</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="hidden flex-1 flex flex-col">
+        <!-- HEADER -->
+        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div onclick="navigateToHome()" class="cursor-pointer flex items-center gap-2.5">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold shrink-0">
+                        <i class="fa-solid fa-network-wired text-sm sm:text-base"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="font-bold text-sm sm:text-base text-white tracking-wide truncate">MESA Fiber</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 flex items-center gap-1.5">
+                            <span id="sync-indicator" class="w-2 h-2 rounded-full bg-slate-500 inline-block"></span>
+                            <span class="truncate" id="header-subtitle">Caricamento DB...</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="navigateTo('chat')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-400 hover:text-white px-2.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-comments"></i> <span class="hidden md:inline">Chat</span>
+                </button>
+
+                <div class="relative">
+                    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl p-1.5 sm:px-3 sm:py-1.5 transition-colors">
+                        <div id="header-avatar-container" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            <span id="user-avatar-initials">S</span>
+                        </div>
+                        <div class="text-left hidden sm:block">
+                            <div class="text-xs font-bold text-white truncate max-w-[100px]" id="user-display-name">Utente</div>
+                            <div class="text-[10px] text-sky-400 uppercase tracking-wider font-semibold" id="user-display-role">Ruolo</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
+                    </button>
+
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
+                        <div class="px-4 py-2 border-b border-slate-800">
+                            <div class="text-[11px] text-slate-400">Connesso come</div>
+                            <div class="text-xs font-bold text-white truncate" id="dropdown-username">username</div>
+                        </div>
+                        <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-user-gear text-sky-400 mr-2"></i> Profilo Personale</button>
+                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-gear mr-2"></i> Amministrazione & Personale</button>
+                        <div class="h-px bg-slate-800 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10"><i class="fa-solid fa-power-off mr-2"></i> Disconnetti</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- VIEW 1: HOME -->
+        <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div class="max-w-2xl space-y-2 sm:space-y-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        <i class="fa-solid fa-circle-check"></i> Suite Operativa Modulare Attiva
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">MESA Fiber Solutions</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        Seleziona il modulo operativo desiderato per gestire attivazioni FTTH, guasti, giunzioni, inventario e logistica sul territorio di Modena.
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400">Moduli Attivi</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="home-modules-grid"></div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: MODULO PRATICHE / GUASTI / DELIVERY -->
+        <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
+                </button>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
+            </div>
+
+            <!-- KPI BOXES -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20"><i class="fa-solid fa-list-check"></i></div>
+                    <div><div class="text-xl font-bold text-white" id="kpi-total">0</div><div class="text-[10px] text-slate-400 font-medium">Totale</div></div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20"><i class="fa-solid fa-spinner"></i></div>
+                    <div><div class="text-xl font-bold text-amber-400" id="kpi-in-progress">0</div><div class="text-[10px] text-slate-400 font-medium">In Lavorazione</div></div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20"><i class="fa-solid fa-circle-check"></i></div>
+                    <div><div class="text-xl font-bold text-emerald-400" id="kpi-resolved">0</div><div class="text-[10px] text-slate-400 font-medium">Risolti</div></div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center border border-rose-500/20"><i class="fa-solid fa-fire"></i></div>
+                    <div><div class="text-xl font-bold text-rose-400" id="kpi-critical">0</div><div class="text-[10px] text-slate-400 font-medium">Urgenti</div></div>
+                </div>
+            </div>
+
+            <!-- MAPPA -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                <div class="flex items-center gap-2 text-xs font-semibold text-white"><i class="fa-solid fa-map-location-dot text-sky-400"></i><span>Mappa Territoriale Modena</span></div>
+                <div id="map"></div>
+            </div>
+
+            <!-- FILTRI E BOTTONI -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5">
+                <div class="flex flex-wrap items-center gap-2.5 flex-1">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-search text-xs"></i></span>
+                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo o PFP..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-3 text-xs text-white focus:border-sky-500">
+                    </div>
+                    <select id="filter-status" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-300">
+                        <option value="ALL">Tutti gli stati</option>
+                        <option value="Aperto">Aperto</option>
+                        <option value="In Lavorazione">In Lavorazione</option>
+                        <option value="Risolto">Risolto</option>
+                    </select>
+                </div>
+                <button onclick="openNewFaultModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg"><i class="fa-solid fa-plus"></i><span>Nuova Pratica</span></button>
+            </div>
+
+            <!-- TABELLA -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-900/50 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-3.5">ID / PFP</th>
+                                <th class="py-3 px-3.5">Indirizzo & Dettaglio</th>
+                                <th class="py-3 px-3.5">Priorità</th>
+                                <th class="py-3 px-3.5">Stato</th>
+                                <th class="py-3 px-3.5 text-right">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faults-table-body" class="divide-y divide-slate-800/60 text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW 3: MAGAZZINO -->
+        <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
+            <button onclick="navigateToHome()" class="bg-slate-950 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left"></i> Home</button>
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <h3 class="font-bold text-white text-sm">Componenti Passivi FTTH</h3>
+                <button onclick="alert('Funzione di test.')" class="bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-semibold">Nuovo Articolo</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid"></div>
+        </main>
+
+        <!-- VIEW 4: FLOTTA -->
+        <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
+            <button onclick="navigateToHome()" class="bg-slate-950 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left"></i> Home</button>
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <h3 class="font-bold text-white text-sm">Parco Veicoli & Furgoni</h3>
+                <button onclick="alert('Funzione di test.')" class="bg-indigo-600 text-white px-3 py-2 rounded-xl text-xs font-semibold">Nuovo Mezzo</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vehicles-grid"></div>
+        </main>
+
+        <!-- VIEW 5: CHAT -->
+        <main id="view-chat" class="hidden flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col h-[calc(100vh-70px)] space-y-3">
+            <button onclick="navigateToHome()" class="bg-slate-900 self-start text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left"></i> Home</button>
+            <div id="chat-messages-container" class="flex-1 bg-slate-950/60 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-3 text-xs sm:text-sm"></div>
+            <form onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2 bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5">
+                <input type="text" id="chat-input-msg" required placeholder="Scrivi un messaggio..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-white">
+                <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-semibold">Invia</button>
+            </form>
+        </main>
+
+        <!-- VIEW 6: PROFILO -->
+        <main id="view-profile" class="hidden flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-5">
+            <button onclick="navigateToHome()" class="bg-slate-950 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left"></i> Home</button>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center gap-4 pb-4 border-b border-slate-800">
+                    <div class="w-16 h-16 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-bold text-xl"><span id="profile-initials">S</span></div>
+                    <div><h3 class="text-base font-bold text-white" id="profile-name-title">Nome</h3><div class="text-xs text-sky-400" id="profile-role-title">Ruolo</div></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW 7: AMMINISTRAZIONE (PERSONALE + GITHUB CLOUD) -->
+        <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateToHome()" class="bg-slate-950 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left"></i> Home</button>
+                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore Riservato</div>
+            </div>
+
+            <!-- SEZIONE GITHUB CLOUD -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
+                <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                    <i class="fa-brands fa-github text-sky-400"></i><span>Configurazione GitHub Cloud</span>
+                </h3>
+                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database in tempo reale.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold uppercase">GitHub Username</label>
+                        <input type="text" id="gh-owner" placeholder="es. sergioyakh-jpg" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold uppercase">Repository Name</label>
+                        <input type="text" id="gh-repo" placeholder="es. mesa-fiber-db" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-slate-400 mb-1 font-semibold uppercase">Token (PAT)</label>
+                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
+                    </div>
+                </div>
+                <button onclick="saveGitHubConfig()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold shadow-lg">Salva e Sincronizza</button>
+            </div>
+
+            <!-- GESTIONE PERSONALE (UTENTI) -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Gestione Personale & Ruoli</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Assegna credenziali e ruoli di accesso.</p>
+                    </div>
+                    <button onclick="openNewUserModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold">Nuovo Utente</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead><tr class="border-b border-slate-800 text-slate-400"><th class="py-2.5 px-3">Nome</th><th class="py-2.5 px-3">Username / Ruolo</th><th class="py-2.5 px-3 text-right">Azioni</th></tr></thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-800/60"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALI -->
+    <!-- Dettaglio Pratica (con WhatsApp e Email) -->
+    <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="font-bold text-white text-sm" id="det-title">Dettaglio Pratica</div>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="det-content" class="space-y-3 text-xs sm:text-sm text-slate-300"></div>
+            <div class="pt-3 border-t border-slate-800 grid grid-cols-2 gap-3">
+                <button onclick="shareViaWhatsApp()" class="bg-emerald-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                <button onclick="shareViaEmail()" class="bg-sky-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2"><i class="fa-solid fa-envelope"></i> Email</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuova Pratica -->
+    <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="font-bold text-white text-sm">Nuova Pratica</div>
+                <button onclick="closeNewFaultModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleCreateFault(event)" class="space-y-3 text-xs">
+                <div><label class="block text-slate-400 mb-1">Indirizzo</label><input type="text" id="nf-address" required placeholder="Via Emilia Est 142" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-slate-400 mb-1">PFP</label><input type="text" id="nf-pfp" required placeholder="PFP-MO-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></div>
+                    <div><label class="block text-slate-400 mb-1">Priorità</label><select id="nf-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300"><option value="Alta">Alta</option><option value="Media" selected>Media</option><option value="Bassa">Bassa</option></select></div>
+                </div>
+                <div><label class="block text-slate-400 mb-1">Descrizione</label><textarea id="nf-desc" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></textarea></div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-sky-600 text-white font-semibold">Salva e Sincronizza</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nuovo Utente -->
+    <div id="modal-new-user" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="font-bold text-white text-sm">Nuovo Utente</div>
+                <button onclick="closeNewUserModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleCreateUser(event)" class="space-y-3 text-xs">
+                <div><label class="block text-slate-400 mb-1">Nome Completo</label><input type="text" id="nu-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-slate-400 mb-1">Username</label><input type="text" id="nu-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></div>
+                    <div><label class="block text-slate-400 mb-1">Password</label><input type="password" id="nu-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></div>
+                </div>
+                <div><label class="block text-slate-400 mb-1">Ruolo</label><select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300"><option value="Tecnico">Tecnico</option><option value="Amministratore">Amministratore</option></select></div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-600 text-white font-semibold">Crea Utente</button>
+            </form>
+        </div>
+    </div>
 
     <script>
-        /********************************************************
-         * 1. DATABASE E GESTIONE STATO (DATA ACCESS LAYER)
-         * Standard: Async/Await, disaccoppiato dalla UI.
-         ********************************************************/
-        const Database = {
-            storageKey: 'mesa_erp_database',
-            
-            // Dati di default per il primo avvio
-            defaultData: {
-                users: [
-                    { id: 'U1', name: "Serhiy Yakh'yayev", username: "admin", pass: "admin123", role: "Admin", email: "admin@mesafiber.it" },
-                    { id: 'U2', name: "Mariya", username: "manager", pass: "manager123", role: "Manager", email: "manager@mesafiber.it" },
-                    { id: 'U3', name: "Marco Tecnico", username: "tecnico", pass: "tecnico123", role: "Tecnico", email: "tecnico@mesafiber.it" }
-                ],
-                tasks: [
-                    { id: "TSK-001", type: "Delivery", address: "Via Emilia Est 100, Modena", priority: "Alta", status: "Aperto", assignedTo: "U3", description: "Attivazione FTTH, test borchia ottica." }
-                ],
-                inventory: [
-                    { id: "INV-001", item: "Bretella Ottica SC/APC", quantity: 50, threshold: 10 }
-                ],
-                fleet: [
-                    { id: "VEH-001", model: "Peugeot Partner", plate: "AB123CD", assignedTo: "U3", status: "Operativo" }
-                ],
-                settings: {
-                    ghOwner: "", ghRepo: "", ghToken: ""
-                }
-            },
+        // ----------------------------------------------------
+        // GESTIONE DATI E VARIABILI GLOBALI
+        // ----------------------------------------------------
+        let ghConfig = { owner: '', repo: '', token: '' };
+        let appModules = [
+            { id: 'Delivery', name: 'Delivery (Attivazioni)', icon: 'fa-house-signal', color: 'emerald', active: true, desc: 'Nuove linee FTTH e borchie.' },
+            { id: 'Assurance', name: 'Assurance (Guasti)', icon: 'fa-triangle-exclamation', color: 'rose', active: true, desc: 'Ticket guasti e ripristini.' },
+            { id: 'Giunzioni', name: 'Giunzioni & OTDR', icon: 'fa-toolbox', color: 'sky', active: true, desc: 'Fusioni Sumitomo e test Viavi.' },
+            { id: 'magazzino', name: 'Magazzino Materiali', icon: 'fa-boxes-stacked', color: 'amber', active: true, desc: 'Inventario scorte passive.' },
+            { id: 'flotta', name: 'Flotta & Mezzi', icon: 'fa-truck', color: 'indigo', active: true, desc: 'Assegnazione furgoni.' },
+            { id: 'chat', name: 'Chat Aziendale', icon: 'fa-comments', color: 'violet', active: true, desc: 'Comunicazione globale.' }
+        ];
 
-            async init() {
-                let data = localStorage.getItem(this.storageKey);
-                if (!data) {
-                    await this.saveAll(this.defaultData);
-                }
-            },
+        let users = [
+            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore' },
+            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi', role: 'Tecnico' }
+        ];
 
-            async getAll() {
-                return JSON.parse(localStorage.getItem(this.storageKey));
-            },
+        let faults = [
+            { id: 'DEL-001', module: 'Delivery', address: 'Via Emilia Est 142, Modena', pfp: 'PFP-MO-01', priority: 'Alta', status: 'In Lavorazione', lat: 44.6471, lng: 10.9252, desc: 'Nuova attivazione.' }
+        ];
 
-            async saveAll(data) {
-                localStorage.setItem(this.storageKey, JSON.stringify(data));
-                await this.syncToGitHub(data); // Tenta il sync in background
-            },
+        let stock = [{ id: 'S-01', name: 'Bretella SC/APC', qty: 120, unit: 'Pz' }, { id: 'S-02', name: 'Borchia Ottica', qty: 45, unit: 'Pz' }];
+        let vehicles = [{ id: 'V-01', model: 'Peugeot Partner', plate: 'GH456XY', driver: 'Marco Rossi' }];
+        let chatMessages = [{ sender: 'Admin', text: 'Nuova dashboard attivata.', time: '09:00' }];
 
-            // Utility sicura per codificare Base64 (risolve il problema del JSON vuoto su GitHub)
-            encodeBase64(str) {
-                return btoa(new TextEncoder().encode(str).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-            },
+        let currentUser = null;
+        let currentActiveModule = 'Delivery';
+        let map = null;
+        let markersLayer = null;
+        let currentEditingFault = null;
 
-            async syncToGitHub(data) {
-                const settings = data.settings;
-                if (!settings || !settings.ghToken || !settings.ghOwner || !settings.ghRepo) return;
+        // ----------------------------------------------------
+        // UTILITY CODIFICA BASE64 (RISOLVE IL PROBLEMA DEL JSON VUOTO)
+        // ----------------------------------------------------
+        function encodeBase64Unicode(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) { return String.fromCharCode('0x' + p1); }));
+        }
+        function decodeBase64Unicode(str) {
+            return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+        }
 
-                const url = `https://api.github.com/repos/${settings.ghOwner}/${settings.ghRepo}/contents/database.json`;
-                
+        // ----------------------------------------------------
+        // AVVIO E SINCRONIZZAZIONE
+        // ----------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalDatabase();
+            checkSession();
+            syncCloudDatabase();
+        });
+
+        function loadLocalDatabase() {
+            const saved = localStorage.getItem('mesa_erp_full');
+            if (saved) {
                 try {
-                    // 1. Cerca il file per ottenere l'hash (SHA) necessario per l'aggiornamento
-                    let sha = undefined;
-                    const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${settings.ghToken}` } });
-                    if (getRes.ok) {
-                        const fileData = await getRes.json();
-                        sha = fileData.sha;
-                    }
-
-                    // 2. Prepara e invia il nuovo file
-                    const jsonString = JSON.stringify(data, null, 2);
-                    const encodedContent = this.encodeBase64(jsonString);
-
-                    const putRes = await fetch(url, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${settings.ghToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            message: "Sync Database MESA ERP",
-                            content: encodedContent,
-                            sha: sha
-                        })
-                    });
-
-                    if (!putRes.ok) throw new Error("Errore GitHub API");
-                    console.log("Sincronizzazione GitHub completata.");
-                } catch (error) {
-                    console.error("Fallimento sync GitHub:", error);
-                    Toast.show("Errore di sincronizzazione Cloud", "error");
-                }
+                    const db = JSON.parse(saved);
+                    if (db.users) users = db.users;
+                    if (db.faults) faults = db.faults;
+                    if (db.stock) stock = db.stock;
+                    if (db.vehicles) vehicles = db.vehicles;
+                    if (db.chatMessages) chatMessages = db.chatMessages;
+                    if (db.ghConfig) ghConfig = db.ghConfig;
+                } catch(e) {}
             }
-        };
+        }
 
-        /********************************************************
-         * 2. SISTEMA DI AUTENTICAZIONE E SESSIONE
-         ********************************************************/
-        const Auth = {
-            get currentUser() {
-                const user = localStorage.getItem('mesa_session');
-                return user ? JSON.parse(user) : null;
-            },
-            async login(username, password) {
-                const db = await Database.getAll();
-                const user = db.users.find(u => u.username === username && u.pass === password);
-                if (user) {
-                    localStorage.setItem('mesa_session', JSON.stringify(user));
-                    return true;
-                }
-                return false;
-            },
-            logout() {
-                localStorage.removeItem('mesa_session');
-                App.navigate('login');
-            },
-            // Controllo permessi
-            hasRole(rolesArray) {
-                if (!this.currentUser) return false;
-                return rolesArray.includes(this.currentUser.role);
-            }
-        };
-
-        /********************************************************
-         * 3. COMPONENTI UI & NOTIFICHE
-         ********************************************************/
-        const Toast = {
-            show(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                const color = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
-                toast.className = `${color} text-white px-4 py-2 rounded shadow-lg text-sm flex items-center gap-2 module-enter`;
-                toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check' : 'fa-triangle-exclamation'}"></i> ${message}`;
-                container.appendChild(toast);
-                setTimeout(() => { toast.remove(); }, 3000);
-            }
-        };
-
-        // Generatore Form Universale
-        const FormBuilder = {
-            createField(field) {
-                return `
-                    <div class="mb-4">
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">${field.label}</label>
-                        ${field.type === 'select' 
-                            ? `<select id="${field.id}" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-white focus:border-blue-500 focus:outline-none text-sm">
-                                ${field.options.map(o => `<option value="${o.value}">${o.text}</option>`).join('')}
-                               </select>`
-                            : field.type === 'textarea'
-                            ? `<textarea id="${field.id}" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-white focus:border-blue-500 focus:outline-none text-sm" placeholder="${field.placeholder || ''}"></textarea>`
-                            : `<input type="${field.type}" id="${field.id}" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-white focus:border-blue-500 focus:outline-none text-sm" placeholder="${field.placeholder || ''}">`
-                        }
-                    </div>
-                `;
-            }
-        };
-
-        /********************************************************
-         * 4. CORE APPLICATION (ROUTER E RENDERING)
-         ********************************************************/
-        const App = {
-            root: document.getElementById('app-root'),
+        async function syncCloudDatabase() {
+            const ind = document.getElementById('sync-indicator');
+            const sub = document.getElementById('header-subtitle');
             
-            async start() {
-                await Database.init();
-                if (Auth.currentUser) {
-                    this.navigate('dashboard');
+            if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo) {
+                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
+                sub.innerText = 'Cloud Non Configurato';
+                return;
+            }
+
+            try {
+                sub.innerText = 'Sincronizzazione in corso...';
+                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
+
+                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
+
+                if (res.ok) {
+                    const fileData = await res.json();
+                    const decoded = decodeBase64Unicode(fileData.content.replace(/\s/g, ''));
+                    const db = JSON.parse(decoded);
+
+                    if (db.users) users = db.users;
+                    if (db.faults) faults = db.faults;
+                    if (db.stock) stock = db.stock;
+                    if (db.vehicles) vehicles = db.vehicles;
+                    if (db.chatMessages) chatMessages = db.chatMessages;
+                    
+                    saveLocalDatabase(); // Aggiorna la memoria locale
+
+                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
+                    sub.innerText = 'Database Sincronizzato';
+                    
+                    // Ricarica la vista attuale se stiamo guardando qualcosa
+                    if(currentUser) navigateTo('home');
                 } else {
-                    this.navigate('login');
+                    await pushToCloud(); // Se non esiste, lo crea
                 }
-            },
-
-            async navigate(route) {
-                this.root.innerHTML = ''; // Pulisci la vista
-                const db = await Database.getAll();
-
-                if (route === 'login') return Views.renderLogin();
-                
-                // Se non sei loggato, forza il login
-                if (!Auth.currentUser) return this.navigate('login');
-
-                // Struttura Base App (Header + Main)
-                this.root.innerHTML = `
-                    <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
-                        <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('dashboard')">
-                            <div class="w-10 h-10 rounded bg-blue-600 flex items-center justify-center font-bold text-white shadow">M</div>
-                            <div>
-                                <h1 class="font-bold text-lg leading-tight">MESA Fiber</h1>
-                                <p class="text-xs text-slate-400">ERP System</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right hidden sm:block">
-                                <div class="text-sm font-bold">${Auth.currentUser.name}</div>
-                                <div class="text-xs text-blue-400">${Auth.currentUser.role}</div>
-                            </div>
-                            <button onclick="Auth.logout()" class="w-10 h-10 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-red-400 transition">
-                                <i class="fa-solid fa-power-off"></i>
-                            </button>
-                        </div>
-                    </header>
-                    <main id="main-content" class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full module-enter"></main>
-                `;
-
-                const main = document.getElementById('main-content');
-
-                // Router logico e controllo permessi
-                switch(route) {
-                    case 'dashboard': Views.renderDashboard(main, db); break;
-                    case 'tasks': Views.renderTasks(main, db); break;
-                    case 'magazzino': 
-                        if (Auth.hasRole(['Admin', 'Manager'])) Views.renderInventory(main, db); 
-                        else this.forbidden(main);
-                        break;
-                    case 'flotta': 
-                        Views.renderFleet(main, db); 
-                        break;
-                    case 'utenti':
-                        if (Auth.hasRole(['Admin'])) Views.renderUsers(main, db);
-                        else this.forbidden(main);
-                        break;
-                    case 'impostazioni':
-                        if (Auth.hasRole(['Admin'])) Views.renderSettings(main, db);
-                        else this.forbidden(main);
-                        break;
-                    default: this.navigate('dashboard');
-                }
-            },
-
-            forbidden(container) {
-                container.innerHTML = `
-                    <div class="text-center py-20">
-                        <i class="fa-solid fa-lock text-5xl text-slate-600 mb-4"></i>
-                        <h2 class="text-xl font-bold text-white">Accesso Negato</h2>
-                        <p class="text-slate-400 mt-2">Il tuo ruolo (${Auth.currentUser.role}) non ha i permessi per questa sezione.</p>
-                        <button onclick="App.navigate('dashboard')" class="mt-6 px-4 py-2 bg-blue-600 rounded text-sm font-semibold">Torna alla Home</button>
-                    </div>
-                `;
+            } catch (err) {
+                console.error(err);
+                ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
+                sub.innerText = 'Errore Connessione Cloud';
             }
-        };
+        }
 
-        /********************************************************
-         * 5. VISTE (VIEWS) MODULARI
-         ********************************************************/
-        const Views = {
-            // -- SCHERMATA LOGIN --
-            renderLogin() {
-                App.root.innerHTML = `
-                    <div class="flex-1 flex items-center justify-center p-4 bg-slate-950">
-                        <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl p-8 shadow-2xl">
-                            <div class="text-center mb-8">
-                                <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold mb-4 shadow-lg shadow-blue-900/50"><i class="fa-solid fa-network-wired"></i></div>
-                                <h1 class="text-2xl font-bold">MESA Fiber Solutions</h1>
-                                <p class="text-sm text-slate-400 mt-1">Accesso Sistema ERP</p>
-                            </div>
-                            <form id="frm-login" class="space-y-4">
-                                ${FormBuilder.createField({id: 'log-user', label: 'Username', type: 'text', placeholder: 'Inserisci username'})}
-                                ${FormBuilder.createField({id: 'log-pass', label: 'Password', type: 'password', placeholder: '••••••••'})}
-                                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded font-bold transition">Accedi</button>
-                            </form>
-                            <div class="mt-6 p-3 bg-slate-800 rounded text-xs text-slate-400">
-                                <b>Ruoli di test:</b><br>Admin: admin/admin123<br>Manager: manager/manager123<br>Tecnico: tecnico/tecnico123
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('frm-login').onsubmit = async (e) => {
-                    e.preventDefault();
-                    const success = await Auth.login(document.getElementById('log-user').value, document.getElementById('log-pass').value);
-                    if (success) App.navigate('dashboard');
-                    else Toast.show('Credenziali errate', 'error');
-                };
-            },
+        function saveLocalDatabase() {
+            const db = { users, faults, stock, vehicles, chatMessages, ghConfig };
+            localStorage.setItem('mesa_erp_full', JSON.stringify(db));
+        }
 
-            // -- DASHBOARD PRINCIPALE --
-            renderDashboard(container, db) {
-                const isTech = Auth.currentUser.role === 'Tecnico';
-                
-                container.innerHTML = `
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Benvenuto, ${Auth.currentUser.name}</h2>
-                        <p class="text-slate-400 text-sm">Seleziona un modulo operativo per iniziare.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Modulo Pratiche (Tutti) -->
-                        <div onclick="App.navigate('tasks')" class="bg-slate-800 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition group">
-                            <i class="fa-solid fa-list-check text-3xl text-blue-400 mb-4 group-hover:scale-110 transition"></i>
-                            <h3 class="text-lg font-bold">Gestione Pratiche</h3>
-                            <p class="text-sm text-slate-400 mt-1">${isTech ? 'Vedi i tuoi interventi assegnati.' : 'Crea e assegna pratiche Delivery/Assurance.'}</p>
-                        </div>
+        async function pushToCloud() {
+            saveLocalDatabase(); // Salva sempre prima in locale
 
-                        <!-- Modulo Flotta (Tutti) -->
-                        <div onclick="App.navigate('flotta')" class="bg-slate-800 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition group">
-                            <i class="fa-solid fa-truck text-3xl text-indigo-400 mb-4 group-hover:scale-110 transition"></i>
-                            <h3 class="text-lg font-bold">Flotta Mezzi</h3>
-                            <p class="text-sm text-slate-400 mt-1">${isTech ? 'Vedi il mezzo a te assegnato.' : 'Gestisci assegnazioni furgoni.'}</p>
-                        </div>
+            const ind = document.getElementById('sync-indicator');
+            const sub = document.getElementById('header-subtitle');
+            if (!ghConfig.token) return;
 
-                        <!-- Modulo Magazzino (Admin, Manager) -->
-                        ${!isTech ? `
-                        <div onclick="App.navigate('magazzino')" class="bg-slate-800 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition group">
-                            <i class="fa-solid fa-boxes-stacked text-3xl text-amber-400 mb-4 group-hover:scale-110 transition"></i>
-                            <h3 class="text-lg font-bold">Magazzino</h3>
-                            <p class="text-sm text-slate-400 mt-1">Controllo inventario e soglie scorte.</p>
-                        </div>
-                        ` : ''}
+            try {
+                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-ping';
+                sub.innerText = 'Salvataggio su Cloud...';
 
-                        <!-- Modulo Utenti (Solo Admin) -->
-                        ${Auth.hasRole(['Admin']) ? `
-                        <div onclick="App.navigate('utenti')" class="bg-slate-800 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition group">
-                            <i class="fa-solid fa-users text-3xl text-emerald-400 mb-4 group-hover:scale-110 transition"></i>
-                            <h3 class="text-lg font-bold">Personale</h3>
-                            <p class="text-sm text-slate-400 mt-1">Gestisci dipendenti e credenziali.</p>
-                        </div>
-                        
-                        <!-- Modulo Impostazioni Database -->
-                        <div onclick="App.navigate('impostazioni')" class="bg-slate-800 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition group">
-                            <i class="fa-solid fa-database text-3xl text-slate-400 mb-4 group-hover:scale-110 transition"></i>
-                            <h3 class="text-lg font-bold">Database Cloud</h3>
-                            <p class="text-sm text-slate-400 mt-1">Configura GitHub Sync e Backup.</p>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-            },
+                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
+                let sha = undefined;
 
-            // -- GESTIONE PRATICHE (TASKS) --
-            renderTasks(container, db) {
-                const user = Auth.currentUser;
-                // I tecnici vedono solo le loro pratiche, Manager e Admin vedono tutto
-                const visibleTasks = user.role === 'Tecnico' ? db.tasks.filter(t => t.assignedTo === user.id) : db.tasks;
+                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
+                if (getRes.ok) sha = (await getRes.json()).sha;
 
-                container.innerHTML = `
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <div>
-                            <button onclick="App.navigate('dashboard')" class="text-sm text-slate-400 hover:text-white mb-2"><i class="fa-solid fa-arrow-left"></i> Torna alla Dashboard</button>
-                            <h2 class="text-2xl font-bold">Gestione Pratiche</h2>
-                        </div>
-                        ${Auth.hasRole(['Admin', 'Manager']) ? `
-                        <button onclick="Views.modals.newTask(${JSON.stringify(db.users).replace(/"/g, '&quot;')})" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold shadow"><i class="fa-solid fa-plus mr-2"></i>Nuova Pratica</button>
-                        ` : ''}
-                    </div>
+                const db = { users, faults, stock, vehicles, chatMessages };
+                const encodedContent = encodeBase64Unicode(JSON.stringify(db, null, 2));
 
-                    <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-x-auto shadow">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-900/50 text-slate-400 border-b border-slate-700">
-                                <tr>
-                                    <th class="p-4 font-semibold">ID Pratica</th>
-                                    <th class="p-4 font-semibold">Tipo / Indirizzo</th>
-                                    <th class="p-4 font-semibold">Assegnato A</th>
-                                    <th class="p-4 font-semibold">Stato</th>
-                                    <th class="p-4 font-semibold text-right">Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-700">
-                                ${visibleTasks.length === 0 ? `<tr><td colspan="5" class="p-8 text-center text-slate-500">Nessuna pratica trovata.</td></tr>` : 
-                                  visibleTasks.map(t => {
-                                      const techName = db.users.find(u => u.id === t.assignedTo)?.name || 'Nessuno';
-                                      const statusColor = t.status === 'Risolto' ? 'bg-emerald-500/20 text-emerald-400' : (t.status === 'In Lavorazione' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-600/50 text-slate-300');
-                                      return `
-                                      <tr class="hover:bg-slate-700/50 transition">
-                                          <td class="p-4 font-mono font-bold">${t.id}</td>
-                                          <td class="p-4">
-                                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded mr-2">${t.type}</span>${t.address}
-                                          </td>
-                                          <td class="p-4 text-slate-300">${techName}</td>
-                                          <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusColor}">${t.status}</span></td>
-                                          <td class="p-4 text-right">
-                                            <select onchange="updateTaskStatus('${t.id}', this.value)" class="bg-slate-900 border border-slate-600 rounded text-xs p-1 focus:outline-none">
-                                                <option value="Aperto" ${t.status === 'Aperto' ? 'selected' : ''}>Aperto</option>
-                                                <option value="In Lavorazione" ${t.status === 'In Lavorazione' ? 'selected' : ''}>In Lavorazione</option>
-                                                <option value="Risolto" ${t.status === 'Risolto' ? 'selected' : ''}>Risolto</option>
-                                            </select>
-                                          </td>
-                                      </tr>
-                                      `
-                                  }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
+                const putRes = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Aggiornamento MESA ERP`, content: encodedContent, sha: sha })
+                });
 
-                // Esposizione funzione globale per il select
-                window.updateTaskStatus = async (taskId, newStatus) => {
-                    const db = await Database.getAll();
-                    const task = db.tasks.find(t => t.id === taskId);
-                    if(task) {
-                        task.status = newStatus;
-                        await Database.saveAll(db);
-                        Toast.show("Stato aggiornato");
-                        App.navigate('tasks'); // Ricarica la vista
-                    }
-                };
-            },
-
-            // -- IMPOSTAZIONI DATABASE E ADMIN --
-            renderSettings(container, db) {
-                const s = db.settings || {};
-                container.innerHTML = `
-                    <div class="mb-6">
-                        <button onclick="App.navigate('dashboard')" class="text-sm text-slate-400 hover:text-white mb-2"><i class="fa-solid fa-arrow-left"></i> Torna alla Dashboard</button>
-                        <h2 class="text-2xl font-bold">Impostazioni Database</h2>
-                    </div>
-
-                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-2xl">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fa-brands fa-github text-white"></i> Configurazione Cloud GitHub</h3>
-                        <p class="text-sm text-slate-400 mb-6">Collega un repository GitHub per sincronizzare automaticamente i dati del gestionale in cloud ad ogni modifica.</p>
-                        
-                        <form id="frm-settings" class="space-y-4">
-                            ${FormBuilder.createField({id: 'st-owner', label: 'GitHub Username (Owner)', type: 'text', placeholder: 'es. sergioyakh-jpg'})}
-                            ${FormBuilder.createField({id: 'st-repo', label: 'Nome Repository', type: 'text', placeholder: 'es. mesa-fiber-db'})}
-                            ${FormBuilder.createField({id: 'st-token', label: 'Personal Access Token (PAT)', type: 'password', placeholder: 'ghp_xxxxxxxxxxxx'})}
-                            
-                            <div class="pt-4 border-t border-slate-700 flex gap-3">
-                                <button type="submit" class="bg-blue-600 hover:bg-blue-500 px-6 py-2.5 rounded font-bold transition">Salva e Testa Cloud</button>
-                                <button type="button" onclick="Views.exportLocalBackup()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2.5 rounded font-bold transition">Scarica Backup Locale (JSON)</button>
-                            </div>
-                        </form>
-                    </div>
-                `;
-
-                // Popola i campi
-                document.getElementById('st-owner').value = s.ghOwner || '';
-                document.getElementById('st-repo').value = s.ghRepo || '';
-                document.getElementById('st-token').value = s.ghToken || '';
-
-                document.getElementById('frm-settings').onsubmit = async (e) => {
-                    e.preventDefault();
-                    const db = await Database.getAll();
-                    if(!db.settings) db.settings = {};
-                    db.settings.ghOwner = document.getElementById('st-owner').value.trim();
-                    db.settings.ghRepo = document.getElementById('st-repo').value.trim();
-                    db.settings.ghToken = document.getElementById('st-token').value.trim();
-                    
-                    await Database.saveAll(db);
-                    Toast.show("Impostazioni salvate! Avvio sincronizzazione...", "success");
-                };
-            },
-
-            exportLocalBackup() {
-                const data = localStorage.getItem(Database.storageKey);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `MESA_Backup_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            },
-
-            // Oggetto contenitore per i Modali
-            modals: {
-                newTask(users) {
-                    const techOptions = users.filter(u => u.role === 'Tecnico' || u.role === 'Manager').map(u => ({value: u.id, text: u.name}));
-                    
-                    const modalHtml = `
-                        <div id="modal-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                            <div class="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-lg shadow-2xl module-enter">
-                                <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-                                    <h3 class="font-bold text-lg">Nuova Pratica</h3>
-                                    <button onclick="document.getElementById('modal-overlay').remove()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                                <form id="frm-new-task" class="p-6">
-                                    ${FormBuilder.createField({id: 'nt-type', label: 'Tipo Intervento', type: 'select', options: [{value: 'Delivery', text:'Delivery (Attivazione)'}, {value: 'Assurance', text:'Assurance (Guasto)'}]})}
-                                    ${FormBuilder.createField({id: 'nt-addr', label: 'Indirizzo Completo', type: 'text', placeholder: 'Via Roma 1, Modena'})}
-                                    <div class="grid grid-cols-2 gap-4">
-                                        ${FormBuilder.createField({id: 'nt-prio', label: 'Priorità', type: 'select', options: [{value: 'Bassa', text:'Bassa'}, {value: 'Media', text:'Media'}, {value: 'Alta', text:'Alta'}]})}
-                                        ${FormBuilder.createField({id: 'nt-user', label: 'Assegna a', type: 'select', options: techOptions})}
-                                    </div>
-                                    ${FormBuilder.createField({id: 'nt-desc', label: 'Descrizione / Dettagli', type: 'textarea', placeholder: 'Dettagli intervento...'})}
-                                    
-                                    <button type="submit" class="w-full bg-blue-600 py-3 rounded font-bold mt-2">Crea e Assegna Pratica</button>
-                                </form>
-                            </div>
-                        </div>
-                    `;
-                    document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-                    document.getElementById('frm-new-task').onsubmit = async (e) => {
-                        e.preventDefault();
-                        const db = await Database.getAll();
-                        const newTask = {
-                            id: `TSK-${Math.floor(Math.random() * 9000) + 1000}`,
-                            type: document.getElementById('nt-type').value,
-                            address: document.getElementById('nt-addr').value,
-                            priority: document.getElementById('nt-prio').value,
-                            assignedTo: document.getElementById('nt-user').value,
-                            description: document.getElementById('nt-desc').value,
-                            status: 'Aperto'
-                        };
-                        db.tasks.unshift(newTask);
-                        await Database.saveAll(db);
-                        document.getElementById('modal-overlay').remove();
-                        Toast.show("Pratica creata con successo!");
-                        App.navigate('tasks');
-                    };
+                if (putRes.ok) {
+                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
+                    sub.innerText = 'Database Sincronizzato';
                 }
+            } catch (err) {
+                console.error(err);
+                ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
+                sub.innerText = 'Errore Salvataggio';
             }
-        };
+        }
 
-        // Avvio Applicazione
-        window.onload = () => {
-            App.start();
-        };
+        // ----------------------------------------------------
+        // LOGIN & NAVIGAZIONE
+        // ----------------------------------------------------
+        function checkSession() {
+            const u = localStorage.getItem('mesa_session_user');
+            if (u) {
+                currentUser = JSON.parse(u);
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-wrapper').classList.remove('hidden');
+                updateUserHeaderUI();
+                navigateTo('home');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+            const found = users.find(x => x.username === u && x.pass === p);
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('mesa_session_user', JSON.stringify(currentUser));
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-wrapper').classList.remove('hidden');
+                updateUserHeaderUI();
+                navigateTo('home');
+            } else {
+                document.getElementById('login-error').innerText = 'Credenziali errate.';
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('mesa_session_user');
+            document.getElementById('app-wrapper').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function updateUserHeaderUI() {
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-display-role').innerText = currentUser.role;
+            document.getElementById('dropdown-username').innerText = `${currentUser.username} (${currentUser.role})`;
+            document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
+            const btn = document.getElementById('menu-settings-btn');
+            if (currentUser.role === 'Amministratore') btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        }
+
+        function toggleProfileDropdown() { document.getElementById('profile-dropdown').classList.toggle('hidden'); }
+        function navigateToHome() { navigateTo('home'); }
+
+        function navigateTo(viewName) {
+            if (viewName === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato.'); return; }
+            ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            if (viewName === 'home') renderHomeModules();
+            if (viewName === 'guasti') {
+                setTimeout(() => {
+                    if (!map) {
+                        map = L.map('map').setView([44.6471, 10.9252], 13);
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+                        markersLayer = L.layerGroup().addTo(map);
+                    } else map.invalidateSize();
+                    renderApp(); // Rende i guasti
+                }, 150);
+            }
+            if (viewName === 'magazzino') renderStock();
+            if (viewName === 'flotta') renderVehicles();
+            if (viewName === 'chat') renderChatMessages();
+            if (viewName === 'profile') {
+                document.getElementById('profile-name-title').innerText = currentUser.name;
+                document.getElementById('profile-role-title').innerText = currentUser.role;
+                document.getElementById('profile-initials').innerText = currentUser.name.charAt(0);
+            }
+            if (viewName === 'settings') {
+                document.getElementById('gh-owner').value = ghConfig.owner || '';
+                document.getElementById('gh-repo').value = ghConfig.repo || '';
+                document.getElementById('gh-token').value = ghConfig.token || '';
+                renderUsersTable();
+            }
+        }
+
+        function renderHomeModules() {
+            const grid = document.getElementById('home-modules-grid');
+            grid.innerHTML = '';
+            appModules.forEach(m => {
+                grid.innerHTML += `
+                    <div onclick="navigateToModule('${m.id}')" class="group bg-slate-950/60 border border-slate-800 hover:border-${m.color}-500/50 rounded-2xl p-5 cursor-pointer shadow-lg">
+                        <div class="w-10 h-10 rounded-2xl bg-${m.color}-500/10 text-${m.color}-400 flex items-center justify-center text-lg border border-${m.color}-500/20 group-hover:scale-110 transition-transform mb-3">
+                            <i class="fa-solid ${m.icon}"></i>
+                        </div>
+                        <h4 class="font-bold text-white group-hover:text-${m.color}-400">${m.name}</h4>
+                        <p class="text-xs text-slate-400 mt-1">${m.desc}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function navigateToModule(id) {
+            if (['magazzino', 'flotta', 'chat'].includes(id)) {
+                navigateTo(id);
+            } else {
+                currentActiveModule = id;
+                document.getElementById('current-module-name').innerText = id;
+                navigateTo('guasti');
+            }
+        }
+
+        // ----------------------------------------------------
+        // MODULO GUASTI & DELIVERY
+        // ----------------------------------------------------
+        function renderApp() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const fs = document.getElementById('filter-status').value;
+            const modF = faults.filter(f => f.module === currentActiveModule);
+
+            document.getElementById('kpi-total').innerText = modF.length;
+            document.getElementById('kpi-in-progress').innerText = modF.filter(x => x.status === 'In Lavorazione').length;
+            document.getElementById('kpi-resolved').innerText = modF.filter(x => x.status === 'Risolto').length;
+            document.getElementById('kpi-critical').innerText = modF.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
+
+            const filtered = modF.filter(f => (f.address.toLowerCase().includes(q) || f.pfp.toLowerCase().includes(q)) && (fs === 'ALL' || f.status === fs));
+            const tbody = document.getElementById('faults-table-body');
+            tbody.innerHTML = '';
+
+            filtered.forEach(f => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-900/60">
+                        <td class="py-3 px-3.5"><div class="font-bold text-white">${f.id}</div><div class="text-[10px] text-sky-400 font-mono">${f.pfp}</div></td>
+                        <td class="py-3 px-3.5"><div class="text-slate-200">${f.address}</div><div class="text-[10px] text-slate-500 truncate max-w-[150px]">${f.desc}</div></td>
+                        <td class="py-3 px-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/10 text-sky-400">${f.priority}</span></td>
+                        <td class="py-3 px-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400">${f.status}</span></td>
+                        <td class="py-3 px-3.5 text-right"><button onclick="openDetailModal('${f.id}')" class="w-7 h-7 rounded bg-slate-800 hover:bg-sky-600 text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function handleCreateFault(e) {
+            e.preventDefault();
+            faults.unshift({
+                id: `PRT-0${Math.floor(100 + Math.random()*900)}`,
+                module: currentActiveModule,
+                address: document.getElementById('nf-address').value,
+                pfp: document.getElementById('nf-pfp').value,
+                priority: document.getElementById('nf-priority').value,
+                status: 'Aperto', lat: 44.6471, lng: 10.9252,
+                desc: document.getElementById('nf-desc').value
+            });
+            await pushToCloud();
+            closeNewFaultModal();
+            renderApp();
+        }
+
+        function openDetailModal(id) {
+            currentEditingFault = faults.find(x => x.id === id);
+            document.getElementById('det-title').innerText = `Pratica ${id}`;
+            document.getElementById('det-content').innerHTML = `
+                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs">
+                    <div><b>PFP:</b> ${currentEditingFault.pfp}</div>
+                    <div><b>Indirizzo:</b> ${currentEditingFault.address}</div>
+                    <div><b>Stato:</b> <span class="text-emerald-400 font-bold">${currentEditingFault.status}</span></div>
+                    <div class="mt-1"><b>Descrizione:</b> ${currentEditingFault.desc}</div>
+                </div>
+            `;
+            document.getElementById('modal-detail').classList.remove('hidden'); document.getElementById('modal-detail').classList.add('flex');
+        }
+
+        function shareViaWhatsApp() {
+            if(!currentEditingFault) return;
+            const f = currentEditingFault;
+            window.open(`https://api.whatsapp.com/send?text=*MESA Fiber - ${f.id}*%0AModulo: ${f.module}%0AIndirizzo: ${f.address}%0AInfo: ${f.desc}`, '_blank');
+        }
+        function shareViaEmail() {
+            if(!currentEditingFault) return;
+            const f = currentEditingFault;
+            window.open(`mailto:?subject=Pratica ${f.id}&body=Indirizzo: ${f.address}%0AInfo: ${f.desc}`);
+        }
+
+        function openNewFaultModal() { document.getElementById('modal-new-fault').classList.remove('hidden'); document.getElementById('modal-new-fault').classList.add('flex'); }
+        function closeNewFaultModal() { document.getElementById('modal-new-fault').classList.add('hidden'); document.getElementById('modal-new-fault').classList.remove('flex'); }
+        function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); document.getElementById('modal-detail').classList.remove('flex'); }
+
+        // ----------------------------------------------------
+        // ALTRI MODULI
+        // ----------------------------------------------------
+        function renderStock() {
+            const grid = document.getElementById('stock-grid');
+            grid.innerHTML = stock.map(s => `<div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4"><div class="flex justify-between font-bold text-white text-sm"><span>${s.name}</span><span class="text-amber-400">${s.qty} ${s.unit}</span></div></div>`).join('');
+        }
+        function renderVehicles() {
+            const grid = document.getElementById('vehicles-grid');
+            grid.innerHTML = vehicles.map(v => `<div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4"><div class="flex justify-between font-bold text-white text-sm"><span>${v.model}</span><span class="text-sky-400 font-mono">${v.plate}</span></div><div class="text-xs text-slate-400 mt-1">Autista: ${v.driver}</div></div>`).join('');
+        }
+        function renderChatMessages() {
+            const c = document.getElementById('chat-messages-container');
+            c.innerHTML = chatMessages.map(m => `<div class="flex flex-col ${m.sender === currentUser.name ? 'items-end' : 'items-start'}"><div class="text-[10px] text-slate-400">${m.sender}</div><div class="px-3 py-2 rounded-xl text-xs ${m.sender === currentUser.name ? 'bg-sky-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'}">${m.text}</div></div>`).join('');
+            c.scrollTop = c.scrollHeight;
+        }
+        async function handleSendChatMessage(e) {
+            e.preventDefault();
+            const i = document.getElementById('chat-input-msg');
+            chatMessages.push({ sender: currentUser.name, text: i.value });
+            i.value = '';
+            await pushToCloud();
+            renderChatMessages();
+        }
+
+        // ----------------------------------------------------
+        // ADMIN & CLOUD CONFIG
+        // ----------------------------------------------------
+        async function saveGitHubConfig() {
+            ghConfig.owner = document.getElementById('gh-owner').value.trim();
+            ghConfig.repo = document.getElementById('gh-repo').value.trim();
+            ghConfig.token = document.getElementById('gh-token').value.trim();
+            await pushToCloud(); // Forza subito il salvataggio o la creazione
+            syncCloudDatabase(); // Mostra il risultato a schermo
+            alert('Configurazione GitHub applicata.');
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = users.map(u => `
+                <tr class="hover:bg-slate-900/60">
+                    <td class="py-2.5 px-3 font-bold text-white">${u.name}</td>
+                    <td class="py-2.5 px-3"><code class="text-sky-400">${u.username}</code> (${u.role})</td>
+                    <td class="py-2.5 px-3 text-right">${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="text-rose-400">Elimina</button>` : ''}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function handleCreateUser(e) {
+            e.preventDefault();
+            users.push({
+                name: document.getElementById('nu-name').value,
+                username: document.getElementById('nu-username').value,
+                pass: document.getElementById('nu-pass').value,
+                role: document.getElementById('nu-role').value
+            });
+            await pushToCloud();
+            closeNewUserModal();
+            renderUsersTable();
+        }
+        async function deleteUser(u) {
+            users = users.filter(x => x.username !== u);
+            await pushToCloud();
+            renderUsersTable();
+        }
+
+        function openNewUserModal() { document.getElementById('modal-new-user').classList.remove('hidden'); document.getElementById('modal-new-user').classList.add('flex'); }
+        function closeNewUserModal() { document.getElementById('modal-new-user').classList.add('hidden'); document.getElementById('modal-new-user').classList.remove('flex'); }
     </script>
 </body>
 </html>
