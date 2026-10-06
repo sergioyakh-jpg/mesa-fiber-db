@@ -13,7 +13,16 @@
       "role": "Amministratore"
     }
   ],
-  "faults": [],
+  "faults": [
+    {
+      "id": "PRT-0152",
+      "module": "Delivery",
+      "address": "Via Riva Del Garda 52",
+      "pfp": "dfsd",
+      "desc": "dsfsdf",
+      "status": "Aperto"
+    }
+  ],
   "stock": [],
   "vehicles": [],
   "chatMessages": []
