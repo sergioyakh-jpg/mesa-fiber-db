@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MESA Fiber Solutions — Cloud Centralizzato</title>
+    <title>MESA Fiber Solutions — Cloud Unico</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -28,7 +28,7 @@
                     <i class="fa-solid fa-network-wired"></i>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-white">MESA Fiber</h1>
-                <p class="text-sm text-slate-400 mt-1">Database Cloud Unico</p>
+                <p class="text-sm text-slate-400 mt-1">Suite Cloud Condivisa</p>
             </div>
             <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
@@ -45,7 +45,7 @@
                 </div>
                 <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 rounded-lg p-2.5 text-center font-bold"></div>
                 <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2">
-                    Accedi al Portale <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Accedi <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 </button>
             </form>
         </div>
@@ -63,13 +63,13 @@
                     <h1 class="font-bold text-white">MESA Fiber</h1>
                     <p class="text-[10px] text-slate-400 flex items-center gap-1.5">
                         <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                        <span id="header-subtitle">Pronto</span>
+                        <span id="header-subtitle">Connessione Cloud...</span>
                     </p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="forceCloudRefresh()" class="bg-slate-900 border border-slate-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-rotate mr-1"></i> Sincronizza</button>
+                <button onclick="forceCloudRefresh()" class="bg-slate-900 border border-slate-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-rotate mr-1"></i> Aggiorna</button>
                 <button onclick="navigateTo('chat')" class="bg-slate-900 border border-slate-800 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-comments"></i> Chat</button>
                 <div class="relative">
                     <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1.5 sm:px-3 sm:py-1.5">
@@ -81,7 +81,7 @@
                     </button>
                     <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
                         <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-user-gear mr-2 text-sky-400"></i> Profilo</button>
-                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-users-gear mr-2"></i> Gestione Personale</button>
+                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-gear mr-2"></i> Gestione Personale</button>
                         <div class="h-px bg-slate-800 my-1"></div>
                         <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-slate-800"><i class="fa-solid fa-power-off mr-2"></i> Disconnetti</button>
                     </div>
@@ -92,9 +92,9 @@
         <!-- VIEW: HOME -->
         <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Database Unico Condiviso</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Database Cloud Condiviso (npoint.io)</span>
                 <h2 class="text-2xl font-bold text-white">MESA Fiber Solutions</h2>
-                <p class="text-sm text-slate-400">Tutti i dispositivi leggono e scrivono sullo stesso database cloud in tempo reale.</p>
+                <p class="text-sm text-slate-400">Gestione operativa centralizzata per attivazioni, guasti e logistica.</p>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="home-modules-grid"></div>
         </div>
@@ -160,7 +160,7 @@
             </div>
         </main>
 
-        <!-- VIEW: IMPOSTAZIONI ADMIN (SOLO GESTIONE UTENTI) -->
+        <!-- VIEW: IMPOSTAZIONI ADMIN -->
         <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
@@ -203,7 +203,7 @@
                 <input type="text" id="nf-address" required placeholder="Indirizzo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
                 <input type="text" id="nf-pfp" required placeholder="PFP" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
                 <textarea id="nf-desc" required placeholder="Descrizione..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></textarea>
-                <button type="submit" class="w-full py-2.5 bg-sky-600 text-white rounded-xl font-bold shadow-lg">Salva e Invia al Cloud</button>
+                <button type="submit" class="w-full py-2.5 bg-sky-600 text-white rounded-xl font-bold shadow-lg">Salva e Sincronizza</button>
             </form>
         </div>
     </div>
@@ -224,12 +224,8 @@
     </div>
 
     <script>
-        // CONFIGURAZIONE CLOUD FISSA (TOKEN PRECONFIGURATO)
-        const ghConfig = {
-            owner: "sergioyakh-jpg",
-            repo: "mesa-fiber-db",
-            token: "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"
-        };
+        // ID NPOINT.IO INTEGRATO
+        const npointId = "a75e87e73a684d0246f9";
 
         let appModules = [
             { id: 'Delivery', name: 'Delivery', icon: 'fa-house-signal', color: 'emerald', desc: 'Attivazioni' },
@@ -247,16 +243,13 @@
             faults: [{ id: 'DEL-001', module: 'Delivery', address: 'Via Roma 1, Modena', pfp: 'PFP-01', status: 'Aperto', desc: 'Test' }],
             stock: [{ name: 'Bretella SC/APC', qty: 120, unit: 'Pz' }],
             vehicles: [{ model: 'Peugeot Partner', plate: 'GH456XY', driver: 'Marco Rossi' }],
-            chatMessages: [{ sender: 'Admin', text: 'Benvenuti nel database cloud unico.' }]
+            chatMessages: [{ sender: 'Admin', text: 'Benvenuti nel database cloud npoint.io.' }]
         };
 
         let currentUser = null;
         let currentActiveModule = 'Delivery';
         let currentEditingFault = null;
         let map = null;
-
-        function encodeBase64Unicode(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1))); }
-        function decodeBase64Unicode(str) { return decodeURIComponent(Array.prototype.map.call(atob(str), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
 
         window.addEventListener('DOMContentLoaded', async () => {
             checkSession();
@@ -271,24 +264,19 @@
                 ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
                 sub.innerText = "Sincronizzazione in corso...";
 
-                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
-
+                const res = await fetch(`https://api.npoint.io/${npointId}`);
                 if (res.ok) {
-                    const fileData = await res.json();
-                    const cloudData = JSON.parse(decodeBase64Unicode(fileData.content.replace(/\s/g, '')));
-                    if(cloudData.users) db = cloudData;
+                    const cloudData = await res.json();
+                    if(cloudData && cloudData.users) db = cloudData;
                     
                     ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
                     sub.innerText = "Database Sincronizzato";
                     
                     if(currentUser && !document.getElementById('view-guasti').classList.contains('hidden')) renderApp();
-                } else {
-                    throw new Error("File non trovato o token non valido");
                 }
             } catch(e) {
                 ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                sub.innerText = "Errore connessione Cloud";
+                sub.innerText = "Errore Cloud";
             }
         }
 
@@ -299,19 +287,13 @@
             sub.innerText = "Salvataggio Cloud...";
 
             try {
-                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
-                let sha = undefined;
-                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
-                if (getRes.ok) sha = (await getRes.json()).sha;
-
-                const content = encodeBase64Unicode(JSON.stringify(db, null, 2));
-                const putRes = await fetch(url, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `MESA Cloud Sync`, content: content, sha: sha })
+                const res = await fetch(`https://api.npoint.io/${npointId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(db)
                 });
 
-                if (putRes.ok) {
+                if (res.ok) {
                     ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
                     sub.innerText = "Database Sincronizzato";
                 }
