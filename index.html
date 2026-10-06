@@ -6,59 +6,58 @@
     <title>MESA Fiber Solutions — Suite Operativa</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome per le icone -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS per la mappa -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        #map { height: 350px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        #map { height: 280px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        @media (min-width: 768px) { #map { height: 350px; } }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-4 text-2xl font-bold border border-sky-500/20">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-3 sm:mb-4 text-2xl font-bold border border-sky-500/20 shadow-lg">
                     <i class="fa-solid fa-network-wired"></i>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight text-white">MESA Fiber Solutions</h1>
-                <p class="text-sm text-slate-400 mt-1">Suite Integrata & Cloud Database</p>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">MESA Fiber Solutions</h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Suite Operativa & Gestione Pratiche</p>
             </div>
 
-            <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
+            <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Username Utente</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Username</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="login-username" required placeholder="es. admin, manager, tecnico, cliente" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
+                        <input type="text" id="login-username" required placeholder="es. admin, tecnico" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
 
-                <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 space-y-1.5">
-                    <div class="font-medium text-slate-300">Profili predefiniti:</div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-[11px] sm:text-xs text-slate-400 space-y-1">
+                    <div class="font-semibold text-slate-300">Accessi Rapidi:</div>
                     <div>• Admin: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
-                    <div>• Manager: <code class="text-indigo-400">manager</code> / <code class="text-indigo-400">manager123</code></div>
                     <div>• Tecnico: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
-                    <div>• Cliente: <code class="text-emerald-400">cliente</code> / <code class="text-emerald-400">cliente123</code></div>
                 </div>
 
-                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 text-center"></div>
+                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2.5 text-center"></div>
 
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-sky-600/20 flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-sky-600/25 flex items-center justify-center gap-2 text-sm">
                     <span>Accedi al Portale</span>
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                 </button>
@@ -68,63 +67,53 @@
 
     <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="hidden flex-1 flex flex-col">
-        <!-- HEADER -->
-        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div onclick="navigateToHome()" class="cursor-pointer flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
-                        <i class="fa-solid fa-network-wired"></i>
+        <!-- HEADER MOBILE & DESKTOP RESPONSIVE -->
+        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div onclick="navigateToHome()" class="cursor-pointer flex items-center gap-2.5">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold shrink-0">
+                        <i class="fa-solid fa-network-wired text-sm sm:text-base"></i>
                     </div>
-                    <div>
-                        <h1 class="font-bold text-base text-white tracking-wide">MESA Fiber Solutions</h1>
-                        <p class="text-xs text-slate-400 flex items-center gap-2">
+                    <div class="min-w-0">
+                        <h1 class="font-bold text-sm sm:text-base text-white tracking-wide truncate">MESA Fiber</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 flex items-center gap-1.5">
                             <span id="sync-indicator" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                            <span id="header-subtitle">Suite Operativa Cloud</span>
+                            <span class="truncate" id="header-subtitle">Suite Cloud</span>
                         </p>
                     </div>
                 </div>
-
-                <nav id="nav-breadcrumbs" class="hidden md:flex items-center gap-2 pl-6 border-l border-slate-800 text-xs">
-                    <button onclick="navigateToHome()" class="text-slate-400 hover:text-white transition-colors">Suite Home</button>
-                    <span id="nav-breadcrumb-sub" class="hidden items-center gap-2 text-slate-500">
-                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        <span id="nav-breadcrumb-title" class="text-sky-400 font-semibold">Modulo</span>
-                    </span>
-                </nav>
             </div>
 
-            <div class="flex items-center gap-3">
-                <!-- ACCESSO CHAT GLOBALE -->
-                <button onclick="navigateTo('chat')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-400 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="navigateTo('chat')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-400 hover:text-white px-2.5 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
                     <i class="fa-solid fa-comments"></i>
-                    <span class="hidden sm:inline">Chat Aziendale</span>
+                    <span class="hidden md:inline">Chat</span>
                 </button>
 
-                <!-- MENU PROFILO UTENTE -->
                 <div class="relative">
-                    <button onclick="toggleProfileDropdown()" class="flex items-center gap-3 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl px-3 py-1.5 transition-colors">
-                        <div id="header-avatar-container" class="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden">
+                    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl p-1.5 sm:px-3 sm:py-1.5 transition-colors">
+                        <div id="header-avatar-container" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">
                             <span id="user-avatar-initials">S</span>
                         </div>
                         <div class="text-left hidden sm:block">
-                            <div class="text-xs font-bold text-white" id="user-display-name">Utente</div>
+                            <div class="text-xs font-bold text-white truncate max-w-[100px]" id="user-display-name">Utente</div>
                             <div class="text-[10px] text-sky-400 uppercase tracking-wider font-semibold" id="user-display-role">Ruolo</div>
                         </div>
-                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
                     </button>
 
                     <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
                         <div class="px-4 py-2 border-b border-slate-800">
-                            <div class="text-xs text-slate-400">Connesso come</div>
-                            <div class="text-sm font-bold text-white truncate" id="dropdown-username">username</div>
+                            <div class="text-[11px] text-slate-400">Connesso come</div>
+                            <div class="text-xs font-bold text-white truncate" id="dropdown-username">username</div>
                         </div>
                         <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2.5">
                             <i class="fa-solid fa-user-gear text-sky-400"></i>
-                            <span>Profilo & Storico Chiusure</span>
+                            <span>Profilo Personale</span>
                         </button>
                         <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2.5">
                             <i class="fa-solid fa-gear text-amber-400"></i>
-                            <span>Amministrazione & Cloud DB</span>
+                            <span>Amministrazione & Moduli</span>
                         </button>
                         <div class="h-px bg-slate-800 my-1"></div>
                         <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5">
@@ -136,146 +125,76 @@
             </div>
         </header>
 
-        <!-- VIEW 1: HOME -->
-        <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-8">
-            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-3xl p-8 shadow-xl">
-                <div class="max-w-2xl space-y-3">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                        <i class="fa-solid fa-circle-check"></i> Cloud Database Sincronizzato
+        <!-- VIEW 1: HOME (MODULAR HUB) -->
+        <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div class="max-w-2xl space-y-2 sm:space-y-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        <i class="fa-solid fa-circle-check"></i> Suite Operativa Modulare Attiva
                     </span>
-                    <h2 class="text-3xl font-bold text-white tracking-tight">Benvenuto nella Suite MESA Fiber</h2>
-                    <p class="text-sm text-slate-400 leading-relaxed">
-                        Gestione completa delle attivazioni FTTH, assurance guasti, giunzioni e collaudi OTDR, magazzino, flotta e chat aziendale unificata.
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">MESA Fiber Solutions</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        Seleziona il modulo operativo desiderato per gestire attivazioni FTTH, guasti, giunzioni, inventario e logistica sul territorio di Modena e provincia.
                     </p>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Moduli Operativi Aziendali</h3>
+            <div class="space-y-3">
+                <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400">Moduli Operativi Attivi</h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- DELIVERY -->
-                    <div onclick="navigateToModule('Delivery')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-house-signal"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">Delivery (Attivazioni)</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Gestione nuove linee FTTH, permute borchia ottica e collaudi cliente.</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-emerald-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
-
-                    <!-- ASSURANCE -->
-                    <div onclick="navigateToModule('Assurance')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl border border-rose-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-rose-400 transition-colors">Assurance (Guasti)</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ticket guasti, localizzazione pozzetti, mappe e ripristino cavi multifibra.</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-rose-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
-
-                    <!-- GIUNZIONI & OTDR -->
-                    <div onclick="navigateToModule('Giunzioni')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl border border-sky-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-toolbox"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">Giunzioni & OTDR</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Registro fusioni Sumitomo/Qiirun e certificati di misura Viavi SmartOTDR.</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-sky-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
-
-                    <!-- MAGAZZINO -->
-                    <div onclick="navigateTo('magazzino')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl border border-amber-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">Magazzino Materiali</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Controllo scorte passive, bretelle SC/APC, muffole e apparecchiature.</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-amber-400"><span>Apri Magazzino</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
-
-                    <!-- FLOTTA -->
-                    <div onclick="navigateTo('flotta')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-truck"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">Flotta & Mezzi</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Assegnazione furgoni e veicoli aziendali (Opel Corsa, Peugeot Partner).</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-indigo-400"><span>Apri Flotta</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
-
-                    <!-- CHAT -->
-                    <div onclick="navigateTo('chat')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-violet-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-400 flex items-center justify-center text-xl border border-violet-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-comments"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">Chat Aziendale</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Canale di comunicazione globale aperto a tutti i ruoli aziendali e clienti.</p>
-                        </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-violet-400"><span>Apri Chat</span> <i class="fa-solid fa-arrow-right"></i></div>
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="home-modules-grid">
+                    <!-- Generato via JS in base ai moduli attivati dall'Admin -->
                 </div>
             </div>
         </div>
 
-        <!-- VIEW 2: MODULO INTERVENTI -->
-        <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+        <!-- VIEW 2: MODULO INTERVENTI / PRATICHE -->
+        <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5 sm:space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home Suite</span>
+                    <span>Home</span>
                 </button>
-                <div class="text-xs text-slate-400">Modulo Attivo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg border border-sky-500/20"><i class="fa-solid fa-list-check"></i></div>
-                    <div><div class="text-2xl font-bold text-white" id="kpi-total">0</div><div class="text-xs text-slate-400 font-medium">Totale Interventi</div></div>
+            <!-- KPI STATS CARDS RESPONSIVE -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-base sm:text-lg border border-sky-500/20 shrink-0"><i class="fa-solid fa-list-check"></i></div>
+                    <div><div class="text-xl sm:text-2xl font-bold text-white" id="kpi-total">0</div><div class="text-[11px] sm:text-xs text-slate-400 font-medium">Totale</div></div>
                 </div>
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20"><i class="fa-solid fa-spinner"></i></div>
-                    <div><div class="text-2xl font-bold text-amber-400" id="kpi-in-progress">0</div><div class="text-xs text-slate-400 font-medium">In Lavorazione</div></div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-base sm:text-lg border border-amber-500/20 shrink-0"><i class="fa-solid fa-spinner"></i></div>
+                    <div><div class="text-xl sm:text-2xl font-bold text-amber-400" id="kpi-in-progress">0</div><div class="text-[11px] sm:text-xs text-slate-400 font-medium">In Lavorazione</div></div>
                 </div>
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20"><i class="fa-solid fa-circle-check"></i></div>
-                    <div><div class="text-2xl font-bold text-emerald-400" id="kpi-resolved">0</div><div class="text-xs text-slate-400 font-medium">Risolti / Chiusi</div></div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base sm:text-lg border border-emerald-500/20 shrink-0"><i class="fa-solid fa-circle-check"></i></div>
+                    <div><div class="text-xl sm:text-2xl font-bold text-emerald-400" id="kpi-resolved">0</div><div class="text-[11px] sm:text-xs text-slate-400 font-medium">Risolti</div></div>
                 </div>
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg border border-rose-500/20"><i class="fa-solid fa-fire"></i></div>
-                    <div><div class="text-2xl font-bold text-rose-400" id="kpi-critical">0</div><div class="text-xs text-slate-400 font-medium">Alta Priorità</div></div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-base sm:text-lg border border-rose-500/20 shrink-0"><i class="fa-solid fa-fire"></i></div>
+                    <div><div class="text-xl sm:text-2xl font-bold text-rose-400" id="kpi-critical">0</div><div class="text-[11px] sm:text-xs text-slate-400 font-medium">Urgenti</div></div>
                 </div>
             </div>
 
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-sm font-semibold text-white">
-                        <i class="fa-solid fa-map-location-dot text-sky-400"></i>
-                        <span>Mappa Geografica Interventi</span>
-                    </div>
-                    <div class="text-xs text-slate-400">Modena & Provincia</div>
+            <!-- MAPPA -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4 space-y-2.5">
+                <div class="flex items-center justify-between text-xs font-semibold text-white">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-sky-400"></i><span>Mappa Interventi Territoriali</span></div>
+                    <span class="text-slate-400">Modena</span>
                 </div>
                 <div id="map"></div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
-                <div class="flex flex-wrap items-center gap-3 flex-1">
-                    <div class="relative flex-1 min-w-[220px]">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-search"></i></span>
-                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo, PFP, codice..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+            <!-- CONTROLS & FILTERS -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 sm:p-4">
+                <div class="flex flex-wrap items-center gap-2.5 flex-1">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-search text-xs"></i></span>
+                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo, PFP, codice..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
                     </div>
-                    <select id="filter-status" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
+                    <select id="filter-status" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs sm:text-sm text-slate-300 focus:outline-none focus:border-sky-500">
                         <option value="ALL">Tutti gli stati</option>
                         <option value="Aperto">Aperto</option>
                         <option value="In Lavorazione">In Lavorazione</option>
@@ -283,32 +202,33 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <button onclick="exportCSV()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
+                    <button onclick="exportCSV()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-file-arrow-down text-sky-400"></i>
-                        <span>Esporta CSV</span>
+                        <span>CSV</span>
                     </button>
-                    <button id="btn-new-fault" onclick="openNewFaultModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/25">
+                    <button onclick="openNewFaultModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/25">
                         <i class="fa-solid fa-plus"></i>
-                        <span>Nuovo Intervento</span>
+                        <span>Nuova Pratica</span>
                     </button>
                 </div>
             </div>
 
+            <!-- TABELLA / CARD LIST PER MOBILE -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-slate-800 bg-slate-900/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                                <th class="py-3.5 px-4">Codice / Modulo</th>
-                                <th class="py-3.5 px-4">Indirizzo & Dettaglio</th>
-                                <th class="py-3.5 px-4">Priorità</th>
-                                <th class="py-3.5 px-4">Stato</th>
-                                <th class="py-3.5 px-4">Assegnatario</th>
-                                <th class="py-3.5 px-4 text-right">Azioni</th>
+                            <tr class="border-b border-slate-800 bg-slate-900/50 text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-4">Codice / PFP</th>
+                                <th class="py-3 px-4">Indirizzo & Descrizione</th>
+                                <th class="py-3 px-4">Priorità</th>
+                                <th class="py-3 px-4">Stato</th>
+                                <th class="py-3 px-4">Assegnato</th>
+                                <th class="py-3 px-4 text-right">Azioni Rapide</th>
                             </tr>
                         </thead>
-                        <tbody id="faults-table-body" class="divide-y divide-slate-800/60 text-sm">
+                        <tbody id="faults-table-body" class="divide-y divide-slate-800/60 text-xs sm:text-sm">
                             <!-- Popolato via JS -->
                         </tbody>
                     </table>
@@ -317,394 +237,225 @@
         </main>
 
         <!-- VIEW 3: MAGAZZINO -->
-        <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+        <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home Suite</span>
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
                 </button>
-                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Magazzino Materiali</span></div>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Magazzino</span></div>
             </div>
-
             <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
                 <div>
-                    <h3 class="font-bold text-white text-base">Scorte e Componenti Passivi FTTH</h3>
-                    <p class="text-xs text-slate-400">Gestione inventario bobine cavo, bretelle, splitter e muffole.</p>
+                    <h3 class="font-bold text-white text-sm sm:text-base">Scorte Componenti Passivi FTTH</h3>
+                    <p class="text-xs text-slate-400">Gestione bobine, bretelle, splitter e muffole.</p>
                 </div>
-                <button onclick="openNewStockModal()" id="btn-add-stock" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Nuovo Articolo</span>
+                <button onclick="openNewStockModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i><span>Articolo</span>
                 </button>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stock-grid">
-                <!-- Popolato via JS -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid"></div>
         </main>
 
         <!-- VIEW 4: FLOTTA -->
-        <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+        <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home Suite</span>
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
                 </button>
-                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Parco Mezzi & Flotta</span></div>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Flotta</span></div>
             </div>
-
             <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
                 <div>
-                    <h3 class="font-bold text-white text-base">Assegnazione Veicoli ai Tecnici</h3>
-                    <p class="text-xs text-slate-400">Associa furgoni e automobili aziendali al personale operativo sul campo.</p>
+                    <h3 class="font-bold text-white text-sm sm:text-base">Parco Veicoli & Furgoni</h3>
+                    <p class="text-xs text-slate-400">Assegnazione mezzi ai tecnici operativi.</p>
                 </div>
-                <button onclick="openNewVehicleModal()" id="btn-add-vehicle" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Nuovo Mezzo</span>
+                <button onclick="openNewVehicleModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i><span>Mezzo</span>
                 </button>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="vehicles-grid">
-                <!-- Popolato via JS -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vehicles-grid"></div>
         </main>
 
-        <!-- VIEW 5: CHAT GLOBALE -->
-        <main id="view-chat" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col h-[calc(100vh-80px)] space-y-4">
-            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
-                <button onclick="navigateToHome()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home</span>
+        <!-- VIEW 5: CHAT -->
+        <main id="view-chat" class="hidden flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col h-[calc(100vh-70px)] space-y-3">
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5">
+                <button onclick="navigateToHome()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
                 </button>
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-sm font-bold text-white">Chat Aziendale Globale (Tutti gli utenti)</span>
-                </div>
+                <div class="flex items-center gap-2 text-xs font-bold text-white"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>Chat Aziendale Globale</div>
             </div>
-
-            <div id="chat-messages-container" class="flex-1 bg-slate-950/60 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-4 shadow-xl">
-                <!-- Messaggi chat -->
-            </div>
-
-            <form onsubmit="handleSendChatMessage(event)" class="flex items-center gap-3 bg-slate-950/80 border border-slate-800 rounded-2xl p-3 shadow-xl">
-                <input type="text" id="chat-input-msg" required placeholder="Scrivi un messaggio al team o ai clienti..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
-                <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/20">
-                    <span>Invia</span>
-                    <i class="fa-solid fa-paper-plane text-xs"></i>
-                </button>
+            <div id="chat-messages-container" class="flex-1 bg-slate-950/60 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-3 shadow-xl text-xs sm:text-sm"></div>
+            <form onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5 shadow-xl">
+                <input type="text" id="chat-input-msg" required placeholder="Scrivi un messaggio..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-lg">Invia</button>
             </form>
         </main>
 
-        <!-- VIEW 6: PROFILO & STORICO CHIUSURE -->
-        <main id="view-profile" class="hidden flex-1 max-w-4xl w-full mx-auto p-6 space-y-6">
+        <!-- VIEW 6: PROFILO -->
+        <main id="view-profile" class="hidden flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <div class="flex items-center justify-between">
-                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home</span>
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
                 </button>
-                <div class="text-xs text-slate-400">Gestione Profilo Personale</div>
+                <div class="text-xs text-slate-400">Profilo Personale</div>
             </div>
-
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
-                <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-800">
-                    <div id="profile-avatar-preview" class="w-24 h-24 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-bold text-3xl overflow-hidden border-2 border-sky-500/30 shadow-lg">
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xl">
+                <div class="flex flex-col sm:flex-row items-center gap-4 pb-5 border-b border-slate-800 text-center sm:text-left">
+                    <div id="profile-avatar-preview" class="w-20 h-20 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-bold text-2xl overflow-hidden border border-sky-500/30">
                         <span id="profile-initials">S</span>
                     </div>
-                    <div class="space-y-2 flex-1 text-center sm:text-left">
-                        <h3 class="text-xl font-bold text-white" id="profile-name-title">Nome Utente</h3>
-                        <div class="text-xs text-sky-400 font-semibold uppercase tracking-wider" id="profile-role-title">Ruolo</div>
-                        <div>
-                            <label class="text-[11px] font-semibold text-slate-400 uppercase">Foto Profilo (URL o File)</label>
-                            <input type="text" id="profile-photo-input" placeholder="Incolla link immagine..." onchange="updateProfilePhotoUrl(this.value)" class="w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-sky-500">
-                        </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white" id="profile-name-title">Nome Utente</h3>
+                        <div class="text-xs text-sky-400 font-semibold uppercase" id="profile-role-title">Ruolo</div>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Mansione / Qualifica Specifica</label>
-                        <input type="text" id="profile-mansione" placeholder="es. Senior Telecom Technician & Splicer" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Mansione / Qualifica</label>
+                        <input type="text" id="profile-mansione" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Email Aziendale</label>
-                        <input type="email" id="profile-email" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <input type="email" id="profile-email" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
-
-                <div class="flex justify-end pt-4 border-t border-slate-800">
-                    <button onclick="saveProfileChanges()" class="px-6 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva Modifiche Profilo</button>
-                </div>
-            </div>
-
-            <!-- STORICO INTERVENTI CHIUSI -->
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
-                    <span>Storico Interventi Chiusi / Risolti</span>
-                </h3>
-                <div class="space-y-3" id="profile-closed-faults-list">
-                    <!-- Popolato via JS -->
+                <div class="flex justify-end pt-3 border-t border-slate-800">
+                    <button onclick="saveProfileChanges()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-sky-600 text-white text-xs sm:text-sm font-semibold shadow-lg">Salva Profilo</button>
                 </div>
             </div>
         </main>
 
-        <!-- VIEW 7: AMMINISTRAZIONE & IMPOSTAZIONI -->
-        <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-6 space-y-6">
+        <!-- VIEW 7: AMMINISTRAZIONE & GESTIONE MODULI / CODICI / DB -->
+        <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
-                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Torna alla Home Suite</span>
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i><span>Home</span>
                 </button>
-                <div class="text-xs text-slate-400">Amministrazione Sistema</div>
+                <div class="text-xs text-slate-400">Pannello Admin Avanzato</div>
             </div>
 
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 font-bold">
-                            <i class="fa-solid fa-users text-lg"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white text-base">Gestione Utenti Aziendali & Ruoli</h3>
-                            <p class="text-xs text-slate-400">Crea e gestisci credenziali per Amministratore, Manager, Tecnico e Cliente.</p>
-                        </div>
+            <!-- GESTIONE MODULI ATTIVI NELLA SUITE -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+                <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-sky-400"></i><span>Abilitazione Moduli Suite</span>
+                </h3>
+                <p class="text-xs text-slate-400">Seleziona quali moduli mostrare nella schermata principale dell'applicazione.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="admin-modules-toggles">
+                    <!-- Checkbox moduli dinamici -->
+                </div>
+            </div>
+
+            <!-- GESTIONE UTENTI & CODICI ACCESSO -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear text-amber-400"></i><span>Utenti & Codici di Accesso</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Crea e gestisci credenziali e password per il personale.</p>
                     </div>
-                    <button onclick="openNewUserModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Aggiungi Utente</span>
+                    <button onclick="openNewUserModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i><span>Utente</span>
                     </button>
                 </div>
-
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
                         <thead>
-                            <tr class="border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            <tr class="border-b border-slate-800 text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                                 <th class="py-3 px-3">Nome & Mansione</th>
                                 <th class="py-3 px-3">Username / Ruolo</th>
-                                <th class="py-3 px-3">Contatti</th>
                                 <th class="py-3 px-3 text-right">Azioni</th>
                             </tr>
                         </thead>
-                        <tbody id="users-table-body" class="divide-y divide-slate-800/60 text-xs">
-                            <!-- Popolato via JS -->
-                        </tbody>
+                        <tbody id="users-table-body" class="divide-y divide-slate-800/60"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- GITHUB DATABASE CONFIG -->
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
-                <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
-                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
-                        <i class="fa-brands fa-github text-lg"></i>
+            <!-- CONFIGURAZIONE DATABASE -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+                <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                    <i class="fa-brands fa-github text-sky-400"></i><span>Configurazione GitHub Cloud DB</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold uppercase text-[10px]">Owner Repository</label>
+                        <input type="text" id="set-gh-owner" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sky-400 font-mono">
                     </div>
                     <div>
-                        <h3 class="font-bold text-white text-base">Database Cloud GitHub</h3>
-                        <p class="text-xs text-slate-400">Connessione attiva alla repository remota.</p>
+                        <label class="block text-slate-400 mb-1 font-semibold uppercase text-[10px]">Nome Repository</label>
+                        <input type="text" id="set-gh-repo" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sky-400 font-mono">
                     </div>
                 </div>
-
-                <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Username GitHub</label>
-                            <input type="text" id="set-gh-owner" readonly class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-sky-400 font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Repository</label>
-                            <input type="text" id="set-gh-repo" readonly class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-sky-400 font-mono">
-                        </div>
-                    </div>
-                    <div id="settings-status-box" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
-                        Stato Database: <span id="settings-status-label" class="font-bold text-emerald-400">Connesso e Sincronizzato (Cloud Attivo)</span>
-                    </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <button onclick="testCloudConnection()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold shadow-lg">Testa Connessione</button>
+                    <button onclick="exportLocalDatabase()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold">Scarica Backup JSON</button>
+                </div>
+                <div id="settings-status-box" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+                    Stato: <span id="settings-status-label" class="font-bold text-emerald-400">Connesso</span>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL: NUOVO INTERVENTO -->
-    <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl my-8">
+    <!-- MODALE: DETTAGLIO PRATICA CON WHATSAPP E MAIL -->
+    <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl my-8">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2.5 font-bold text-white text-base">
-                    <i class="fa-solid fa-triangle-exclamation text-sky-400"></i>
-                    <span id="modal-fault-title">Nuovo Intervento</span>
+                <div class="flex items-center gap-2 font-bold text-white text-sm sm:text-base">
+                    <i class="fa-solid fa-circle-info text-sky-400"></i>
+                    <span id="det-title">Dettaglio Pratica</span>
                 </div>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="det-content" class="space-y-4 text-xs sm:text-sm text-slate-300"></div>
+
+            <!-- PULSANTI CONDIVISIONE WHATSAPP & MAIL -->
+            <div class="pt-3 border-t border-slate-800 grid grid-cols-2 gap-3">
+                <button onclick="shareViaWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
+                    <i class="fa-brands fa-whatsapp text-base"></i><span>Invia su WhatsApp</span>
+                </button>
+                <button onclick="shareViaEmail()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-600/20 transition-all">
+                    <i class="fa-solid fa-envelope text-base"></i><span>Invia via Email</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE: NUOVA PRATICA -->
+    <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="font-bold text-white text-sm sm:text-base"><span id="modal-fault-title">Nuova Pratica</span></div>
                 <button onclick="closeNewFaultModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <form id="form-new-fault" onsubmit="handleCreateFault(event)" class="space-y-4">
+            <form id="form-new-fault" onsubmit="handleCreateFault(event)" class="space-y-3.5 text-xs sm:text-sm">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Indirizzo / Ubicazione</label>
-                    <input type="text" id="nf-address" required placeholder="es. Via Emilia Est 142, Modena" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    <label class="block font-semibold uppercase text-slate-400 mb-1 text-[11px]">Indirizzo / Ubicazione</label>
+                    <input type="text" id="nf-address" required placeholder="es. Via Emilia Est 142, Modena" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-white focus:outline-none focus:border-sky-500">
                 </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Codice PFP / Apparato</label>
-                        <input type="text" id="nf-pfp" required placeholder="es. PFP-MO-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <label class="block font-semibold uppercase text-slate-400 mb-1 text-[11px]">Codice PFP</label>
+                        <input type="text" id="nf-pfp" required placeholder="es. PFP-MO-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-white focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Priorità</label>
-                        <select id="nf-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
+                        <label class="block font-semibold uppercase text-slate-400 mb-1 text-[11px]">Priorità</label>
+                        <select id="nf-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-slate-300 focus:outline-none focus:border-sky-500">
                             <option value="Alta">Alta</option>
                             <option value="Media" selected>Media</option>
                             <option value="Bassa">Bassa</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Latitudine</label>
-                        <input type="number" step="any" id="nf-lat" required value="44.6471" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Longitudine</label>
-                        <input type="number" step="any" id="nf-lng" required value="10.9252" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
-                    </div>
-                </div>
-
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Descrizione / Note Tecniche</label>
-                    <textarea id="nf-desc" rows="3" required placeholder="es. Giunzione bretella e test OTDR..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea>
+                    <label class="block font-semibold uppercase text-slate-400 mb-1 text-[11px]">Descrizione Lavoro</label>
+                    <textarea id="nf-desc" rows="3" required placeholder="Dettagli intervento..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-sky-500"></textarea>
                 </div>
-
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeNewFaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium">Annulla</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg">Salva Intervento</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: DETTAGLIO INTERVENTO -->
-    <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2.5 font-bold text-white text-base">
-                    <i class="fa-solid fa-circle-info text-sky-400"></i>
-                    <span id="det-title">Dettaglio Intervento</span>
-                </div>
-                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div id="det-content" class="space-y-4 text-sm text-slate-300">
-                <!-- Popolato via JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: NUOVO UTENTE -->
-    <div id="modal-new-user" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2.5 font-bold text-white text-base">
-                    <i class="fa-solid fa-user-plus text-amber-400"></i>
-                    <span>Nuovo Utente Aziendale</span>
-                </div>
-                <button onclick="closeNewUserModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="form-new-user" onsubmit="handleCreateUser(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nome e Cognome</label>
-                    <input type="text" id="nu-name" required placeholder="es. Mario Rossi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Username</label>
-                        <input type="text" id="nu-username" required placeholder="m.rossi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Password</label>
-                        <input type="password" id="nu-pass" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ruolo Aziendale</label>
-                    <select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-slate-300 focus:outline-none focus:border-amber-500">
-                        <option value="Tecnico">Tecnico</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Cliente">Cliente (Sola lettura)</option>
-                        <option value="Amministratore">Amministratore</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Mansione / Qualifica</label>
-                    <input type="text" id="nu-mansione" placeholder="es. Fiber Splicer Specialist" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeNewUserModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-500">Salva Utente</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: NUOVO ARTICOLO MAGAZZINO -->
-    <div id="modal-new-stock" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2.5 font-bold text-white text-base">
-                    <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
-                    <span>Nuovo Articolo Magazzino</span>
-                </div>
-                <button onclick="closeNewStockModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="form-new-stock" onsubmit="handleCreateStock(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nome Articolo</label>
-                    <input type="text" id="ns-name" required placeholder="es. Bretella SC/APC OS2 2m" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Quantità Disponibile</label>
-                        <input type="number" id="ns-qty" required value="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Unità di Misura</label>
-                        <input type="text" id="ns-unit" required value="Pezzi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeNewStockModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-500">Salva Articolo</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: NUOVO MEZZO FLOTTA -->
-    <div id="modal-new-vehicle" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2.5 font-bold text-white text-base">
-                    <i class="fa-solid fa-truck text-indigo-400"></i>
-                    <span>Nuovo Veicolo / Furgone</span>
-                </div>
-                <button onclick="closeNewVehicleModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="form-new-vehicle" onsubmit="handleCreateVehicle(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Modello Veicolo</label>
-                    <input type="text" id="nv-model" required placeholder="es. Peugeot Partner Van" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Targa</label>
-                        <input type="text" id="nv-plate" required placeholder="GH456XY" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white uppercase focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Assegna a Tecnico</label>
-                        <select id="nv-driver" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-slate-300 focus:outline-none focus:border-indigo-500">
-                            <option value="Non assegnato">Non assegnato</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeNewVehicleModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500">Salva Mezzo</button>
+                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeNewFaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 text-white font-semibold">Salva Pratica</button>
                 </div>
             </form>
         </div>
@@ -712,143 +463,77 @@
 
     <!-- SCRIPT APPLICAZIONE -->
     <script>
-        // CONFIGURAZIONE GITHUB PREIMPOSTATA
         let ghConfig = {
             owner: 'sergioyakh-jpg',
             repo: 'mesa-fiber-db',
             token: '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'
         };
 
-        let defaultUsers = [
-            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore', mansione: 'Senior Telecommunications Manager', email: 'admin@mesafiber.it', photo: '' },
-            { username: 'manager', pass: 'manager123', name: 'Direzione Operations', role: 'Manager', mansione: 'Operations Coordinator', email: 'manager@mesafiber.it', photo: '' },
-            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi', role: 'Tecnico', mansione: 'FTTH & OTDR Specialist', email: 'm.rossi@mesafiber.it', photo: '' },
-            { username: 'cliente', pass: 'cliente123', name: 'Committente Rete', role: 'Cliente', mansione: 'Client Supervisor', email: 'cliente@committente.it', photo: '' }
+        // Moduli configurabili dall'Admin
+        let appModules = [
+            { id: 'Delivery', name: 'Delivery (Attivazioni)', icon: 'fa-house-signal', color: 'emerald', active: true, desc: 'Gestione nuove linee FTTH e borchie.' },
+            { id: 'Assurance', name: 'Assurance (Guasti)', icon: 'fa-triangle-exclamation', color: 'rose', active: true, desc: 'Ticket guasti e ripristino cavi.' },
+            { id: 'Giunzioni', name: 'Giunzioni & OTDR', icon: 'fa-toolbox', color: 'sky', active: true, desc: 'Registro fusioni Sumitomo e test Viavi.' },
+            { id: 'magazzino', name: 'Magazzino Materiali', icon: 'fa-boxes-stacked', color: 'amber', active: true, desc: 'Controllo scorte passive e bretelle.' },
+            { id: 'flotta', name: 'Flotta & Mezzi', icon: 'fa-truck', color: 'indigo', active: true, desc: 'Assegnazione furgoni aziendali.' },
+            { id: 'chat', name: 'Chat Aziendale', icon: 'fa-comments', color: 'violet', active: true, desc: 'Comunicazione globale unificata.' }
         ];
 
-        let defaultFaults = [
-            {
-                id: 'DEL-2026-001', module: 'Delivery', address: 'Via Emilia Est 142, Modena', pfp: 'PFP-MO-01', priority: 'Alta', status: 'In Lavorazione',
-                lat: 44.6471, lng: 10.9252, desc: 'Nuova attivazione FTTH residenziale. Posa bretella e test borchia ottica.', assignedTo: 'Marco Rossi',
-                photoInitial: '', photoClose: null, closingNotes: '', createdAt: '2026-10-06 08:30'
-            },
-            {
-                id: 'ASS-2026-002', module: 'Assurance', address: 'Viale Caduti in Guerra 25, Modena', pfp: 'PFP-MO-04', priority: 'Media', status: 'Aperto',
-                lat: 44.6515, lng: 10.9321, desc: 'Attenuazione elevata su splitter secondario PFS 04.', assignedTo: 'Non assegnato',
-                photoInitial: '', photoClose: null, closingNotes: '', createdAt: '2026-10-06 10:15'
-            },
-            {
-                id: 'GIU-2026-003', module: 'Giunzioni', address: 'Via Giardini 450, Modena', pfp: 'PFP-MO-09', priority: 'Alta', status: 'Risolto',
-                lat: 44.6280, lng: 10.9100, desc: 'Giunzione muffola principale con Sumitomo Type-72C+ e collaudo OTDR.', assignedTo: 'Marco Rossi',
-                photoInitial: '', photoClose: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
-                closingNotes: 'Test riflettometrico Viavi SmartOTDR superato. Attenuazione 0.02dB.', createdAt: '2026-10-05 14:20'
-            }
+        let users = [
+            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore', mansione: 'Senior Manager', email: 'admin@mesafiber.it' },
+            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi', role: 'Tecnico', mansione: 'FTTH Specialist', email: 'm.rossi@mesafiber.it' }
         ];
 
-        let defaultStock = [
-            { id: 'S-01', name: 'Bretella Ottica SC/APC OS2 2m', qty: 120, unit: 'Pezzi' },
-            { id: 'S-02', name: 'Muffola in Linea 24 Fibrale', qty: 15, unit: 'Pezzi' },
-            { id: 'S-03', name: 'Splitter Ottico 1:8 SC/APC', qty: 28, unit: 'Pezzi' },
-            { id: 'S-04', name: 'Cavo Multifibra Armato 48FO', qty: 450, unit: 'Metri' }
+        let faults = [
+            { id: 'DEL-2026-001', module: 'Delivery', address: 'Via Emilia Est 142, Modena', pfp: 'PFP-MO-01', priority: 'Alta', status: 'In Lavorazione', lat: 44.6471, lng: 10.9252, desc: 'Nuova attivazione FTTH residenziale. Test borchia ottica.', assignedTo: 'Marco Rossi', closingNotes: '' }
         ];
 
-        let defaultVehicles = [
-            { id: 'V-01', model: 'Peugeot Partner Van', plate: 'GH456XY', driver: 'Marco Rossi' },
-            { id: 'V-02', model: 'Opel Corsa 2016 Diesel', plate: 'EX789ZZ', driver: 'Non assegnato' }
-        ];
+        let stock = [{ id: 'S-01', name: 'Bretella SC/APC 2m', qty: 120, unit: 'Pezzi' }];
+        let vehicles = [{ id: 'V-01', model: 'Peugeot Partner', plate: 'GH456XY', driver: 'Marco Rossi' }];
+        let chatMessages = [{ sender: 'Marco Rossi', role: 'Tecnico', text: 'Pronta la connessione in Via Emilia Est.', time: '09:15' }];
 
-        let defaultChat = [
-            { sender: 'Direzione Operations', role: 'Manager', text: 'Buongiorno a tutti, ricordate di completare i report OTDR per i cantieri di Modena Est.', time: '08:45' },
-            { sender: 'Marco Rossi', role: 'Tecnico', text: 'Ricevuto, collaudo completato in Via Giardini.', time: '09:15' }
-        ];
-
-        let users = [];
-        let faults = [];
-        let stock = [];
-        let vehicles = [];
-        let chatMessages = [];
         let currentUser = null;
         let currentActiveModule = 'Delivery';
         let map = null;
         let markersLayer = null;
+        let currentEditingFault = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadDatabase();
-        });
+        window.addEventListener('DOMContentLoaded', () => loadDatabase());
 
         async function loadDatabase() {
-            localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
-
             try {
                 const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' } });
                 if (res.ok) {
                     const fileData = await res.json();
                     if (fileData.content) {
-                        const decodedStr = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
-                        if (decodedStr.trim().length > 2) {
-                            const db = JSON.parse(decodedStr);
-                            users = db.users || defaultUsers;
-                            faults = db.faults || defaultFaults;
-                            stock = db.stock || defaultStock;
-                            vehicles = db.vehicles || defaultVehicles;
-                            chatMessages = db.chatMessages || defaultChat;
-                            document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
-                            return;
-                        }
+                        const db = JSON.parse(decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, '')))));
+                        users = db.users || users;
+                        faults = db.faults || faults;
+                        stock = db.stock || stock;
+                        vehicles = db.vehicles || vehicles;
+                        chatMessages = db.chatMessages || chatMessages;
+                        appModules = db.appModules || appModules;
                     }
                 }
-            } catch (err) { console.warn('Cloud sync load fallback:', err); }
-            loadLocalFallback();
-        }
-
-        function loadLocalFallback() {
-            const saved = localStorage.getItem('mesa_suite_complete_db');
-            if (saved) {
-                const db = JSON.parse(saved);
-                users = db.users || defaultUsers;
-                faults = db.faults || defaultFaults;
-                stock = db.stock || defaultStock;
-                vehicles = db.vehicles || defaultVehicles;
-                chatMessages = db.chatMessages || defaultChat;
-            } else {
-                users = defaultUsers;
-                faults = defaultFaults;
-                stock = defaultStock;
-                vehicles = defaultVehicles;
-                chatMessages = defaultChat;
-                saveDatabase();
-            }
-            document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+            } catch (err) { console.warn('Cloud load fallback:', err); }
+            renderHomeModules();
         }
 
         async function saveDatabase() {
-            const db = { users, faults, stock, vehicles, chatMessages };
-            localStorage.setItem('mesa_suite_complete_db', JSON.stringify(db));
-            await syncWithGitHub(db);
-        }
-
-        async function syncWithGitHub(dbData) {
+            const db = { users, faults, stock, vehicles, chatMessages, appModules };
+            localStorage.setItem('mesa_suite_db', JSON.stringify(db));
             try {
                 const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
                 const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-                let sha = '';
-                if (getRes.ok) {
-                    const fileData = await getRes.json();
-                    sha = fileData.sha;
-                }
-                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(dbData, null, 2))));
-                const putRes = await fetch(url, {
+                let sha = getRes.ok ? (await getRes.json()).sha : undefined;
+                await fetch(url, {
                     method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-                    body: JSON.stringify({ message: 'MESA Suite Auto-Sync DB', content: contentB64, sha: sha ? sha : undefined })
+                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'MESA Suite Sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2)))), sha })
                 });
-                if (putRes.ok) {
-                    document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
-                } else {
-                    console.error('Errore GitHub PUT status:', putRes.status);
-                }
-            } catch (err) { console.error('Errore sync GitHub:', err); }
+                document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
+            } catch (e) { document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-amber-500 inline-block'; }
         }
 
         function handleLogin(e) {
@@ -856,25 +541,15 @@
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
             const found = users.find(x => x.username === u && x.pass === p);
-
             if (found) {
                 currentUser = found;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-wrapper').classList.remove('hidden');
                 updateUserHeaderUI();
-
-                if (currentUser.role === 'Cliente') {
-                    document.getElementById('header-subtitle').innerText = 'Portale Tracciabilità';
-                    document.getElementById('menu-settings-btn').classList.add('hidden');
-                    navigateToModule('Delivery');
-                } else {
-                    document.getElementById('header-subtitle').innerText = 'Suite Operativa Cloud';
-                    document.getElementById('menu-settings-btn').classList.remove('hidden');
-                    navigateTo('home');
-                }
+                navigateTo('home');
             } else {
                 const err = document.getElementById('login-error');
-                err.innerText = 'Username o password errati.';
+                err.innerText = 'Credenziali errate.';
                 err.classList.remove('hidden');
             }
         }
@@ -883,556 +558,212 @@
             document.getElementById('user-display-name').innerText = currentUser.name;
             document.getElementById('user-display-role').innerText = currentUser.role;
             document.getElementById('dropdown-username').innerText = `${currentUser.username} (${currentUser.role})`;
-            const avatarContainer = document.getElementById('header-avatar-container');
-            if (currentUser.photo) {
-                avatarContainer.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
-            } else {
-                avatarContainer.innerHTML = `<span id="user-avatar-initials">${currentUser.name.charAt(0)}</span>`;
-            }
+            document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
         }
 
         function logout() {
             currentUser = null;
             document.getElementById('app-wrapper').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('login-form').reset();
-            document.getElementById('login-error').classList.add('hidden');
         }
 
-        function navigateToHome() {
-            if (currentUser && currentUser.role === 'Cliente') {
-                navigateToModule('Delivery');
-            } else {
-                navigateTo('home');
-            }
-        }
-
-        function navigateToModule(moduleName) {
-            currentActiveModule = moduleName;
-            document.getElementById('current-module-name').innerText = moduleName;
-            navigateTo('guasti');
-        }
+        function navigateToHome() { navigateTo('home'); }
 
         function navigateTo(viewName) {
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-guasti').classList.add('hidden');
-            document.getElementById('view-magazzino').classList.add('hidden');
-            document.getElementById('view-flotta').classList.add('hidden');
-            document.getElementById('view-chat').classList.add('hidden');
-            document.getElementById('view-profile').classList.add('hidden');
-            document.getElementById('view-settings').classList.add('hidden');
+            ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
 
-            const sub = document.getElementById('nav-breadcrumb-sub');
-            const crumbTitle = document.getElementById('nav-breadcrumb-title');
-
-            if (viewName === 'home') {
-                document.getElementById('view-home').classList.remove('hidden');
-                sub.classList.remove('flex'); sub.classList.add('hidden');
-            } else if (viewName === 'guasti') {
-                document.getElementById('view-guasti').classList.remove('hidden');
-                crumbTitle.innerText = `Modulo: ${currentActiveModule}`;
-                sub.classList.remove('hidden'); sub.classList.add('flex');
+            if (viewName === 'home') renderHomeModules();
+            if (viewName === 'guasti') {
                 setTimeout(() => {
                     if (!map) {
                         map = L.map('map').setView([44.6471, 10.9252], 13);
                         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
                         markersLayer = L.layerGroup().addTo(map);
                     } else { map.invalidateSize(); }
-                    updateMapMarkers();
                     renderApp();
                 }, 150);
-            } else if (viewName === 'magazzino') {
-                document.getElementById('view-magazzino').classList.remove('hidden');
-                crumbTitle.innerText = 'Magazzino';
-                sub.classList.remove('hidden'); sub.classList.add('flex');
-                renderStock();
-            } else if (viewName === 'flotta') {
-                document.getElementById('view-flotta').classList.remove('hidden');
-                crumbTitle.innerText = 'Flotta & Mezzi';
-                sub.classList.remove('hidden'); sub.classList.add('flex');
-                renderVehicles();
-            } else if (viewName === 'chat') {
-                document.getElementById('view-chat').classList.remove('hidden');
-                crumbTitle.innerText = 'Chat Globale';
-                sub.classList.remove('hidden'); sub.classList.add('flex');
-                renderChatMessages();
-            } else if (viewName === 'profile') {
-                document.getElementById('view-profile').classList.remove('hidden');
-                crumbTitle.innerText = 'Profilo & Storico';
-                sub.classList.remove('hidden'); sub.classList.add('flex');
-                initProfileView();
-            } else if (viewName === 'settings') {
-                document.getElementById('view-settings').classList.remove('hidden');
-                crumbTitle.innerText = 'Amministrazione';
-                sub.classList.remove('hidden'); sub.classList.add('flex');
-                initSettingsForm();
-                renderUsersTable();
             }
+            if (viewName === 'magazzino') renderStock();
+            if (viewName === 'flotta') renderVehicles();
+            if (viewName === 'chat') renderChatMessages();
+            if (viewName === 'profile') initProfileView();
+            if (viewName === 'settings') { initSettings(); renderUsersTable(); renderAdminModulesToggles(); }
         }
 
-        function toggleProfileDropdown() {
-            document.getElementById('profile-dropdown').classList.toggle('hidden');
+        function renderHomeModules() {
+            const grid = document.getElementById('home-modules-grid');
+            grid.innerHTML = '';
+            appModules.filter(m => m.active).forEach(m => {
+                const card = document.createElement('div');
+                card.className = `group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-${m.color}-500/50 rounded-2xl p-5 sm:p-6 transition-all cursor-pointer shadow-lg space-y-3`;
+                card.onclick = () => {
+                    if (['magazzino', 'flotta', 'chat'].includes(m.id)) navigateTo(m.id);
+                    else navigateToModule(m.id);
+                };
+                card.innerHTML = `
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-${m.color}-500/10 text-${m.color}-400 flex items-center justify-center text-lg sm:text-xl border border-${m.color}-500/20 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid ${m.icon}"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-base sm:text-lg font-bold text-white group-hover:text-${m.color}-400 transition-colors">${m.name}</h4>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">${m.desc}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        window.addEventListener('click', (e) => {
-            if (!e.target.closest('#profile-dropdown') && !e.target.closest('button[onclick="toggleProfileDropdown()"]')) {
-                const drop = document.getElementById('profile-dropdown');
-                if (drop) drop.classList.add('hidden');
-            }
-        });
+        function navigateToModule(modName) {
+            currentActiveModule = modName;
+            document.getElementById('current-module-name').innerText = modName;
+            navigateTo('guasti');
+        }
 
-        function initProfileView() {
-            document.getElementById('profile-name-title').innerText = currentUser.name;
-            document.getElementById('profile-role-title').innerText = `${currentUser.role} — ${currentUser.mansione || 'Tecnico Specializzato'}`;
-            document.getElementById('profile-mansione').value = currentUser.mansione || '';
-            document.getElementById('profile-email').value = currentUser.email || '';
-            document.getElementById('profile-photo-input').value = currentUser.photo || '';
-            
-            const initials = currentUser.name.charAt(0);
-            document.getElementById('profile-initials').innerText = initials;
-            const preview = document.getElementById('profile-avatar-preview');
-            if (currentUser.photo) {
-                preview.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
-            } else {
-                preview.innerHTML = `<span id="profile-initials">${initials}</span>`;
-            }
+        function toggleProfileDropdown() { document.getElementById('profile-dropdown').classList.toggle('hidden'); }
 
-            const closedList = document.getElementById('profile-closed-faults-list');
-            closedList.innerHTML = '';
-            const userClosed = faults.filter(f => f.status === 'Risolto' && (currentUser.role === 'Amministratore' || currentUser.role === 'Manager' || f.assignedTo === currentUser.name));
+        // CONDIVISIONE RAPIDA WHATSAPP E MAIL
+        function shareViaWhatsApp() {
+            if (!currentEditingFault) return;
+            const f = currentEditingFault;
+            const text = `*MESA Fiber Solutions - Pratica ${f.id}*%0A• Modulo: ${f.module}%0A• PFP: ${f.pfp}%0A• Indirizzo: ${f.address}%0A• Priorità: ${f.priority}%0A• Stato: ${f.status}%0A• Descrizione: ${f.desc}`;
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
 
-            if (userClosed.length === 0) {
-                closedList.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center">Nessun intervento chiuso registrato.</div>`;
+        function shareViaEmail() {
+            if (!currentEditingFault) return;
+            const f = currentEditingFault;
+            const subject = encodeURIComponent(`Pratica MESA Fiber: ${f.id} - ${f.address}`);
+            const body = encodeURIComponent(`Dettagli Intervento:\n\nID: ${f.id}\nModulo: ${f.module}\nPFP: ${f.pfp}\nIndirizzo: ${f.address}\nPriorità: ${f.priority}\nStato: ${f.status}\nDescrizione: ${f.desc}\n\nAssegnato a: ${f.assignedTo}`);
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+        }
+
+        function openDetailModal(id) {
+            const f = faults.find(x => x.id === id);
+            if (!f) return;
+            currentEditingFault = f;
+            document.getElementById('det-title').innerText = `Pratica ${f.id} (${f.module})`;
+            document.getElementById('det-content').innerHTML = `
+                <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs">
+                    <div><span class="text-slate-400 uppercase text-[10px]">PFP:</span> <b class="text-white">${f.pfp}</b></div>
+                    <div><span class="text-slate-400 uppercase text-[10px]">Stato:</span> <b class="text-emerald-400">${f.status}</b></div>
+                    <div class="col-span-2"><span class="text-slate-400 uppercase text-[10px]">Indirizzo:</span> <div class="text-white">${f.address}</div></div>
+                    <div class="col-span-2"><span class="text-slate-400 uppercase text-[10px]">Descrizione:</span> <div class="text-slate-300 mt-0.5">${f.desc}</div></div>
+                </div>
+            `;
+            document.getElementById('modal-detail').classList.remove('hidden');
+            document.getElementById('modal-detail').classList.add('flex');
+        }
+        function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); document.getElementById('modal-detail').classList.remove('flex'); }
+
+        function renderApp() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const fs = document.getElementById('filter-status').value;
+            const modF = faults.filter(f => f.module === currentActiveModule);
+
+            document.getElementById('kpi-total').innerText = modF.length;
+            document.getElementById('kpi-in-progress').innerText = modF.filter(x => x.status === 'In Lavorazione').length;
+            document.getElementById('kpi-resolved').innerText = modF.filter(x => x.status === 'Risolto').length;
+            document.getElementById('kpi-critical').innerText = modF.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
+
+            const filtered = modF.filter(f => (f.address.toLowerCase().includes(q) || f.pfp.toLowerCase().includes(q) || f.id.toLowerCase().includes(q)) && (fs === 'ALL' || f.status === fs));
+            const tbody = document.getElementById('faults-table-body');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">Nessuna pratica trovata.</td></tr>`;
                 return;
             }
 
-            userClosed.forEach(f => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between text-xs';
-                item.innerHTML = `
-                    <div>
-                        <div class="font-bold text-white text-sm">${f.id} (${f.module})</div>
-                        <div class="text-slate-400 mt-0.5">${f.address}</div>
-                        <div class="text-sky-400 mt-1 font-medium">Nota: ${f.closingNotes || 'Completato con successo.'}</div>
-                    </div>
-                    <button onclick="openDetailModal('${f.id}')" class="bg-slate-800 hover:bg-sky-600 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg font-medium transition-colors">Visualizza</button>
+            filtered.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-4"><div class="font-bold text-white">${f.id}</div><div class="text-[10px] text-sky-400 font-mono">${f.pfp}</div></td>
+                    <td class="py-3 px-4"><div class="text-slate-200">${f.address}</div><div class="text-[11px] text-slate-500 truncate max-w-xs">${f.desc}</div></td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-sky-500/10 text-sky-400">${f.priority}</span></td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-400">${f.status}</span></td>
+                    <td class="py-3 px-4 text-slate-300">${f.assignedTo}</td>
+                    <td class="py-3 px-4 text-right space-x-1">
+                        <button onclick="openDetailModal('${f.id}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-sky-600 text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></button>
+                    </td>
                 `;
-                closedList.appendChild(item);
+                tbody.appendChild(tr);
             });
         }
 
-        function updateProfilePhotoUrl(val) {
-            currentUser.photo = val.trim();
-            const preview = document.getElementById('profile-avatar-preview');
-            if (currentUser.photo) {
-                preview.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
-            } else {
-                preview.innerHTML = `<span>${currentUser.name.charAt(0)}</span>`;
-            }
-        }
+        function openNewFaultModal() { document.getElementById('modal-new-fault').classList.remove('hidden'); document.getElementById('modal-new-fault').classList.add('flex'); }
+        function closeNewFaultModal() { document.getElementById('modal-new-fault').classList.add('hidden'); document.getElementById('modal-new-fault').classList.remove('flex'); }
 
-        async function saveProfileChanges() {
-            currentUser.mansione = document.getElementById('profile-mansione').value.trim();
-            currentUser.email = document.getElementById('profile-email').value.trim();
-            currentUser.photo = document.getElementById('profile-photo-input').value.trim();
-
-            const idx = users.findIndex(x => x.username === currentUser.username);
-            if (idx !== -1) users[idx] = currentUser;
-
+        async function handleCreateFault(e) {
+            e.preventDefault();
+            faults.unshift({
+                id: `DEL-2026-0${Math.floor(100 + Math.random()*900)}`,
+                module: currentActiveModule,
+                address: document.getElementById('nf-address').value,
+                pfp: document.getElementById('nf-pfp').value,
+                priority: document.getElementById('nf-priority').value,
+                status: 'Aperto', lat: 44.6471, lng: 10.9252,
+                desc: document.getElementById('nf-desc').value,
+                assignedTo: currentUser.name, closingNotes: ''
+            });
             await saveDatabase();
-            updateUserHeaderUI();
-            alert('Profilo aggiornato con successo.');
+            closeNewFaultModal();
+            renderApp();
         }
 
-        function renderChatMessages() {
-            const container = document.getElementById('chat-messages-container');
+        function renderAdminModulesToggles() {
+            const container = document.getElementById('admin-modules-toggles');
             container.innerHTML = '';
-            chatMessages.forEach(m => {
-                const isMe = m.sender === currentUser.name;
-                const bubble = document.createElement('div');
-                bubble.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`;
-                bubble.innerHTML = `
-                    <div class="text-[10px] text-slate-400 px-1">${m.sender} <span class="text-sky-400 font-semibold">(${m.role})</span> • ${m.time}</div>
-                    <div class="max-w-md px-4 py-2.5 rounded-2xl text-sm ${isMe ? 'bg-sky-600 text-white rounded-br-none' : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'}">${m.text}</div>
+            appModules.forEach(m => {
+                const item = document.createElement('label');
+                item.className = 'flex items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl cursor-pointer text-xs';
+                item.innerHTML = `
+                    <input type="checkbox" ${m.active ? 'checked' : ''} onchange="toggleModuleActive('${m.id}')" class="rounded bg-slate-950 border-slate-700 text-sky-500 focus:ring-0 w-4 h-4">
+                    <span class="font-bold text-white">${m.name}</span>
                 `;
-                container.appendChild(bubble);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function handleSendChatMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('chat-input-msg');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            chatMessages.push({ sender: currentUser.name, role: currentUser.role, text, time: timeNow });
-            input.value = '';
-            await saveDatabase();
-            renderChatMessages();
-        }
-
-        function renderStock() {
-            const grid = document.getElementById('stock-grid');
-            grid.innerHTML = '';
-            stock.forEach(s => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-lg';
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 font-bold"><i class="fa-solid fa-boxes-stacked"></i></div>
-                        <div class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">${s.qty} ${s.unit}</div>
-                    </div>
-                    <div><h4 class="text-base font-bold text-white">${s.name}</h4></div>
-                    ${currentUser.role === 'Amministratore' || currentUser.role === 'Manager' ? `
-                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <button onclick="updateStockQty('${s.id}', -1)" class="w-7 h-7 bg-slate-900 hover:bg-rose-600 text-slate-300 rounded-lg">-</button>
-                            <button onclick="updateStockQty('${s.id}', 1)" class="w-7 h-7 bg-slate-900 hover:bg-emerald-600 text-slate-300 rounded-lg">+</button>
-                        </div>
-                        <button onclick="deleteStock('${s.id}')" class="text-xs text-rose-400 hover:text-rose-300">Elimina</button>
-                    </div>` : ''}
-                `;
-                grid.appendChild(card);
+                container.appendChild(item);
             });
         }
 
-        function openNewStockModal() { document.getElementById('modal-new-stock').classList.remove('hidden'); document.getElementById('modal-new-stock').classList.add('flex'); }
-        function closeNewStockModal() { document.getElementById('modal-new-stock').classList.add('hidden'); document.getElementById('modal-new-stock').classList.remove('flex'); document.getElementById('form-new-stock').reset(); }
-        
-        async function handleCreateStock(e) {
-            e.preventDefault();
-            const name = document.getElementById('ns-name').value.trim();
-            const qty = parseInt(document.getElementById('ns-qty').value);
-            const unit = document.getElementById('ns-unit').value.trim();
-            stock.push({ id: `S-0${stock.length + 1}`, name, qty, unit });
-            await saveDatabase();
-            closeNewStockModal();
-            renderStock();
-        }
-
-        async function updateStockQty(id, delta) {
-            const item = stock.find(x => x.id === id);
-            if (item) {
-                item.qty = Math.max(0, item.qty + delta);
-                await saveDatabase();
-                renderStock();
-            }
-        }
-
-        async function deleteStock(id) {
-            stock = stock.filter(x => x.id !== id);
-            await saveDatabase();
-            renderStock();
-        }
-
-        function renderVehicles() {
-            const grid = document.getElementById('vehicles-grid');
-            grid.innerHTML = '';
-            vehicles.forEach(v => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-lg';
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20 font-bold"><i class="fa-solid fa-truck"></i></div>
-                        <div class="font-mono text-xs font-bold bg-slate-900 px-2.5 py-1 rounded-lg text-sky-400 border border-slate-800">${v.plate}</div>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-white">${v.model}</h4>
-                        <div class="text-xs text-slate-400 mt-1 flex items-center gap-1.5"><i class="fa-solid fa-user-tie text-indigo-400"></i><span>Assegnato a: <strong class="text-slate-200">${v.driver}</strong></span></div>
-                    </div>
-                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-                        <select onchange="updateVehicleDriver('${v.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl py-1.5 px-3 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
-                            <option value="Non assegnato" ${v.driver === 'Non assegnato' ? 'selected' : ''}>Non assegnato</option>
-                            ${users.filter(u => u.role === 'Tecnico' || u.role === 'Amministratore' || u.role === 'Manager').map(u => `<option value="${u.name}" ${v.driver === u.name ? 'selected' : ''}>${u.name}</option>`).join('')}
-                        </select>
-                        ${currentUser.role === 'Amministratore' ? `<button onclick="deleteVehicle('${v.id}')" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-rose-600 text-slate-400 hover:text-white transition-colors flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function openNewVehicleModal() {
-            const select = document.getElementById('nv-driver');
-            select.innerHTML = '<option value="Non assegnato">Non assegnato</option>' + users.filter(u => u.role !== 'Cliente').map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-            document.getElementById('modal-new-vehicle').classList.remove('hidden'); document.getElementById('modal-new-vehicle').classList.add('flex');
-        }
-        function closeNewVehicleModal() { document.getElementById('modal-new-vehicle').classList.add('hidden'); document.getElementById('modal-new-vehicle').classList.remove('flex'); document.getElementById('form-new-vehicle').reset(); }
-
-        async function handleCreateVehicle(e) {
-            e.preventDefault();
-            const model = document.getElementById('nv-model').value.trim();
-            const plate = document.getElementById('nv-plate').value.trim().toUpperCase();
-            const driver = document.getElementById('nv-driver').value;
-            vehicles.push({ id: `V-0${vehicles.length + 1}`, model, plate, driver });
-            await saveDatabase();
-            closeNewVehicleModal();
-            renderVehicles();
-        }
-
-        async function updateVehicleDriver(id, newDriver) {
-            const v = vehicles.find(x => x.id === id);
-            if (v) { v.driver = newDriver; await saveDatabase(); renderVehicles(); }
-        }
-
-        async function deleteVehicle(id) {
-            vehicles = vehicles.filter(x => x.id !== id);
-            await saveDatabase();
-            renderVehicles();
+        async function toggleModuleActive(id) {
+            const m = appModules.find(x => x.id === id);
+            if (m) { m.active = !m.active; await saveDatabase(); }
         }
 
         function renderUsersTable() {
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '';
             users.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-900/60 transition-colors';
-                tr.innerHTML = `
-                    <td class="py-3 px-3"><div class="font-bold text-white">${u.name}</div><div class="text-[11px] text-slate-400">${u.mansione || ''}</div></td>
-                    <td class="py-3 px-3"><code class="text-sky-400">${u.username}</code> <span class="text-slate-400">(${u.role})</span></td>
-                    <td class="py-3 px-3 text-slate-300">${u.email || '-'}</td>
-                    <td class="py-3 px-3 text-right">
-                        ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-400 hover:text-white inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
-                    </td>
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-900/60">
+                        <td class="py-2.5 px-3 font-bold text-white">${u.name}<div class="text-[10px] text-slate-400">${u.mansione}</div></td>
+                        <td class="py-2.5 px-3"><code class="text-sky-400">${u.username}</code> (${u.role})</td>
+                        <td class="py-2.5 px-3 text-right">
+                            ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="text-rose-400 text-xs">Elimina</button>` : ''}
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
-        }
-
-        function openNewUserModal() { document.getElementById('modal-new-user').classList.remove('hidden'); document.getElementById('modal-new-user').classList.add('flex'); }
-        function closeNewUserModal() { document.getElementById('modal-new-user').classList.add('hidden'); document.getElementById('modal-new-user').classList.remove('flex'); document.getElementById('form-new-user').reset(); }
-
-        async function handleCreateUser(e) {
-            e.preventDefault();
-            const name = document.getElementById('nu-name').value.trim();
-            const username = document.getElementById('nu-username').value.trim();
-            const pass = document.getElementById('nu-pass').value.trim();
-            const role = document.getElementById('nu-role').value;
-            const mansione = document.getElementById('nu-mansione').value.trim();
-
-            if (users.some(x => x.username === username)) { alert('Username già esistente.'); return; }
-            users.push({ name, username, pass, role, mansione, email: `${username}@mesafiber.it`, photo: '' });
-            await saveDatabase();
-            closeNewUserModal();
-            renderUsersTable();
-            alert('Utente creato con successo.');
         }
 
         async function deleteUser(username) {
-            if (confirm(`Eliminare l'utente ${username}?`)) {
-                users = users.filter(x => x.username !== username);
-                await saveDatabase();
-                renderUsersTable();
-            }
-        }
-
-        function updateMapMarkers() {
-            if (!markersLayer) return;
-            markersLayer.clearLayers();
-            const moduleFaults = faults.filter(f => f.module === currentActiveModule);
-            moduleFaults.forEach(f => {
-                let color = '#38bdf8';
-                if (f.status === 'Aperto') color = '#ef4444';
-                if (f.status === 'In Lavorazione') color = '#f59e0b';
-                if (f.status === 'Risolto') color = '#10b981';
-
-                const customIcon = L.divIcon({
-                    className: 'custom-div-icon',
-                    html: `<div style="background-color: ${color}; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; box-shadow: 0 0 10px rgba(0,0,0,0.5); border: 2px solid white;"><i class="fa-solid fa-network-wired"></i></div>`,
-                    iconSize: [28, 28], iconAnchor: [14, 14]
-                });
-
-                const marker = L.marker([f.lat, f.lng], { icon: customIcon });
-                marker.bindPopup(`
-                    <div style="color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; min-width: 180px;">
-                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #0284c7;">${f.id} (${f.pfp})</div>
-                        <div style="margin-bottom: 2px;"><b>Indirizzo:</b> ${f.address}</div>
-                        <div style="margin-bottom: 2px;"><b>Stato:</b> ${f.status}</div>
-                        <button onclick="openDetailModal('${f.id}')" style="margin-top: 8px; width: 100%; background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">Visualizza Dettagli</button>
-                    </div>
-                `);
-                markersLayer.addLayer(marker);
-            });
-        }
-
-        function renderApp() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const filterStatus = document.getElementById('filter-status').value;
-
-            const moduleFaults = faults.filter(f => f.module === currentActiveModule);
-            document.getElementById('kpi-total').innerText = moduleFaults.length;
-            document.getElementById('kpi-in-progress').innerText = moduleFaults.filter(x => x.status === 'In Lavorazione').length;
-            document.getElementById('kpi-resolved').innerText = moduleFaults.filter(x => x.status === 'Risolto').length;
-            document.getElementById('kpi-critical').innerText = moduleFaults.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
-
-            const filtered = moduleFaults.filter(f => {
-                const matchQ = f.address.toLowerCase().includes(query) || f.pfp.toLowerCase().includes(query) || f.id.toLowerCase().includes(query) || f.desc.toLowerCase().includes(query);
-                const matchS = filterStatus === 'ALL' || f.status === filterStatus;
-                return matchQ && matchS;
-            });
-
-            const tbody = document.getElementById('faults-table-body');
-            tbody.innerHTML = '';
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Nessun intervento trovato in questo modulo.</td></tr>`;
-                updateMapMarkers();
-                return;
-            }
-
-            filtered.forEach(f => {
-                let badgeColor = 'bg-sky-500/10 text-sky-400 border-sky-500/20';
-                if (f.priority === 'Alta') badgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-                if (f.priority === 'Media') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-
-                let statusColor = 'bg-sky-500/10 text-sky-400 border-sky-500/20';
-                if (f.status === 'Aperto') statusColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-                if (f.status === 'In Lavorazione') statusColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-                if (f.status === 'Risolto') statusColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-900/60 transition-colors';
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4"><div class="font-bold text-white">${f.id}</div><div class="text-xs text-slate-400 font-mono">${f.pfp}</div></td>
-                    <td class="py-3.5 px-4"><div class="text-slate-200 font-medium">${f.address}</div><div class="text-xs text-slate-500 truncate max-w-xs">${f.desc}</div></td>
-                    <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor}">${f.priority}</span></td>
-                    <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColor}">${f.status}</span></td>
-                    <td class="py-3.5 px-4"><div class="text-xs text-slate-300 font-medium">${currentUser.role === 'Cliente' ? 'Squadra Operativa' : f.assignedTo}</div></td>
-                    <td class="py-3.5 px-4 text-right space-x-2">
-                        <button onclick="openDetailModal('${f.id}')" title="Visualizza" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-sky-600 hover:text-white text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></button>
-                        ${currentUser.role === 'Amministratore' || currentUser.role === 'Manager' ? `<button onclick="deleteFault('${f.id}')" title="Elimina" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            updateMapMarkers();
-        }
-
-        function openNewFaultModal() {
-            if (currentUser && currentUser.role === 'Cliente') return;
-            document.getElementById('modal-fault-title').innerText = `Nuovo Intervento — ${currentActiveModule}`;
-            document.getElementById('modal-new-fault').classList.remove('hidden'); document.getElementById('modal-new-fault').classList.add('flex');
-        }
-        function closeNewFaultModal() { document.getElementById('modal-new-fault').classList.add('hidden'); document.getElementById('modal-new-fault').classList.remove('flex'); document.getElementById('form-new-fault').reset(); }
-
-        async function handleCreateFault(e) {
-            e.preventDefault();
-            const address = document.getElementById('nf-address').value;
-            const pfp = document.getElementById('nf-pfp').value;
-            const priority = document.getElementById('nf-priority').value;
-            const lat = parseFloat(document.getElementById('nf-lat').value);
-            const lng = parseFloat(document.getElementById('nf-lng').value);
-            const desc = document.getElementById('nf-desc').value;
-
-            const prefix = currentActiveModule === 'Delivery' ? 'DEL' : currentActiveModule === 'Assurance' ? 'ASS' : 'GIU';
-            const newFault = {
-                id: `${prefix}-2026-0${Math.floor(100 + Math.random() * 900)}`,
-                module: currentActiveModule, address, pfp, priority, status: 'Aperto', lat, lng, desc,
-                assignedTo: currentUser.role === 'Tecnico' ? currentUser.name : 'Non assegnato',
-                photoInitial: '', photoClose: null, closingNotes: '',
-                createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
-            };
-            faults.unshift(newFault);
+            users = users.filter(x => x.username !== username);
             await saveDatabase();
-            closeNewFaultModal();
-            renderApp();
+            renderUsersTable();
         }
 
-        let currentEditingId = null;
-        function openDetailModal(id) {
-            currentEditingId = id;
-            const f = faults.find(x => x.id === id);
-            if (!f) return;
-            document.getElementById('det-title').innerText = `Gestione Intervento — ${f.id} (${f.module})`;
-            const c = document.getElementById('det-content');
-
-            if (currentUser.role === 'Cliente') {
-                c.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Codice PFP</div><div class="text-white font-bold">${f.pfp}</div></div>
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Stato</div><div class="text-emerald-400 font-bold">${f.status}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo</div><div class="text-white">${f.address}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Descrizione</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
-                        ${f.closingNotes ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Note di Chiusura / OTDR</div><div class="text-sky-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.closingNotes}</div></div>` : ''}
-                    </div>
-                    <div class="flex justify-end pt-3 border-t border-slate-800">
-                        <button type="button" onclick="closeDetailModal()" class="px-5 py-2 rounded-xl bg-slate-800 text-slate-200 text-sm font-medium">Chiudi</button>
-                    </div>
-                `;
-            } else {
-                c.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Codice PFP</div><div class="text-white font-bold">${f.pfp}</div></div>
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Priorità</div><div class="text-white font-bold">${f.priority}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo</div><div class="text-white">${f.address}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Segnalazione</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
-                    </div>
-                    <div class="space-y-3 pt-2">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Stato</label>
-                                <select id="det-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-sm text-white focus:outline-none focus:border-sky-500">
-                                    <option value="Aperto" ${f.status === 'Aperto' ? 'selected' : ''}>Aperto</option>
-                                    <option value="In Lavorazione" ${f.status === 'In Lavorazione' ? 'selected' : ''}>In Lavorazione</option>
-                                    <option value="Risolto" ${f.status === 'Risolto' ? 'selected' : ''}>Risolto (Chiuso)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Assegnatario</label>
-                                <input type="text" id="det-assign" value="${f.assignedTo}" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-sm text-white focus:outline-none focus:border-sky-500">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Note di Chiusura / Test OTDR / Collaudo</label>
-                            <textarea id="det-notes" rows="3" placeholder="es. Giunzione eseguita con Sumitomo e test Viavi SmartOTDR OK..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">${f.closingNotes || ''}</textarea>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                        <button type="button" onclick="closeDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium">Chiudi</button>
-                        <button type="button" onclick="saveDetailFault()" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg">Salva e Aggiorna</button>
-                    </div>
-                `;
-            }
-            document.getElementById('modal-detail').classList.remove('hidden'); document.getElementById('modal-detail').classList.add('flex');
-        }
-
-        function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); document.getElementById('modal-detail').classList.remove('flex'); currentEditingId = null; }
-
-        async function saveDetailFault() {
-            const f = faults.find(x => x.id === currentEditingId);
-            if (!f) return;
-            f.status = document.getElementById('det-status').value;
-            f.assignedTo = document.getElementById('det-assign').value;
-            f.closingNotes = document.getElementById('det-notes').value;
-            await saveDatabase();
-            closeDetailModal();
-            renderApp();
-        }
-
-        async function deleteFault(id) {
-            if (confirm(`Eliminare l'intervento ${id}?`)) {
-                faults = faults.filter(x => x.id !== id);
-                await saveDatabase();
-                renderApp();
-            }
-        }
-
-        function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,ID,Modulo,PFP,Indirizzo,Priorita,Stato,Tecnico,NoteChiusura\n";
-            faults.filter(f => f.module === currentActiveModule).forEach(f => {
-                csvContent += [f.id, f.module, f.pfp, `"${f.address}"`, f.priority, f.status, `"${f.assignedTo}"`, `"${f.closingNotes || ''}"`].join(",") + "\n";
-            });
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `MESA_${currentActiveModule}_Report.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        function initSettingsForm() {
+        function initSettings() {
             document.getElementById('set-gh-owner').value = ghConfig.owner;
             document.getElementById('set-gh-repo').value = ghConfig.repo;
+        }
+
+        function exportLocalDatabase() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ users, faults, stock, vehicles, chatMessages, appModules }, null, 2));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "mesa_suite_db.json");
+            document.body.appendChild(dl); dl.click(); dl.remove();
         }
     </script>
 </body>
