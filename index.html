@@ -81,7 +81,7 @@
                     </button>
                     <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
                         <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-user-gear mr-2 text-sky-400"></i> Profilo</button>
-                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-gear mr-2"></i> Configurazione Cloud & Admin</button>
+                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-users-gear mr-2"></i> Gestione Personale</button>
                         <div class="h-px bg-slate-800 my-1"></div>
                         <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-slate-800"><i class="fa-solid fa-power-off mr-2"></i> Disconnetti</button>
                     </div>
@@ -160,36 +160,19 @@
             </div>
         </main>
 
-        <!-- VIEW: IMPOSTAZIONI ADMIN -->
+        <!-- VIEW: IMPOSTAZIONI ADMIN (SOLO GESTIONE UTENTI) -->
         <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore & Cloud</div>
-            </div>
-
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-                <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Connessione Database GitHub</h3>
-                <p class="text-xs text-slate-400">Inserisci i dati del repository e il Token PAT per collegare i dispositivi.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <label class="block text-slate-400 mb-1">GitHub Owner</label>
-                        <input type="text" id="gh-owner" placeholder="es. sergioyakh-jpg" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">Repository Name</label>
-                        <input type="text" id="gh-repo" placeholder="es. mesa-fiber-db" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-slate-400 mb-1">Personal Access Token (PAT)</label>
-                        <input type="password" id="gh-token" placeholder="ghp_..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
-                    </div>
-                </div>
-                <button onclick="saveCloudConfig()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold">Salva Configurazione e Sincronizza</button>
+                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore — Gestione Personale</div>
             </div>
 
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                    <div><h3 class="font-bold text-white text-sm">Gestione Personale</h3></div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Personale & Ruoli Autorizzati</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Database Cloud centralizzato attivo e sincronizzato.</p>
+                    </div>
                     <button onclick="openModal('modal-new-user')" class="bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i> Nuovo Utente</button>
                 </div>
                 <table class="w-full text-left text-xs">
@@ -241,11 +224,11 @@
     </div>
 
     <script>
-        // CONFIGURAZIONE CLOUD (Inserisci qui i tuoi dati o salvali dal pannello Admin)
-        let ghConfig = {
+        // CONFIGURAZIONE CLOUD FISSA (TOKEN PRECONFIGURATO)
+        const ghConfig = {
             owner: "sergioyakh-jpg",
             repo: "mesa-fiber-db",
-            token: "" 
+            token: "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"
         };
 
         let appModules = [
@@ -276,27 +259,13 @@
         function decodeBase64Unicode(str) { return decodeURIComponent(Array.prototype.map.call(atob(str), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            loadLocalConfig();
             checkSession();
             await forceCloudRefresh();
         });
 
-        function loadLocalConfig() {
-            const savedCfg = localStorage.getItem('mesa_gh_config');
-            if (savedCfg) {
-                try { ghConfig = JSON.parse(savedCfg); } catch(e){}
-            }
-        }
-
         async function forceCloudRefresh() {
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
-
-            if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) {
-                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
-                sub.innerText = "Cloud non configurato (Vai in Impostazioni Admin)";
-                return;
-            }
 
             try {
                 ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
@@ -310,7 +279,7 @@
                     const cloudData = JSON.parse(decodeBase64Unicode(fileData.content.replace(/\s/g, '')));
                     if(cloudData.users) db = cloudData;
                     
-                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
+                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
                     sub.innerText = "Database Sincronizzato";
                     
                     if(currentUser && !document.getElementById('view-guasti').classList.contains('hidden')) renderApp();
@@ -324,7 +293,6 @@
         }
 
         async function pushToCloud() {
-            if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
             ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-ping';
@@ -353,18 +321,9 @@
             }
         }
 
-        function saveCloudConfig() {
-            ghConfig.owner = document.getElementById('gh-owner').value.trim();
-            ghConfig.repo = document.getElementById('gh-repo').value.trim();
-            ghConfig.token = document.getElementById('gh-token').value.trim();
-            localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
-            forceCloudRefresh();
-            alert("Configurazione salvata e testata con successo!");
-        }
-
         async function handleLogin(e) {
             e.preventDefault();
-            await forceCloudRefresh(); // Aggiorna i dati dal cloud prima di controllare utente e password
+            await forceCloudRefresh(); // Scarica gli utenti aggiornati prima di verificare
             
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
@@ -423,9 +382,6 @@
                 document.getElementById('profile-big-initial').innerText = currentUser.name.charAt(0);
             }
             if(view === 'settings') {
-                document.getElementById('gh-owner').value = ghConfig.owner;
-                document.getElementById('gh-repo').value = ghConfig.repo;
-                document.getElementById('gh-token').value = ghConfig.token;
                 renderUsersTable();
             }
         }
@@ -529,7 +485,7 @@
             }
         }
 
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function openModal(id) { document.getElementById(id).classList.add('flex'); document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
         function openNewFaultModal() { openModal('modal-new-fault'); }
     </script>
