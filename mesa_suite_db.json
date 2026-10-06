@@ -1,5 +1,12 @@
 {
-  "users": [],
+  "users": [
+    {
+      "name": "1",
+      "username": "1",
+      "pass": "1",
+      "role": "Tecnico"
+    }
+  ],
   "faults": [],
   "stock": [],
   "vehicles": [],
