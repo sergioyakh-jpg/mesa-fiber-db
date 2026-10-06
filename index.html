@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS & JS per la Mappa -->
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -356,7 +356,7 @@
             }
         }
 
-        // MOTORE DI SCRITTURA ANTICONFLITTO (RISOLVE IL 409)
+        // MOTORE DI SCRITTURA FORZATA (INTERCETTA IL CONFLITTO E RECUPERA LO SHA FRESCO)
         async function pushToCloud() {
             saveLocalDb();
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
@@ -370,40 +370,29 @@
             const dbObj = { users, faults, stock, vehicles, chatMessages, ghConfig };
             const encodedContent = encodeBase64Unicode(JSON.stringify(dbObj, null, 2));
 
-            // Tenta fino a 2 volte se riceve conflitti (gestione automatica dello SHA)
-            for (let attempt = 1; attempt <= 2; attempt++) {
-                try {
-                    let sha = undefined;
-                    const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
-                    if (getRes.ok) {
-                        sha = (await getRes.json()).sha;
-                    } else if (getRes.status === 401) {
-                        throw new Error("Token non valido (401). Verifica il PAT.");
-                    }
-
-                    const putRes = await fetch(url, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `MESA ERP Sync`, content: encodedContent, sha: sha })
-                    });
-
-                    if (putRes.ok) {
-                        ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-                        sub.innerText = "Database Sincronizzato";
-                        return; // Salvataggio completato con successo
-                    } else if (putRes.status === 409 && attempt === 1) {
-                        // Se riceve 409, riprova subito rinfrescando lo sha nel ciclo successivo
-                        continue;
-                    } else {
-                        throw new Error(`Errore GitHub (Codice ${putRes.status}). Verifica di aver dato i permessi 'Contents: Read and write' al Token.`);
-                    }
-                } catch (err) {
-                    if (attempt === 2) {
-                        ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                        sub.innerText = "Errore Cloud";
-                        throw err;
-                    }
+            let sha = undefined;
+            // 1. Chiede sempre lo SHA aggiornato appena prima di scrivere per evitare disallineamenti
+            try {
+                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
+                if (getRes.ok) {
+                    const fileMeta = await getRes.json();
+                    sha = fileMeta.sha;
                 }
+            } catch (err) {}
+
+            // 2. Invia i dati
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `MESA ERP Sync`, content: encodedContent, sha: sha })
+            });
+
+            if (putRes.ok) {
+                ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+                sub.innerText = "Database Sincronizzato";
+            } else {
+                const errData = await putRes.json().catch(() => ({}));
+                throw new Error(errData.message || `Errore GitHub (Codice ${putRes.status}). Verifica i permessi di scrittura.`);
             }
         }
 
