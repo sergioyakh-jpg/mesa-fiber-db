@@ -175,10 +175,10 @@
                 <div class="text-xs text-amber-400 font-bold">Pannello Amministratore</div>
             </div>
 
-            <!-- SEZIONE GITHUB CLOUD (CON DIAGNOSTICA) -->
+            <!-- SEZIONE GITHUB CLOUD -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Configurazione GitHub Cloud</h3>
-                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database sul Cloud. Il sistema controllerà eventuali errori.</p>
+                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database sul Cloud.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">GitHub Owner (Username)</label>
@@ -211,7 +211,6 @@
     </div>
 
     <!-- MODALI SOVRAPPOSTI -->
-    <!-- Dettaglio Pratica (WhatsApp/Mail) -->
     <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex justify-between font-bold text-white mb-4"><span id="det-title">Dettaglio</span><button onclick="closeModal('modal-detail')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
@@ -223,7 +222,6 @@
         </div>
     </div>
 
-    <!-- Nuova Pratica -->
     <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex justify-between font-bold text-white mb-4"><span>Nuova Pratica</span><button onclick="closeModal('modal-new-fault')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
@@ -231,12 +229,11 @@
                 <input type="text" id="nf-address" required placeholder="Indirizzo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
                 <input type="text" id="nf-pfp" required placeholder="PFP" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
                 <textarea id="nf-desc" required placeholder="Descrizione dell'intervento..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></textarea>
-                <button type="submit" class="w-full py-2.5 bg-sky-600 text-white rounded-xl font-bold shadow-lg">Salva e Sincronizza nel Cloud</button>
+                <button type="submit" class="w-full py-2.5 bg-sky-600 text-white rounded-xl font-bold shadow-lg">Salva e Sincronizza</button>
             </form>
         </div>
     </div>
     
-    <!-- Nuovo Utente -->
     <div id="modal-new-user" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex justify-between font-bold text-white mb-4"><span>Nuovo Utente</span><button onclick="closeModal('modal-new-user')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
@@ -247,13 +244,12 @@
                 <select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300">
                     <option value="Tecnico">Tecnico</option><option value="Amministratore">Amministratore</option>
                 </select>
-                <button type="submit" class="w-full py-2.5 bg-amber-600 text-white rounded-xl font-bold shadow-lg">Salva e Sincronizza Utente</button>
+                <button type="submit" class="w-full py-2.5 bg-amber-600 text-white rounded-xl font-bold shadow-lg">Salva Utente</button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- 1. STRUTTURE DATI ---
         let ghConfig = { owner: '', repo: '', token: '' };
         let appModules = [
             { id: 'Delivery', name: 'Delivery', icon: 'fa-house-signal', color: 'emerald', desc: 'Nuove attivazioni' },
@@ -277,15 +273,13 @@
         let currentEditingFault = null;
         let map = null;
 
-        // --- 2. FUNZIONI BASE64 SICURE (RISOLVONO JSON VUOTO/CORROTTO) ---
         function encodeBase64Unicode(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1))); }
         function decodeBase64Unicode(str) { return decodeURIComponent(Array.prototype.map.call(atob(str), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
 
-        // --- 3. AVVIO E MOTORE DATABASE (LOCAL + CLOUD) ---
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalDb();
             checkSession();
-            syncCloud(); // Tenta di scaricare gli ultimi aggiornamenti all'avvio
+            syncCloud();
         });
 
         function loadLocalDb() {
@@ -306,50 +300,35 @@
             localStorage.setItem('mesa_erp_db', JSON.stringify({users, faults, stock, vehicles, chatMessages, ghConfig})); 
         }
 
-        // Funzione per testare da interfaccia se GitHub risponde e configurarlo
         async function testAndSaveGitHub() {
             const owner = document.getElementById('gh-owner').value.trim();
             const repo = document.getElementById('gh-repo').value.trim();
             const token = document.getElementById('gh-token').value.trim();
 
-            if(!owner || !repo || !token) { alert("Attenzione: Compila tutti i campi prima di testare."); return; }
+            if(!owner || !repo || !token) { alert("Compila tutti i campi."); return; }
             
             const btn = document.getElementById('btn-save-gh');
-            btn.innerText = "Verifica in corso...";
+            btn.innerText = "Verifica...";
 
             try {
-                // Testa se il repository esiste e il token ha permessi
-                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                
-                if (res.status === 401) throw new Error("IL TOKEN NON È VALIDO.\nAssicurati di averlo copiato per intero senza spazi, o generane uno nuovo.");
-                if (res.status === 404) throw new Error("REPOSITORY NON TROVATO O TOKEN SENZA PERMESSO 'repo'.\nHai spuntato la voce 'repo' creando il Token PAT?");
-
-                const repoData = await res.json();
-                if (repoData.size === 0 && !repoData.default_branch) {
-                    throw new Error("IL REPOSITORY È VUOTO!\nVai su GitHub nel tuo repo 'mesa-fiber-db' e clicca 'Add a README' per sbloccarlo.");
-                }
-
-                // Se va a buon fine, salva la configurazione
                 ghConfig = { owner, repo, token };
                 saveLocalDb();
-                alert("Connessione GitHub Riuscita!\nOra proviamo a salvare i dati correnti sul Cloud.");
-                
-                await pushToCloud(); // Invia i dati correnti
+                await pushToCloud();
+                alert("Connessione GitHub Riuscita e Database Sincronizzato!");
             } catch (e) {
-                alert("ERRORE DURANTE IL TEST:\n\n" + e.message);
+                alert("ERRORE:\n\n" + e.message);
             } finally {
                 btn.innerText = "Salva e Testa Connessione Cloud";
             }
         }
 
-        // Scarica i dati dal cloud (al caricamento della pagina)
         async function syncCloud() {
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
             
             try {
-                sub.innerText = "Sincronizzazione in corso...";
+                sub.innerText = "Sincronizzazione...";
                 ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
                 
                 const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
@@ -370,17 +349,14 @@
                         updateUI();
                         if(!document.getElementById('view-guasti').classList.contains('hidden')) renderApp();
                     }
-                } else if (res.status === 404) {
-                    sub.innerText = "Inizializzazione File Cloud...";
-                    await pushToCloud(); // Se il file non c'è, lo crea
                 }
             } catch(e) {
-                sub.innerText = "Uso database locale";
+                sub.innerText = "Modo locale";
                 ind.className = 'w-2 h-2 rounded-full bg-slate-500 inline-block';
             }
         }
 
-        // Invia i dati al cloud (chiamata ogni volta che crei/modifichi qualcosa)
+        // MOTORE DI SCRITTURA ANTICONFLITTO (RISOLVE IL 409)
         async function pushToCloud() {
             saveLocalDb();
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
@@ -388,46 +364,49 @@
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
             ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-ping';
-            sub.innerText = "Salvataggio su Cloud in corso...";
+            sub.innerText = "Salvataggio Cloud...";
 
-            try {
-                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
-                let sha = undefined;
+            const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
+            const dbObj = { users, faults, stock, vehicles, chatMessages, ghConfig };
+            const encodedContent = encodeBase64Unicode(JSON.stringify(dbObj, null, 2));
 
-                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
-                if (getRes.ok) {
-                    sha = (await getRes.json()).sha; // Prende la "firma" del file esistente
-                } else if (getRes.status === 401) {
-                    throw new Error("Token non valido (Errore 401). Verifica il PAT in Impostazioni.");
-                } else if (getRes.status === 404 && sha === undefined) {
-                    // Significa che il file non esiste ancora, e va bene crearlo.
+            // Tenta fino a 2 volte se riceve conflitti (gestione automatica dello SHA)
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                try {
+                    let sha = undefined;
+                    const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
+                    if (getRes.ok) {
+                        sha = (await getRes.json()).sha;
+                    } else if (getRes.status === 401) {
+                        throw new Error("Token non valido (401). Verifica il PAT.");
+                    }
+
+                    const putRes = await fetch(url, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: `MESA ERP Sync`, content: encodedContent, sha: sha })
+                    });
+
+                    if (putRes.ok) {
+                        ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
+                        sub.innerText = "Database Sincronizzato";
+                        return; // Salvataggio completato con successo
+                    } else if (putRes.status === 409 && attempt === 1) {
+                        // Se riceve 409, riprova subito rinfrescando lo sha nel ciclo successivo
+                        continue;
+                    } else {
+                        throw new Error(`Errore GitHub (Codice ${putRes.status}). Verifica di aver dato i permessi 'Contents: Read and write' al Token.`);
+                    }
+                } catch (err) {
+                    if (attempt === 2) {
+                        ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
+                        sub.innerText = "Errore Cloud";
+                        throw err;
+                    }
                 }
-
-                // Inseriamo TUTTI i dati nel payload
-                const dbObj = { users, faults, stock, vehicles, chatMessages, ghConfig };
-                const encodedContent = encodeBase64Unicode(JSON.stringify(dbObj, null, 2));
-
-                const putRes = await fetch(url, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Aggiornamento dati operativi MESA`, content: encodedContent, sha: sha })
-                });
-
-                if (putRes.ok) {
-                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-                    sub.innerText = "Database Sincronizzato";
-                } else {
-                    throw new Error(`Errore durante il salvataggio su GitHub (Codice ${putRes.status}).`);
-                }
-            } catch (err) {
-                console.error(err);
-                ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                sub.innerText = "Errore di salvataggio Cloud";
-                alert("ATTENZIONE - Sincronizzazione Cloud Fallita:\n\n" + err.message + "\n\nI dati sono comunque stati salvati nel tuo dispositivo in attesa di riprovare.");
             }
         }
 
-        // --- 4. GESTIONE AUTENTICAZIONE E UI ---
         function checkSession() {
             const u = localStorage.getItem('mesa_session_u');
             if (u) { currentUser = JSON.parse(u); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-wrapper').classList.remove('hidden'); updateUI(); navigateTo('home'); }
@@ -450,11 +429,9 @@
         }
         function toggleProfileDropdown() { document.getElementById('profile-dropdown').classList.toggle('hidden'); }
 
-        // --- 5. NAVIGAZIONE VIEWS ---
         function navigateToHome() { navigateTo('home'); }
         function navigateTo(view) {
             if (view === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato.'); return; }
-            
             ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(id => document.getElementById(`view-${id}`).classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
 
@@ -482,7 +459,6 @@
             }
         }
 
-        // --- 6. RENDER MODULI E FUNZIONI SPECIFICHE ---
         function renderHome() {
             document.getElementById('home-modules-grid').innerHTML = appModules.map(m => `
                 <div onclick="openMod('${m.id}')" class="group bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-${m.color}-500/50 shadow-lg">
@@ -500,7 +476,6 @@
         function renderApp() {
             const q = document.getElementById('search-input').value.toLowerCase();
             const f = faults.filter(x => x.module === currentActiveModule && (x.address.toLowerCase().includes(q) || x.pfp.toLowerCase().includes(q)));
-            
             document.getElementById('faults-table-body').innerHTML = f.map(x => `
                 <tr class="hover:bg-slate-900/60">
                     <td class="py-3 px-3"><div class="font-bold text-white">${x.id}</div><div class="text-[10px] text-sky-400">${x.pfp}</div></td>
@@ -528,7 +503,6 @@
         function shareViaWhatsApp() { if(!currentEditingFault) return; window.open(`https://api.whatsapp.com/send?text=*MESA Fiber - ${currentEditingFault.id}*%0APFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AInfo: ${currentEditingFault.desc}`, '_blank'); }
         function shareViaEmail() { if(!currentEditingFault) return; window.open(`mailto:?subject=Pratica ${currentEditingFault.id}&body=PFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AInfo: ${currentEditingFault.desc}`); }
 
-        // Altri Moduli (Dati dinamici presi dal DB globale salvato in Cloud)
         function renderStock() { document.getElementById('stock-grid').innerHTML = stock.map(s => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl flex justify-between font-bold text-white text-sm"><span>${s.name}</span><span class="text-amber-400">${s.qty} ${s.unit}</span></div>`).join(''); }
         function renderVehicles() { document.getElementById('vehicles-grid').innerHTML = vehicles.map(v => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl font-bold text-white text-sm"><div>${v.model} - <span class="text-sky-400 font-mono">${v.plate}</span></div><div class="text-xs text-slate-400 mt-1 font-normal">Autista: ${v.driver}</div></div>`).join(''); }
         
@@ -546,7 +520,6 @@
             await pushToCloud();
         }
 
-        // Modulo Admin e Utenti
         function renderUsersTable() {
             document.getElementById('users-table-body').innerHTML = users.map(u => `<tr class="hover:bg-slate-900/60"><td class="py-2.5 font-bold text-white">${u.name}</td><td class="py-2.5"><code class="text-sky-400">${u.username}</code><br><span class="text-[10px] uppercase text-slate-400">${u.role}</span></td><td class="py-2.5 text-right">${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button>` : ''}</td></tr>`).join('');
         }
@@ -565,7 +538,6 @@
             }
         }
 
-        // Utilities Modali
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
         function openNewFaultModal() { openModal('modal-new-fault'); }
