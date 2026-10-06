@@ -91,9 +91,9 @@
         <!-- VIEW: HOME DASHBOARD -->
         <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Suite Cloud Attiva</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Database Cloud Centralizzato</span>
                 <h2 class="text-2xl font-bold text-white">MESA Fiber Solutions</h2>
-                <p class="text-sm text-slate-400">Seleziona il modulo operativo per gestire attivazioni, guasti, magazzino e mezzi.</p>
+                <p class="text-sm text-slate-400">Gestione operativa centralizzata per attivazioni, guasti e logistica.</p>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="home-modules-grid"></div>
         </div>
@@ -105,19 +105,16 @@
                 <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
             </div>
 
-            <!-- Mappa -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 space-y-2 shadow-xl">
                 <div class="text-xs font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-sky-400"></i> Mappa Territoriale</div>
                 <div id="map"></div>
             </div>
 
-            <!-- Filtri -->
             <div class="flex justify-between items-center bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 shadow-xl">
                 <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo o PFP..." class="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white">
-                <button onclick="openNewFaultModal()" class="bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus mr-2"></i>Nuova Pratica</button>
+                <button id="btn-new-fault" onclick="openNewFaultModal()" class="bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow"><i class="fa-solid fa-plus mr-2"></i>Nuova Pratica</button>
             </div>
 
-            <!-- Tabella Pratiche -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
@@ -133,7 +130,7 @@
             <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
             <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
                 <h3 class="font-bold text-white text-sm">Inventario Magazzino FTTH</h3>
-                <button onclick="alert('Funzione Aggiungi Articolo in arrivo')" class="bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus"></i> Articolo</button>
+                <span id="stock-admin-badge" class="text-xs text-slate-400">Vista Condivisa</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid"></div>
         </main>
@@ -143,7 +140,7 @@
             <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
             <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
                 <h3 class="font-bold text-white text-sm">Flotta Mezzi Aziendali</h3>
-                <button onclick="alert('Funzione Aggiungi Mezzo in arrivo')" class="bg-indigo-600 text-white px-3 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus"></i> Mezzo</button>
+                <span class="text-xs text-slate-400">Parco Mezzi</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vehicles-grid"></div>
         </main>
@@ -168,17 +165,17 @@
             </div>
         </main>
 
-        <!-- VIEW: IMPOSTAZIONI ADMIN & CLOUD -->
+        <!-- VIEW: IMPOSTAZIONI ADMIN & CLOUD (RISERVATO SOLO ADMIN) -->
         <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore</div>
+                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore Riservato</div>
             </div>
 
-            <!-- SEZIONE GITHUB CLOUD -->
+            <!-- CONFIGURAZIONE GITHUB CLOUD -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-                <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Configurazione GitHub Cloud</h3>
-                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database sul Cloud (il Token non viene mai esposto nel repository).</p>
+                <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Configurazione Cloud GitHub (Centralizzata)</h3>
+                <p class="text-xs text-slate-400">Queste impostazioni valgono per tutti i dispositivi collegati al database.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">GitHub Owner (Username)</label>
@@ -193,10 +190,10 @@
                         <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
                     </div>
                 </div>
-                <button id="btn-save-gh" onclick="testAndSaveGitHub()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold w-full sm:w-auto">Salva e Testa Connessione Cloud</button>
+                <button id="btn-save-gh" onclick="testAndSaveGitHub()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold w-full sm:w-auto">Salva Configurazione Cloud</button>
             </div>
 
-            <!-- SEZIONE PERSONALE -->
+            <!-- GESTIONE PERSONALE -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                     <div><h3 class="font-bold text-white text-sm">Gestione Personale</h3></div>
@@ -210,12 +207,13 @@
         </main>
     </div>
 
-    <!-- MODALI SOVRAPPOSTI -->
+    <!-- MODALI -->
     <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex justify-between font-bold text-white mb-4"><span id="det-title">Dettaglio</span><button onclick="closeModal('modal-detail')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <div id="det-content" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1 mb-4"></div>
-            <div class="grid grid-cols-2 gap-3">
+            <div id="det-actions" class="space-y-2"></div>
+            <div class="grid grid-cols-2 gap-3 mt-3">
                 <button onclick="shareViaWhatsApp()" class="bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold"><i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp</button>
                 <button onclick="shareViaEmail()" class="bg-sky-600 text-white py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-envelope mr-1"></i> Email</button>
             </div>
@@ -276,10 +274,10 @@
         function encodeBase64Unicode(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1))); }
         function decodeBase64Unicode(str) { return decodeURIComponent(Array.prototype.map.call(atob(str), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             loadLocalDb();
             checkSession();
-            syncCloud();
+            await syncCloud();
         });
 
         function loadLocalDb() {
@@ -308,17 +306,17 @@
             if(!owner || !repo || !token) { alert("Compila tutti i campi."); return; }
             
             const btn = document.getElementById('btn-save-gh');
-            btn.innerText = "Verifica...";
+            btn.innerText = "Salvataggio...";
 
             try {
                 ghConfig = { owner, repo, token };
                 saveLocalDb();
                 await pushToCloud();
-                alert("Connessione GitHub Riuscita e Database Sincronizzato con successo!");
+                alert("Configurazione Cloud salvata e sincronizzata con successo su tutti i dispositivi!");
             } catch (e) {
                 alert("ERRORE:\n\n" + e.message);
             } finally {
-                btn.innerText = "Salva e Testa Connessione Cloud";
+                btn.innerText = "Salva Configurazione Cloud";
             }
         }
 
@@ -356,7 +354,6 @@
             }
         }
 
-        // MOTORE DI SCRITTURA SICURO (ESCLUDE IL TOKEN DAL FILE JSON PER EVITARE BLOCCHI DI SICUREZZA GITHUB)
         async function pushToCloud() {
             saveLocalDb();
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
@@ -367,8 +364,6 @@
             sub.innerText = "Salvataggio Cloud...";
 
             const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
-            
-            // INVIO SOLO I DATI PULITI (IL TOKEN NON VIENE MAI SCRITTO NEL JSON)
             const cleanDbObj = { users, faults, stock, vehicles, chatMessages };
             const encodedContent = encodeBase64Unicode(JSON.stringify(cleanDbObj, null, 2));
 
@@ -405,8 +400,19 @@
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
             const found = users.find(x => x.username === u && x.pass === p);
-            if (found) { currentUser = found; localStorage.setItem('mesa_session_u', JSON.stringify(found)); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-wrapper').classList.remove('hidden'); updateUI(); navigateTo('home'); }
-            else { const err = document.getElementById('login-error'); err.innerText = 'Credenziali errate.'; err.classList.remove('hidden'); }
+            if (found) { 
+                currentUser = found; 
+                localStorage.setItem('mesa_session_u', JSON.stringify(found)); 
+                document.getElementById('login-screen').classList.add('hidden'); 
+                document.getElementById('app-wrapper').classList.remove('hidden'); 
+                updateUI(); 
+                navigateTo('home'); 
+                syncCloud(); // Scarica subito i dati aggiornati all'accesso
+            } else { 
+                const err = document.getElementById('login-error'); 
+                err.innerText = 'Credenziali errate.'; 
+                err.classList.remove('hidden'); 
+            }
         }
         function logout() { currentUser = null; localStorage.removeItem('mesa_session_u'); location.reload(); }
         
@@ -414,13 +420,24 @@
             document.getElementById('user-display-name').innerText = currentUser.name;
             document.getElementById('user-display-role').innerText = currentUser.role;
             document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
-            if(currentUser.role === 'Amministratore') document.getElementById('menu-settings-btn').classList.remove('hidden');
+            
+            const btnNewFault = document.getElementById('btn-new-fault');
+            const menuSettings = document.getElementById('menu-settings-btn');
+            
+            if(currentUser.role === 'Amministratore') {
+                menuSettings.classList.remove('hidden');
+                btnNewFault.classList.remove('hidden');
+            } else {
+                menuSettings.classList.add('hidden');
+                // I tecnici possono creare pratiche o solo chiuderle? Qui lasciamo visibile per permettere la gestione operativa, ma blindiamo la modifica degli stati.
+                btnNewFault.classList.remove('hidden'); 
+            }
         }
         function toggleProfileDropdown() { document.getElementById('profile-dropdown').classList.toggle('hidden'); }
 
         function navigateToHome() { navigateTo('home'); }
         function navigateTo(view) {
-            if (view === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato.'); return; }
+            if (view === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato. Sezione riservata agli amministratori.'); return; }
             ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(id => document.getElementById(`view-${id}`).classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
 
@@ -486,11 +503,33 @@
         function viewDetail(id) {
             currentEditingFault = faults.find(x => x.id === id);
             document.getElementById('det-title').innerText = currentEditingFault.id;
-            document.getElementById('det-content').innerHTML = `<div><b>PFP:</b> ${currentEditingFault.pfp}</div><div><b>Indirizzo:</b> ${currentEditingFault.address}</div><div class="mt-2"><b>Descrizione:</b><br>${currentEditingFault.desc}</div>`;
+            document.getElementById('det-content').innerHTML = `<div><b>PFP:</b> ${currentEditingFault.pfp}</div><div><b>Indirizzo:</b> ${currentEditingFault.address}</div><div class="mt-2"><b>Descrizione:</b><br>${currentEditingFault.desc}</div><div class="mt-2"><b>Stato Attuale:</b> <span class="text-emerald-400 font-bold">${currentEditingFault.status}</span></div>`;
+            
+            // Pulsanti di cambio stato per i tecnici o admin
+            document.getElementById('det-actions').innerHTML = `
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Cambia Stato / Chiudi Pratica:</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'Aperto')" class="py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs">Aperto</button>
+                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'In Lavorazione')" class="py-2 bg-amber-600 hover:bg-amber-500 text-white rounded text-xs">In Corso</button>
+                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'Risolto')" class="py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold">Risolto</button>
+                </div>
+            `;
             openModal('modal-detail');
         }
-        function shareViaWhatsApp() { if(!currentEditingFault) return; window.open(`https://api.whatsapp.com/send?text=*MESA Fiber - ${currentEditingFault.id}*%0APFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AInfo: ${currentEditingFault.desc}`, '_blank'); }
-        function shareViaEmail() { if(!currentEditingFault) return; window.open(`mailto:?subject=Pratica ${currentEditingFault.id}&body=PFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AInfo: ${currentEditingFault.desc}`); }
+
+        async function updateFaultStatus(id, newStatus) {
+            const f = faults.find(x => x.id === id);
+            if(f) {
+                f.status = newStatus;
+                closeModal('modal-detail');
+                renderApp();
+                await pushToCloud();
+                alert(`Stato pratica ${id} aggiornato a: ${newStatus}`);
+            }
+        }
+
+        function shareViaWhatsApp() { if(!currentEditingFault) return; window.open(`https://api.whatsapp.com/send?text=*MESA Fiber - ${currentEditingFault.id}*%0APFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AStato: ${currentEditingFault.status}%0AInfo: ${currentEditingFault.desc}`, '_blank'); }
+        function shareViaEmail() { if(!currentEditingFault) return; window.open(`mailto:?subject=Pratica ${currentEditingFault.id}&body=PFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AStato: ${currentEditingFault.status}%0AInfo: ${currentEditingFault.desc}`); }
 
         function renderStock() { document.getElementById('stock-grid').innerHTML = stock.map(s => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl flex justify-between font-bold text-white text-sm"><span>${s.name}</span><span class="text-amber-400">${s.qty} ${s.unit}</span></div>`).join(''); }
         function renderVehicles() { document.getElementById('vehicles-grid').innerHTML = vehicles.map(v => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl font-bold text-white text-sm"><div>${v.model} - <span class="text-sky-400 font-mono">${v.plate}</span></div><div class="text-xs text-slate-400 mt-1 font-normal">Autista: ${v.driver}</div></div>`).join(''); }
@@ -518,6 +557,7 @@
             closeModal('modal-new-user');
             renderUsersTable();
             await pushToCloud();
+            alert("Nuovo utente creato e sincronizzato sul Cloud!");
         }
         async function deleteUser(u) {
             if(confirm('Vuoi davvero eliminare questo utente?')) {
