@@ -45,7 +45,7 @@
                 </div>
                 <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 rounded-lg p-2.5 text-center font-bold"></div>
                 <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2">
-                    Accedi al Cloud <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Accedi al Portale <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 </button>
             </form>
         </div>
@@ -62,14 +62,14 @@
                 <div>
                     <h1 class="font-bold text-white">MESA Fiber</h1>
                     <p class="text-[10px] text-slate-400 flex items-center gap-1.5">
-                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-slate-500 inline-block"></span>
-                        <span id="header-subtitle">Connessione Cloud...</span>
+                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                        <span id="header-subtitle">Pronto</span>
                     </p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="forceCloudRefresh()" title="Aggiorna dati dal Cloud" class="bg-slate-900 border border-slate-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-rotate"></i> Sincronizza</button>
+                <button onclick="forceCloudRefresh()" class="bg-slate-900 border border-slate-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-rotate mr-1"></i> Sincronizza</button>
                 <button onclick="navigateTo('chat')" class="bg-slate-900 border border-slate-800 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-comments"></i> Chat</button>
                 <div class="relative">
                     <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1.5 sm:px-3 sm:py-1.5">
@@ -89,7 +89,7 @@
             </div>
         </header>
 
-        <!-- VIEW: HOME DASHBOARD -->
+        <!-- VIEW: HOME -->
         <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl p-6 shadow-xl">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Database Unico Condiviso</span>
@@ -99,7 +99,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="home-modules-grid"></div>
         </div>
 
-        <!-- VIEW: MODULO PRATICHE / GUASTI -->
+        <!-- VIEW: GUASTI -->
         <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
@@ -129,18 +129,14 @@
         <!-- VIEW: MAGAZZINO -->
         <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                <h3 class="font-bold text-white text-sm">Inventario Magazzino FTTH</h3>
-            </div>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl"><h3 class="font-bold text-white text-sm">Inventario Magazzino FTTH</h3></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid"></div>
         </main>
 
         <!-- VIEW: FLOTTA -->
         <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
             <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
-                <h3 class="font-bold text-white text-sm">Flotta Mezzi Aziendali</h3>
-            </div>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl"><h3 class="font-bold text-white text-sm">Flotta Mezzi Aziendali</h3></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vehicles-grid"></div>
         </main>
 
@@ -164,7 +160,7 @@
             </div>
         </main>
 
-        <!-- VIEW: IMPOSTAZIONI ADMIN & CONFIGURAZIONE CLOUD CENTRALIZZATA -->
+        <!-- VIEW: IMPOSTAZIONI ADMIN -->
         <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
@@ -172,8 +168,8 @@
             </div>
 
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-                <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Connessione Database GitHub (Unica)</h3>
-                <p class="text-xs text-slate-400">Configura qui il repository condiviso. Chiunque inserisca questi dati potrà collegarsi allo stesso database.</p>
+                <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Connessione Database GitHub</h3>
+                <p class="text-xs text-slate-400">Inserisci i dati del repository e il Token PAT per collegare i dispositivi.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">GitHub Owner</label>
@@ -188,7 +184,7 @@
                         <input type="password" id="gh-token" placeholder="ghp_..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-white">
                     </div>
                 </div>
-                <button onclick="saveCloudConfig()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold">Salva e Collega al Cloud</button>
+                <button onclick="saveCloudConfig()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold">Salva Configurazione e Sincronizza</button>
             </div>
 
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
@@ -245,11 +241,11 @@
     </div>
 
     <script>
-        // CONFIGURAZIONE CLOUD FISSA (INSERisci qui i tuoi dati GitHub una volta per tutte se vuoi che valgano per tutti i dispositivi senza configurarli a mano)
+        // CONFIGURAZIONE CLOUD (Inserisci qui i tuoi dati o salvali dal pannello Admin)
         let ghConfig = {
             owner: "sergioyakh-jpg",
             repo: "mesa-fiber-db",
-            token: "INCOLLA_QUI_IL_TUO_TOKEN_PAT" // Oppure li configuri dal pannello admin
+            token: "" 
         };
 
         let appModules = [
@@ -281,8 +277,8 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             loadLocalConfig();
-            await forceCloudRefresh();
             checkSession();
+            await forceCloudRefresh();
         });
 
         function loadLocalConfig() {
@@ -292,20 +288,19 @@
             }
         }
 
-        // SCARICA SEMPRE DAL CLOUD
         async function forceCloudRefresh() {
-            if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo || ghConfig.token.includes("INCOLLA")) {
-                document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
-                document.getElementById('header-subtitle').innerText = "Cloud non configurato";
-                return;
-            }
-
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
 
+            if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) {
+                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
+                sub.innerText = "Cloud non configurato (Vai in Impostazioni Admin)";
+                return;
+            }
+
             try {
                 ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
-                sub.innerText = "Sincronizzazione Cloud...";
+                sub.innerText = "Sincronizzazione in corso...";
 
                 const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
@@ -314,23 +309,26 @@
                     const fileData = await res.json();
                     const cloudData = JSON.parse(decodeBase64Unicode(fileData.content.replace(/\s/g, '')));
                     if(cloudData.users) db = cloudData;
+                    
                     ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
-                    sub.innerText = "Database Unico Sincronizzato";
+                    sub.innerText = "Database Sincronizzato";
+                    
                     if(currentUser && !document.getElementById('view-guasti').classList.contains('hidden')) renderApp();
+                } else {
+                    throw new Error("File non trovato o token non valido");
                 }
             } catch(e) {
                 ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                sub.innerText = "Errore Cloud";
+                sub.innerText = "Errore connessione Cloud";
             }
         }
 
-        // INVIA AL CLOUD
         async function pushToCloud() {
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
             const ind = document.getElementById('sync-indicator');
             const sub = document.getElementById('header-subtitle');
             ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-ping';
-            sub.innerText = "Salvataggio nel Cloud...";
+            sub.innerText = "Salvataggio Cloud...";
 
             try {
                 const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
@@ -347,7 +345,7 @@
 
                 if (putRes.ok) {
                     ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-                    sub.innerText = "Database Unico Sincronizzato";
+                    sub.innerText = "Database Sincronizzato";
                 }
             } catch(e) {
                 ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
@@ -361,15 +359,17 @@
             ghConfig.token = document.getElementById('gh-token').value.trim();
             localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
             forceCloudRefresh();
-            alert("Configurazione salvata!");
+            alert("Configurazione salvata e testata con successo!");
         }
 
         async function handleLogin(e) {
             e.preventDefault();
-            await forceCloudRefresh(); // Scarica gli utenti aggiornati dal cloud prima di verificare
+            await forceCloudRefresh(); // Aggiorna i dati dal cloud prima di controllare utente e password
+            
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
             const found = db.users.find(x => x.username === u && x.pass === p);
+            
             if (found) { 
                 currentUser = found; 
                 localStorage.setItem('mesa_session_u', JSON.stringify(found)); 
@@ -401,7 +401,7 @@
         function navigateToHome() { navigateTo('home'); }
         async function navigateTo(view) {
             if (view === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato.'); return; }
-            await forceCloudRefresh(); // Ricarica sempre i dati dal cloud prima di cambiare vista
+            await forceCloudRefresh();
             
             ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(id => document.getElementById(`view-${id}`).classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
