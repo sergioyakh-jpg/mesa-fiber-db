@@ -15,7 +15,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        #map { height: 380px; width: 100%; border-radius: 0.75rem; z-index: 1; }
+        #map { height: 350px; width: 100%; border-radius: 0.75rem; z-index: 1; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
@@ -28,7 +28,7 @@
                     <i class="fa-solid fa-network-wired"></i>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-white">MESA Fiber Solutions</h1>
-                <p class="text-sm text-slate-400 mt-1">Suite Gestionale & Database Cloud</p>
+                <p class="text-sm text-slate-400 mt-1">Suite Integrata & Cloud Database</p>
             </div>
 
             <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
@@ -36,7 +36,7 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Username Utente</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="login-username" required placeholder="es. admin, tecnico o cliente" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
+                        <input type="text" id="login-username" required placeholder="es. admin, manager, tecnico, cliente" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
                     </div>
                 </div>
 
@@ -49,10 +49,11 @@
                 </div>
 
                 <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 space-y-1.5">
-                    <div class="font-medium text-slate-300">Profili di accesso:</div>
-                    <div>• Amministratore: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
-                    <div>• Tecnico Campo: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
-                    <div>• Portale Cliente (Visualizzazione): <code class="text-emerald-400">cliente</code> / <code class="text-emerald-400">cliente123</code></div>
+                    <div class="font-medium text-slate-300">Profili predefiniti:</div>
+                    <div>• Admin: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
+                    <div>• Manager: <code class="text-indigo-400">manager</code> / <code class="text-indigo-400">manager123</code></div>
+                    <div>• Tecnico: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
+                    <div>• Cliente: <code class="text-emerald-400">cliente</code> / <code class="text-emerald-400">cliente123</code></div>
                 </div>
 
                 <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 text-center"></div>
@@ -77,8 +78,8 @@
                     <div>
                         <h1 class="font-bold text-base text-white tracking-wide">MESA Fiber Solutions</h1>
                         <p class="text-xs text-slate-400 flex items-center gap-2">
-                            <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                            <span id="header-subtitle">App Gestionale Interventi</span>
+                            <span id="sync-indicator" class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                            <span id="header-subtitle">Suite Operativa</span>
                         </p>
                     </div>
                 </div>
@@ -87,15 +88,24 @@
                     <button onclick="navigateToHome()" class="text-slate-400 hover:text-white transition-colors">Suite Home</button>
                     <span id="nav-breadcrumb-sub" class="hidden items-center gap-2 text-slate-500">
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        <span id="nav-breadcrumb-title" class="text-sky-400 font-semibold">Gestione Guasti</span>
+                        <span id="nav-breadcrumb-title" class="text-sky-400 font-semibold">Modulo</span>
                     </span>
                 </nav>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <!-- ACCESSO CHAT GLOBALE -->
+                <button onclick="navigateTo('chat')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-sky-400 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-comments"></i>
+                    <span class="hidden sm:inline">Chat Aziendale</span>
+                </button>
+
+                <!-- MENU PROFILO UTENTE -->
                 <div class="relative">
                     <button onclick="toggleProfileDropdown()" class="flex items-center gap-3 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl px-3 py-1.5 transition-colors">
-                        <div class="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs" id="user-avatar-initials">S</div>
+                        <div id="header-avatar-container" class="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden">
+                            <span id="user-avatar-initials">S</span>
+                        </div>
                         <div class="text-left hidden sm:block">
                             <div class="text-xs font-bold text-white" id="user-display-name">Utente</div>
                             <div class="text-[10px] text-sky-400 uppercase tracking-wider font-semibold" id="user-display-role">Ruolo</div>
@@ -108,9 +118,13 @@
                             <div class="text-xs text-slate-400">Connesso come</div>
                             <div class="text-sm font-bold text-white truncate" id="dropdown-username">username</div>
                         </div>
+                        <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2.5">
+                            <i class="fa-solid fa-user-gear text-sky-400"></i>
+                            <span>Profilo & Storico Chiusure</span>
+                        </button>
                         <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2.5">
-                            <i class="fa-solid fa-gear text-sky-400"></i>
-                            <span>Impostazioni & Database</span>
+                            <i class="fa-solid fa-gear text-amber-400"></i>
+                            <span>Amministrazione & Cloud DB</span>
                         </button>
                         <div class="h-px bg-slate-800 my-1"></div>
                         <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5">
@@ -127,99 +141,120 @@
             <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-3xl p-8 shadow-xl">
                 <div class="max-w-2xl space-y-3">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                        <i class="fa-solid fa-circle-check"></i> Database Condiviso Attivo
+                        <i class="fa-solid fa-circle-check"></i> Suite Integrata Attiva
                     </span>
-                    <h2 class="text-3xl font-bold text-white tracking-tight">Benvenuto nella Suite MESA Fiber</h2>
+                    <h2 class="text-3xl font-bold text-white tracking-tight" id="home-welcome-title">Benvenuto nella Suite MESA Fiber</h2>
                     <p class="text-sm text-slate-400 leading-relaxed">
-                        Piattaforma centralizzata per la gestione delle infrastrutture in fibra ottica FTTH, interventi di giunzione, collaudi OTDR e monitoraggio guasti in tempo reale per tutto il team e i clienti.
+                        Gestione completa delle attivazioni FTTH, assurance guasti, giunzioni e collaudi OTDR, magazzino, flotta e chat aziendale unificata.
                     </p>
                 </div>
             </div>
 
             <div class="space-y-4">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Applicazioni Aziendali Disponibili</h3>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Moduli Operativi Aziendali</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="navigateTo('guasti')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl group-hover:bg-sky-500/10 transition-all"></div>
-                        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl border border-sky-500/20 group-hover:scale-110 transition-transform">
+                    <!-- DELIVERY -->
+                    <div onclick="navigateToModule('Delivery')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-house-signal"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">Delivery (Attivazioni)</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Gestione nuove linee FTTH, permute borchia ottica e collaudi cliente.</p>
+                        </div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-emerald-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- ASSURANCE -->
+                    <div onclick="navigateToModule('Assurance')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl border border-rose-500/20 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">Gestione Guasti FTTH</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                                Monitoraggio guasti in tempo reale, mappa interattiva, assegnazione tecnici, allegati foto e collaudi OTDR.
-                            </p>
+                            <h4 class="text-lg font-bold text-white group-hover:text-rose-400 transition-colors">Assurance (Guasti)</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ticket guasti, localizzazione pozzetti, mappe e ripristino cavi multifibra.</p>
                         </div>
-                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-sky-400">
-                            <span>Apri Applicazione</span>
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-rose-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
                     </div>
 
-                    <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-6 space-y-4 opacity-60">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-500 flex items-center justify-center text-xl border border-slate-700/50">
+                    <!-- GIUNZIONI & OTDR -->
+                    <div onclick="navigateToModule('Giunzioni')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl border border-sky-500/20 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-toolbox"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">Giunzioni & OTDR</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Registro fusioni Sumitomo/Qiirun e certificati di misura Viavi SmartOTDR.</p>
+                        </div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-sky-400"><span>Apri Modulo</span> <i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- MAGAZZINO -->
+                    <div onclick="navigateTo('magazzino')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl border border-amber-500/20 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-slate-300">Magazzino & Splicer</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Gestione scorte materiali passivi, bretelle, muffole e inventario giuntatrici.</p>
+                            <h4 class="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">Magazzino Materiali</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Controllo scorte passive, bretelle SC/APC, muffole e apparecchiature.</p>
                         </div>
-                        <div class="pt-2 text-xs text-slate-500 font-medium">Prossimamente</div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-amber-400"><span>Apri Magazzino</span> <i class="fa-solid fa-arrow-right"></i></div>
                     </div>
 
-                    <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-6 space-y-4 opacity-60">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-500 flex items-center justify-center text-xl border border-slate-700/50">
-                            <i class="fa-solid fa-chart-line"></i>
+                    <!-- FLOTTA -->
+                    <div onclick="navigateTo('flotta')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-truck"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-slate-300">Report & Collaudi OTDR</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Generazione automatica report di misura riflettometrica e certificati.</p>
+                            <h4 class="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">Flotta & Mezzi</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Assegnazione furgoni e veicoli aziendali (Opel Corsa, Peugeot Partner).</p>
                         </div>
-                        <div class="pt-2 text-xs text-slate-500 font-medium">Prossimamente</div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-indigo-400"><span>Apri Flotta</span> <i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- CHAT -->
+                    <div onclick="navigateTo('chat')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-violet-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-400 flex items-center justify-center text-xl border border-violet-500/20 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">Chat Aziendale</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Canale di comunicazione globale aperto a tutti i ruoli aziendali e clienti.</p>
+                        </div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-violet-400"><span>Apri Chat</span> <i class="fa-solid fa-arrow-right"></i></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW 2: APP GESTIONE GUASTI -->
+        <!-- VIEW 2: MODULO INTERVENTI (DELIVERY / ASSURANCE / GIUNZIONI) -->
         <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-            <div id="back-home-bar" class="flex items-center justify-between">
+            <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span>Torna alla Home Suite</span>
                 </button>
-                <div class="text-xs text-slate-400">Modulo Operativo: <span class="text-white font-bold">Gestione Guasti</span></div>
+                <div class="text-xs text-slate-400">Modulo Attivo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg border border-sky-500/20"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div>
-                        <div class="text-2xl font-bold text-white" id="kpi-total">0</div>
-                        <div class="text-xs text-slate-400 font-medium">Guasti Totali</div>
-                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg border border-sky-500/20"><i class="fa-solid fa-list-check"></i></div>
+                    <div><div class="text-2xl font-bold text-white" id="kpi-total">0</div><div class="text-xs text-slate-400 font-medium">Totale Interventi</div></div>
                 </div>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20"><i class="fa-solid fa-spinner"></i></div>
-                    <div>
-                        <div class="text-2xl font-bold text-amber-400" id="kpi-in-progress">0</div>
-                        <div class="text-xs text-slate-400 font-medium">In Lavorazione</div>
-                    </div>
+                    <div><div class="text-2xl font-bold text-amber-400" id="kpi-in-progress">0</div><div class="text-xs text-slate-400 font-medium">In Lavorazione</div></div>
                 </div>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20"><i class="fa-solid fa-circle-check"></i></div>
-                    <div>
-                        <div class="text-2xl font-bold text-emerald-400" id="kpi-resolved">0</div>
-                        <div class="text-xs text-slate-400 font-medium">Risolti / Chiusi</div>
-                    </div>
+                    <div><div class="text-2xl font-bold text-emerald-400" id="kpi-resolved">0</div><div class="text-xs text-slate-400 font-medium">Risolti / Chiusi</div></div>
                 </div>
                 <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg border border-rose-500/20"><i class="fa-solid fa-fire"></i></div>
-                    <div>
-                        <div class="text-2xl font-bold text-rose-400" id="kpi-critical">0</div>
-                        <div class="text-xs text-slate-400 font-medium">Criticità Alta</div>
-                    </div>
+                    <div><div class="text-2xl font-bold text-rose-400" id="kpi-critical">0</div><div class="text-xs text-slate-400 font-medium">Alta Priorità</div></div>
                 </div>
             </div>
 
@@ -227,9 +262,9 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 text-sm font-semibold text-white">
                         <i class="fa-solid fa-map-location-dot text-sky-400"></i>
-                        <span>Mappa Interattiva Interventi & Muffole</span>
+                        <span>Mappa Geografica Interventi</span>
                     </div>
-                    <div class="text-xs text-slate-400">Monitoraggio Territoriale</div>
+                    <div class="text-xs text-slate-400">Modena & Provincia</div>
                 </div>
                 <div id="map"></div>
             </div>
@@ -238,19 +273,13 @@
                 <div class="flex flex-wrap items-center gap-3 flex-1">
                     <div class="relative flex-1 min-w-[220px]">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-search"></i></span>
-                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca per indirizzo, PFP, codice guasto..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo, PFP, codice..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
                     </div>
                     <select id="filter-status" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
                         <option value="ALL">Tutti gli stati</option>
                         <option value="Aperto">Aperto</option>
                         <option value="In Lavorazione">In Lavorazione</option>
                         <option value="Risolto">Risolto</option>
-                    </select>
-                    <select id="filter-priority" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
-                        <option value="ALL">Tutte le priorità</option>
-                        <option value="Alta">Alta</option>
-                        <option value="Media">Media</option>
-                        <option value="Bassa">Bassa</option>
                     </select>
                 </div>
 
@@ -261,7 +290,7 @@
                     </button>
                     <button id="btn-new-fault" onclick="openNewFaultModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/25">
                         <i class="fa-solid fa-plus"></i>
-                        <span>Nuovo Guasto</span>
+                        <span>Nuovo Intervento</span>
                     </button>
                 </div>
             </div>
@@ -271,32 +300,198 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 bg-slate-900/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                                <th class="py-3.5 px-4">Codice / App apparato</th>
-                                <th class="py-3.5 px-4">Indirizzo & Zona</th>
+                                <th class="py-3.5 px-4">Codice / Modulo</th>
+                                <th class="py-3.5 px-4">Indirizzo & Dettaglio</th>
                                 <th class="py-3.5 px-4">Priorità</th>
-                                <th class="py-3.5 px-4">Stato Intervento</th>
-                                <th class="py-3.5 px-4">Tecnico Assegnato</th>
+                                <th class="py-3.5 px-4">Stato</th>
+                                <th class="py-3.5 px-4">Assegnatario</th>
                                 <th class="py-3.5 px-4 text-right">Azioni</th>
                             </tr>
                         </thead>
                         <tbody id="faults-table-body" class="divide-y divide-slate-800/60 text-sm">
-                            <!-- Inserito via JS -->
+                            <!-- Popolato via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </main>
 
-        <!-- VIEW 3: IMPOSTAZIONI & DATABASE -->
-        <main id="view-settings" class="hidden flex-1 max-w-4xl w-full mx-auto p-6 space-y-6">
+        <!-- VIEW 3: MAGAZZINO -->
+        <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span>Torna alla Home Suite</span>
                 </button>
-                <div class="text-xs text-slate-400">Configurazioni Database</div>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Magazzino Materiali</span></div>
             </div>
 
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <div>
+                    <h3 class="font-bold text-white text-base">Scorte e Componenti Passivi FTTH</h3>
+                    <p class="text-xs text-slate-400">Gestione inventario bobine cavo, bretelle, splitter e muffole.</p>
+                </div>
+                <button onclick="openNewStockModal()" id="btn-add-stock" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nuovo Articolo</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stock-grid">
+                <!-- Popolato via JS -->
+            </div>
+        </main>
+
+        <!-- VIEW 4: FLOTTA -->
+        <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home Suite</span>
+                </button>
+                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold">Parco Mezzi & Flotta</span></div>
+            </div>
+
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <div>
+                    <h3 class="font-bold text-white text-base">Assegnazione Veicoli ai Tecnici</h3>
+                    <p class="text-xs text-slate-400">Associa furgoni e automobili aziendali al personale operativo sul campo.</p>
+                </div>
+                <button onclick="openNewVehicleModal()" id="btn-add-vehicle" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nuovo Mezzo</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="vehicles-grid">
+                <!-- Popolato via JS -->
+            </div>
+        </main>
+
+        <!-- VIEW 5: CHAT GLOBALE -->
+        <main id="view-chat" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col h-[calc(100vh-80px)] space-y-4">
+            <div class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <button onclick="navigateToHome()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-sm font-bold text-white">Chat Aziendale Globale (Tutti gli utenti)</span>
+                </div>
+            </div>
+
+            <div id="chat-messages-container" class="flex-1 bg-slate-950/60 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-4 shadow-xl">
+                <!-- Messaggi chat -->
+            </div>
+
+            <form onsubmit="handleSendChatMessage(event)" class="flex items-center gap-3 bg-slate-950/80 border border-slate-800 rounded-2xl p-3 shadow-xl">
+                <input type="text" id="chat-input-msg" required placeholder="Scrivi un messaggio al team o ai clienti..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl py-3 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/20">
+                    <span>Invia</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </main>
+
+        <!-- VIEW 6: PROFILO & STORICO CHIUSURE -->
+        <main id="view-profile" class="hidden flex-1 max-w-4xl w-full mx-auto p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home</span>
+                </button>
+                <div class="text-xs text-slate-400">Gestione Profilo Personale</div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-800">
+                    <div id="profile-avatar-preview" class="w-24 h-24 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-bold text-3xl overflow-hidden border-2 border-sky-500/30 shadow-lg">
+                        <span id="profile-initials">S</span>
+                    </div>
+                    <div class="space-y-2 flex-1 text-center sm:text-left">
+                        <h3 class="text-xl font-bold text-white" id="profile-name-title">Nome Utente</h3>
+                        <div class="text-xs text-sky-400 font-semibold uppercase tracking-wider" id="profile-role-title">Ruolo</div>
+                        <div>
+                            <label class="text-[11px] font-semibold text-slate-400 uppercase">Foto Profilo (URL o File)</label>
+                            <input type="text" id="profile-photo-input" placeholder="Incolla link immagine o carica file..." onchange="updateProfilePhotoUrl(this.value)" class="w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Mansione / Qualifica Specifica</label>
+                        <input type="text" id="profile-mansione" placeholder="es. Senior Telecom Technician & Splicer" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Email Aziendale</label>
+                        <input type="email" id="profile-email" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-slate-800">
+                    <button onclick="saveProfileChanges()" class="px-6 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva Modifiche Profilo</button>
+                </div>
+            </div>
+
+            <!-- STORICO INTERVENTI CHIUSI -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>Storico Interventi Chiusi / Risolti</span>
+                </h3>
+                <div class="space-y-3" id="profile-closed-faults-list">
+                    <!-- Popolato via JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW 7: AMMINISTRAZIONE & IMPOSTAZIONI -->
+        <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateToHome()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home Suite</span>
+                </button>
+                <div class="text-xs text-slate-400">Amministrazione Sistema</div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 font-bold">
+                            <i class="fa-solid fa-users text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-base">Gestione Utenti Aziendali & Ruoli</h3>
+                            <p class="text-xs text-slate-400">Crea e gestisci credenziali per Amministratore, Manager, Tecnico e Cliente.</p>
+                        </div>
+                    </div>
+                    <button onclick="openNewUserModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Aggiungi Utente</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-3">Nome & Mansione</th>
+                                <th class="py-3 px-3">Username / Ruolo</th>
+                                <th class="py-3 px-3">Contatti</th>
+                                <th class="py-3 px-3 text-right">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-800/60 text-xs">
+                            <!-- Popolato via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GITHUB DATABASE CONFIG -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
                 <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
                     <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
@@ -304,7 +499,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-white text-base">Database Condiviso GitHub (Cloud)</h3>
-                        <p class="text-xs text-slate-400">Collega la repository per sincronizzare in tempo reale tutti i guasti tra admin, tecnici e clienti.</p>
+                        <p class="text-xs text-slate-400">Sincronizza in tempo reale tutti i moduli, chat e flotta su repository.</p>
                     </div>
                 </div>
 
@@ -328,19 +523,19 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-                    <button onclick="saveSettingsGithub()" class="px-6 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva e Sincronizza Database</button>
+                    <button onclick="saveSettingsGithub()" class="px-6 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg">Salva e Sincronizza Cloud</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL: NUOVO GUASTO -->
+    <!-- MODAL: NUOVO INTERVENTO -->
     <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl my-8">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div class="flex items-center gap-2.5 font-bold text-white text-base">
                     <i class="fa-solid fa-triangle-exclamation text-sky-400"></i>
-                    <span>Segnalazione Nuovo Guasto Fibra</span>
+                    <span id="modal-fault-title">Nuovo Intervento</span>
                 </div>
                 <button onclick="closeNewFaultModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -353,13 +548,13 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Codice PFP / Muffola</label>
-                        <input type="text" id="nf-pfp" required placeholder="es. PFP-MO-04" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Codice PFP / Apparato</label>
+                        <input type="text" id="nf-pfp" required placeholder="es. PFP-MO-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Priorità</label>
                         <select id="nf-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
-                            <option value="Alta">Alta (Critical)</option>
+                            <option value="Alta">Alta</option>
                             <option value="Media" selected>Media</option>
                             <option value="Bassa">Bassa</option>
                         </select>
@@ -378,31 +573,19 @@
                 </div>
 
                 <div>
-                    <button type="button" onclick="detectGPS()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-location-crosshairs text-sky-400"></i>
-                        <span>Acquisisci GPS Attuale</span>
-                    </button>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Descrizione Anomalia / Ticket</label>
-                    <textarea id="nf-desc" rows="3" required placeholder="es. Rottura cavo multifibra in pozzetto, segnale OTDR assente..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Foto Anomalia (Iniziale)</label>
-                    <input type="file" id="nf-photo" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-sky-400 hover:file:bg-slate-700 cursor-pointer">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Descrizione / Note Tecniche</label>
+                    <textarea id="nf-desc" rows="3" required placeholder="es. Giunzione bretella e test OTDR..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeNewFaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700">Annulla</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Crea Guasto</button>
+                    <button type="button" onclick="closeNewFaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg">Salva Intervento</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: DETTAGLIO & VISUALIZZAZIONE -->
+    <!-- MODAL: DETTAGLIO INTERVENTO -->
     <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -419,258 +602,288 @@
         </div>
     </div>
 
+    <!-- MODAL: NUOVO UTENTE -->
+    <div id="modal-new-user" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5 font-bold text-white text-base">
+                    <i class="fa-solid fa-user-plus text-amber-400"></i>
+                    <span>Nuovo Utente Aziendale</span>
+                </div>
+                <button onclick="closeNewUserModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="form-new-user" onsubmit="handleCreateUser(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nome e Cognome</label>
+                    <input type="text" id="nu-name" required placeholder="es. Mario Rossi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Username</label>
+                        <input type="text" id="nu-username" required placeholder="m.rossi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Password</label>
+                        <input type="password" id="nu-pass" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ruolo Aziendale</label>
+                    <select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-slate-300 focus:outline-none focus:border-amber-500">
+                        <option value="Tecnico">Tecnico</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Cliente">Cliente (Sola lettura)</option>
+                        <option value="Amministratore">Amministratore</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Mansione / Qualifica</label>
+                    <input type="text" id="nu-mansione" placeholder="es. Fiber Splicer Specialist" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeNewUserModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-500">Salva Utente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NUOVO ARTICOLO MAGAZZINO -->
+    <div id="modal-new-stock" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5 font-bold text-white text-base">
+                    <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
+                    <span>Nuovo Articolo Magazzino</span>
+                </div>
+                <button onclick="closeNewStockModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-new-stock" onsubmit="handleCreateStock(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nome Articolo</label>
+                    <input type="text" id="ns-name" required placeholder="es. Bretella SC/APC OS2 2m" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Quantità Disponibile</label>
+                        <input type="number" id="ns-qty" required value="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Unità di Misura</label>
+                        <input type="text" id="ns-unit" required value="Pezzi" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeNewStockModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-500">Salva Articolo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NUOVO MEZZO FLOTTA -->
+    <div id="modal-new-vehicle" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5 font-bold text-white text-base">
+                    <i class="fa-solid fa-truck text-indigo-400"></i>
+                    <span>Nuovo Veicolo / Furgone</span>
+                </div>
+                <button onclick="closeNewVehicleModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-new-vehicle" onsubmit="handleCreateVehicle(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Modello Veicolo</label>
+                    <input type="text" id="nv-model" required placeholder="es. Peugeot Partner Van" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Targa</label>
+                        <input type="text" id="nv-plate" required placeholder="GH456XY" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-white uppercase focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Assegna a Tecnico</label>
+                        <select id="nv-driver" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-sm text-slate-300 focus:outline-none focus:border-indigo-500">
+                            <option value="Non assegnato">Non assegnato</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeNewVehicleModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500">Salva Mezzo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- SCRIPT APPLICAZIONE -->
     <script>
-        const USERS = [
-            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore' },
-            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi (Tecnico FTTH)', role: 'Tecnico' },
-            { username: 'cliente', pass: 'cliente123', name: 'Portale Monitoraggio Cliente', role: 'Cliente' }
+        let defaultUsers = [
+            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore', mansione: 'Senior Telecommunications Manager', email: 'admin@mesafiber.it', photo: '' },
+            { username: 'manager', pass: 'manager123', name: 'Direzione Operations', role: 'Manager', mansione: 'Operations Coordinator', email: 'manager@mesafiber.it', photo: '' },
+            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi', role: 'Tecnico', mansione: 'FTTH & OTDR Specialist', email: 'm.rossi@mesafiber.it', photo: '' },
+            { username: 'cliente', pass: 'cliente123', name: 'Committente Rete', role: 'Cliente', mansione: 'Client Supervisor', email: 'cliente@committente.it', photo: '' }
         ];
-
-        let currentUser = null;
-        let map = null;
-        let markersLayer = null;
 
         let defaultFaults = [
             {
-                id: 'FIB-2026-001',
-                address: 'Via Emilia Est 142, Modena',
-                pfp: 'PFP-MO-01',
-                priority: 'Alta',
-                status: 'In Lavorazione',
-                lat: 44.6471,
-                lng: 10.9252,
-                desc: 'Rottura cavo multifibra in pozzetto BT. Segnale OTDR azzerato a 1.2km.',
-                assignedTo: 'Marco Rossi (Tecnico FTTH)',
-                photoInitial: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
-                photoClose: null,
-                closingNotes: '',
-                createdAt: '2026-10-06 08:30'
+                id: 'DEL-2026-001', module: 'Delivery', address: 'Via Emilia Est 142, Modena', pfp: 'PFP-MO-01', priority: 'Alta', status: 'In Lavorazione',
+                lat: 44.6471, lng: 10.9252, desc: 'Nuova attivazione FTTH residenziale. Posa bretella e test borchia ottica.', assignedTo: 'Marco Rossi',
+                photoInitial: '', photoClose: null, closingNotes: '', createdAt: '2026-10-06 08:30'
             },
             {
-                id: 'FIB-2026-002',
-                address: 'Viale Caduti in Guerra 25, Modena',
-                pfp: 'PFP-MO-04',
-                priority: 'Media',
-                status: 'Aperto',
-                lat: 44.6515,
-                lng: 10.9321,
-                desc: 'Attenuazione elevata su splitter secondario PFS 04.',
-                assignedTo: 'Non assegnato',
-                photoInitial: '',
-                photoClose: null,
-                closingNotes: '',
-                createdAt: '2026-10-06 10:15'
+                id: 'ASS-2026-002', module: 'Assurance', address: 'Viale Caduti in Guerra 25, Modena', pfp: 'PFP-MO-04', priority: 'Media', status: 'Aperto',
+                lat: 44.6515, lng: 10.9321, desc: 'Attenuazione elevata su splitter secondario PFS 04.', assignedTo: 'Non assegnato',
+                photoInitial: '', photoClose: null, closingNotes: '', createdAt: '2026-10-06 10:15'
             },
             {
-                id: 'FIB-2026-003',
-                address: 'Via Giardini 450, Modena',
-                pfp: 'PFP-MO-09',
-                priority: 'Alta',
-                status: 'Risolto',
-                lat: 44.6280,
-                lng: 10.9100,
-                desc: 'Muffola interrata allagata e danneggiata da scavi terzi.',
-                assignedTo: 'Marco Rossi (Tecnico FTTH)',
-                photoInitial: '',
-                photoClose: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
-                closingNotes: 'Giunzione eseguita con Sumitomo Type-72C+ e test Viavi SmartOTDR superato. OK collaudo.',
-                createdAt: '2026-10-05 14:20'
+                id: 'GIU-2026-003', module: 'Giunzioni', address: 'Via Giardini 450, Modena', pfp: 'PFP-MO-09', priority: 'Alta', status: 'Risolto',
+                lat: 44.6280, lng: 10.9100, desc: 'Giunzione muffola principale con Sumitomo Type-72C+ e collaudo OTDR.', assignedTo: 'Marco Rossi',
+                photoInitial: '', photoClose: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
+                closingNotes: 'Test riflettometrico Viavi SmartOTDR superato. Attenuazione 0.02dB.', createdAt: '2026-10-05 14:20'
             }
         ];
 
+        let defaultStock = [
+            { id: 'S-01', name: 'Bretella Ottica SC/APC OS2 2m', qty: 120, unit: 'Pezzi' },
+            { id: 'S-02', name: 'Muffola in Linea 24 Fibrale', qty: 15, unit: 'Pezzi' },
+            { id: 'S-03', name: 'Splitter Ottico 1:8 SC/APC', qty: 28, unit: 'Pezzi' },
+            { id: 'S-04', name: 'Cavo Multifibra Armato 48FO', qty: 450, unit: 'Metri' }
+        ];
+
+        let defaultVehicles = [
+            { id: 'V-01', model: 'Peugeot Partner Van', plate: 'GH456XY', driver: 'Marco Rossi' },
+            { id: 'V-02', model: 'Opel Corsa 2016 Diesel', plate: 'EX789ZZ', driver: 'Non assegnato' }
+        ];
+
+        let defaultChat = [
+            { sender: 'Direzione Operations', role: 'Manager', text: 'Buongiorno a tutti, ricordate di completare i report OTDR per i cantieri di Modena Est.', time: '08:45' },
+            { sender: 'Marco Rossi', role: 'Tecnico', text: 'Ricevuto, collaudo completato in Via Giardini.', time: '09:15' }
+        ];
+
+        let users = [];
         let faults = [];
+        let stock = [];
+        let vehicles = [];
+        let chatMessages = [];
+        let currentUser = null;
+        let currentActiveModule = 'Delivery';
+        let map = null;
+        let markersLayer = null;
         let ghConfig = { owner: '', repo: '', token: '' };
 
         window.addEventListener('DOMContentLoaded', () => {
             loadDatabase();
         });
 
-        // Caricamento dati da GitHub o LocalStorage
         async function loadDatabase() {
             const savedGh = localStorage.getItem('mesa_gh_config');
             if (savedGh) ghConfig = JSON.parse(savedGh);
 
-            // Se GitHub è configurato, prova a scaricare il file faults.json condiviso
             if (ghConfig.owner && ghConfig.repo && ghConfig.token) {
                 try {
-                    const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/faults.json`;
-                    const res = await fetch(url, {
-                        headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' }
-                    });
+                    const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
+                    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' } });
                     if (res.ok) {
                         const fileData = await res.json();
-                        const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
-                        faults = JSON.parse(decodedContent);
+                        const db = JSON.parse(decodeURIComponent(escape(atob(fileData.content))));
+                        users = db.users || defaultUsers;
+                        faults = db.faults || defaultFaults;
+                        stock = db.stock || defaultStock;
+                        vehicles = db.vehicles || defaultVehicles;
+                        chatMessages = db.chatMessages || defaultChat;
                         document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
-                    } else {
-                        throw new Error('File non trovato');
+                        return;
                     }
-                } catch (err) {
-                    console.warn('Impossibile caricare da GitHub, uso fallback locale:', err);
-                    loadLocalFallback();
-                }
-            } else {
-                loadLocalFallback();
+                } catch (err) { console.warn('Cloud sync fallito, uso storage locale'); }
             }
+            loadLocalFallback();
         }
 
         function loadLocalFallback() {
-            const savedFaults = localStorage.getItem('mesa_faults');
-            if (savedFaults) {
-                faults = JSON.parse(savedFaults);
+            const saved = localStorage.getItem('mesa_suite_complete_db');
+            if (saved) {
+                const db = JSON.parse(saved);
+                users = db.users || defaultUsers;
+                faults = db.faults || defaultFaults;
+                stock = db.stock || defaultStock;
+                vehicles = db.vehicles || defaultVehicles;
+                chatMessages = db.chatMessages || defaultChat;
             } else {
+                users = defaultUsers;
                 faults = defaultFaults;
+                stock = defaultStock;
+                vehicles = defaultVehicles;
+                chatMessages = defaultChat;
                 saveDatabase();
             }
             document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
         }
 
         async function saveDatabase() {
-            localStorage.setItem('mesa_faults', JSON.stringify(faults));
-            await syncWithGitHub();
+            const db = { users, faults, stock, vehicles, chatMessages };
+            localStorage.setItem('mesa_suite_complete_db', JSON.stringify(db));
+            await syncWithGitHub(db);
         }
 
-        // Sincronizzazione automatica in tempo reale su GitHub per tutti
-        async function syncWithGitHub() {
-            if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) {
-                document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-amber-500 inline-block';
-                return;
-            }
+        async function syncWithGitHub(dbData) {
+            if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) return;
             try {
-                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/faults.json`;
-                const getRes = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
+                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
+                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Accept': 'application/vnd.github.v3+json' } });
                 let sha = '';
                 if (getRes.ok) {
                     const fileData = await getRes.json();
                     sha = fileData.sha;
                 }
-
-                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(faults, null, 2))));
+                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(dbData, null, 2))));
                 const putRes = await fetch(url, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${ghConfig.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: 'MESA Fiber Cloud Database Auto-Sync',
-                        content: contentB64,
-                        sha: sha ? sha : undefined
-                    })
+                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+                    body: JSON.stringify({ message: 'MESA Suite Auto-Sync DB', content: contentB64, sha: sha ? sha : undefined })
                 });
-
-                if (putRes.ok) {
-                    document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
-                }
-            } catch (err) {
-                console.error('Errore sincronizzazione cloud GitHub:', err);
-                document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-rose-500/80 inline-block';
-            }
+                if (putRes.ok) document.getElementById('sync-indicator').className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse';
+            } catch (err) { console.error('Errore sync GitHub:', err); }
         }
 
-        function navigateToHome() {
-            if (currentUser && currentUser.role === 'Cliente') {
-                navigateTo('guasti');
-            } else {
-                navigateTo('home');
-            }
-        }
-
-        function navigateTo(viewName) {
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-guasti').classList.add('hidden');
-            document.getElementById('view-settings').classList.add('hidden');
-
-            const sub = document.getElementById('nav-breadcrumb-sub');
-            const crumbTitle = document.getElementById('nav-breadcrumb-title');
-
-            if (viewName === 'home') {
-                document.getElementById('view-home').classList.remove('hidden');
-                sub.classList.remove('flex');
-                sub.classList.add('hidden');
-            } else if (viewName === 'guasti') {
-                document.getElementById('view-guasti').classList.remove('hidden');
-                crumbTitle.innerText = currentUser && currentUser.role === 'Cliente' ? 'Stato Interventi di Rete' : 'Gestione Guasti';
-                sub.classList.remove('hidden');
-                sub.classList.add('flex');
-                
-                setTimeout(() => {
-                    if (!map) {
-                        map = L.map('map').setView([44.6471, 10.9252], 13);
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                            attribution: '&copy; OpenStreetMap & CARTO',
-                            maxZoom: 19
-                        }).addTo(map);
-                        markersLayer = L.layerGroup().addTo(map);
-                    } else {
-                        map.invalidateSize();
-                    }
-                    updateMapMarkers();
-                    renderApp();
-                }, 150);
-            } else if (viewName === 'settings') {
-                document.getElementById('view-settings').classList.remove('hidden');
-                crumbTitle.innerText = 'Impostazioni';
-                sub.classList.remove('hidden');
-                sub.classList.add('flex');
-                initSettingsForm();
-            }
-        }
-
-        function toggleProfileDropdown() {
-            const drop = document.getElementById('profile-dropdown');
-            drop.classList.toggle('hidden');
-        }
-
-        window.addEventListener('click', (e) => {
-            if (!e.target.closest('#profile-dropdown') && !e.target.closest('button[onclick="toggleProfileDropdown()"]')) {
-                const drop = document.getElementById('profile-dropdown');
-                if (drop) drop.classList.add('hidden');
-            }
-        });
-
-        async function handleLogin(e) {
+        function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
-            const found = USERS.find(x => x.username === u && x.pass === p);
+            const found = users.find(x => x.username === u && x.pass === p);
 
             if (found) {
                 currentUser = found;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-wrapper').classList.remove('hidden');
-                
-                document.getElementById('user-display-name').innerText = currentUser.name;
-                document.getElementById('user-display-role').innerText = currentUser.role;
-                document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
-                document.getElementById('dropdown-username').innerText = `${currentUser.username} (${currentUser.role})`;
-
-                // Aggiorna database in tempo reale al login
-                await loadDatabase();
+                updateUserHeaderUI();
 
                 if (currentUser.role === 'Cliente') {
-                    document.getElementById('header-subtitle').innerText = 'Portale Tracciabilità Clienti';
-                    document.getElementById('nav-breadcrumbs').classList.add('hidden');
-                    document.getElementById('btn-new-fault').classList.add('hidden');
+                    document.getElementById('header-subtitle').innerText = 'Portale Tracciabilità';
                     document.getElementById('menu-settings-btn').classList.add('hidden');
-                    document.getElementById('back-home-bar').classList.add('hidden');
-                    navigateTo('guasti');
+                    navigateToModule('Delivery');
                 } else {
-                    document.getElementById('header-subtitle').innerText = 'App Gestionale Interventi';
-                    document.getElementById('nav-breadcrumbs').classList.remove('hidden');
-                    document.getElementById('btn-new-fault').classList.remove('hidden');
+                    document.getElementById('header-subtitle').innerText = 'Suite Operativa';
                     document.getElementById('menu-settings-btn').classList.remove('hidden');
-                    document.getElementById('back-home-bar').classList.remove('hidden');
                     navigateTo('home');
                 }
             } else {
                 const err = document.getElementById('login-error');
                 err.innerText = 'Username o password errati.';
                 err.classList.remove('hidden');
+            }
+        }
+
+        function updateUserHeaderUI() {
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-display-role').innerText = currentUser.role;
+            document.getElementById('dropdown-username').innerText = `${currentUser.username} (${currentUser.role})`;
+            const avatarContainer = document.getElementById('header-avatar-container');
+            if (currentUser.photo) {
+                avatarContainer.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
+            } else {
+                avatarContainer.innerHTML = `<span id="user-avatar-initials">${currentUser.name.charAt(0)}</span>`;
             }
         }
 
@@ -682,35 +895,347 @@
             document.getElementById('login-error').classList.add('hidden');
         }
 
-        function initSettingsForm() {
-            document.getElementById('set-gh-owner').value = ghConfig.owner;
-            document.getElementById('set-gh-repo').value = ghConfig.repo;
-            document.getElementById('set-gh-token').value = ghConfig.token;
-            const lbl = document.getElementById('settings-status-label');
-            if (ghConfig.owner && ghConfig.repo) {
-                lbl.innerText = `Connesso a ${ghConfig.owner}/${ghConfig.repo} (Database Cloud Attivo)`;
-                lbl.className = 'font-bold text-emerald-400';
+        function navigateToHome() {
+            if (currentUser && currentUser.role === 'Cliente') {
+                navigateToModule('Delivery');
             } else {
-                lbl.innerText = 'Non configurato (Uso locale Browser)';
-                lbl.className = 'font-bold text-amber-400';
+                navigateTo('home');
             }
         }
 
-        async function saveSettingsGithub() {
-            ghConfig.owner = document.getElementById('set-gh-owner').value.trim();
-            ghConfig.repo = document.getElementById('set-gh-repo').value.trim();
-            ghConfig.token = document.getElementById('set-gh-token').value.trim();
-            localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
-            initSettingsForm();
-            alert('Configurazione database salvata. Sincronizzazione in corso...');
-            await loadDatabase();
-            renderApp();
+        function navigateToModule(moduleName) {
+            currentActiveModule = moduleName;
+            document.getElementById('current-module-name').innerText = moduleName;
+            navigateTo('guasti');
         }
 
+        function navigateTo(viewName) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-guasti').classList.add('hidden');
+            document.getElementById('view-magazzino').classList.add('hidden');
+            document.getElementById('view-flotta').classList.add('hidden');
+            document.getElementById('view-chat').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-settings').classList.add('hidden');
+
+            const sub = document.getElementById('nav-breadcrumb-sub');
+            const crumbTitle = document.getElementById('nav-breadcrumb-title');
+
+            if (viewName === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+                sub.classList.remove('flex'); sub.classList.add('hidden');
+            } else if (viewName === 'guasti') {
+                document.getElementById('view-guasti').classList.remove('hidden');
+                crumbTitle.innerText = `Modulo: ${currentActiveModule}`;
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                setTimeout(() => {
+                    if (!map) {
+                        map = L.map('map').setView([44.6471, 10.9252], 13);
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+                        markersLayer = L.layerGroup().addTo(map);
+                    } else { map.invalidateSize(); }
+                    updateMapMarkers();
+                    renderApp();
+                }, 150);
+            } else if (viewName === 'magazzino') {
+                document.getElementById('view-magazzino').classList.remove('hidden');
+                crumbTitle.innerText = 'Magazzino';
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                renderStock();
+            } else if (viewName === 'flotta') {
+                document.getElementById('view-flotta').classList.remove('hidden');
+                crumbTitle.innerText = 'Flotta & Mezzi';
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                renderVehicles();
+            } else if (viewName === 'chat') {
+                document.getElementById('view-chat').classList.remove('hidden');
+                crumbTitle.innerText = 'Chat Globale';
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                renderChatMessages();
+            } else if (viewName === 'profile') {
+                document.getElementById('view-profile').classList.remove('hidden');
+                crumbTitle.innerText = 'Profilo & Storico';
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                initProfileView();
+            } else if (viewName === 'settings') {
+                document.getElementById('view-settings').classList.remove('hidden');
+                crumbTitle.innerText = 'Amministrazione';
+                sub.classList.remove('hidden'); sub.classList.add('flex');
+                initSettingsForm();
+                renderUsersTable();
+            }
+        }
+
+        function toggleProfileDropdown() {
+            document.getElementById('profile-dropdown').classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('#profile-dropdown') && !e.target.closest('button[onclick="toggleProfileDropdown()"]')) {
+                const drop = document.getElementById('profile-dropdown');
+                if (drop) drop.classList.add('hidden');
+            }
+        });
+
+        // PROFILO & STORICO INTERVENTI CHIUSI
+        function initProfileView() {
+            document.getElementById('profile-name-title').innerText = currentUser.name;
+            document.getElementById('profile-role-title').innerText = `${currentUser.role} — ${currentUser.mansione || 'Tecnico Specializzato'}`;
+            document.getElementById('profile-mansione').value = currentUser.mansione || '';
+            document.getElementById('profile-email').value = currentUser.email || '';
+            document.getElementById('profile-photo-input').value = currentUser.photo || '';
+            
+            const initials = currentUser.name.charAt(0);
+            document.getElementById('profile-initials').innerText = initials;
+            const preview = document.getElementById('profile-avatar-preview');
+            if (currentUser.photo) {
+                preview.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
+            } else {
+                preview.innerHTML = `<span id="profile-initials">${initials}</span>`;
+            }
+
+            // Renderizza storico interventi chiusi associati all'utente o totali se manager/admin
+            const closedList = document.getElementById('profile-closed-faults-list');
+            closedList.innerHTML = '';
+            const userClosed = faults.filter(f => f.status === 'Risolto' && (currentUser.role === 'Amministratore' || currentUser.role === 'Manager' || f.assignedTo === currentUser.name));
+
+            if (userClosed.length === 0) {
+                closedList.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center">Nessun intervento chiuso registrato.</div>`;
+                return;
+            }
+
+            userClosed.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between text-xs';
+                item.innerHTML = `
+                    <div>
+                        <div class="font-bold text-white text-sm">${f.id} (${f.module})</div>
+                        <div class="text-slate-400 mt-0.5">${f.address}</div>
+                        <div class="text-sky-400 mt-1 font-medium">Nota: ${f.closingNotes || 'Completato con successo.'}</div>
+                    </div>
+                    <button onclick="openDetailModal('${f.id}')" class="bg-slate-800 hover:bg-sky-600 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg font-medium transition-colors">Visualizza</button>
+                `;
+                closedList.appendChild(item);
+            });
+        }
+
+        function updateProfilePhotoUrl(val) {
+            currentUser.photo = val.trim();
+            const preview = document.getElementById('profile-avatar-preview');
+            if (currentUser.photo) {
+                preview.innerHTML = `<img src="${currentUser.photo}" class="w-full h-full object-cover">`;
+            } else {
+                preview.innerHTML = `<span>${currentUser.name.charAt(0)}</span>`;
+            }
+        }
+
+        async function saveProfileChanges() {
+            currentUser.mansione = document.getElementById('profile-mansione').value.trim();
+            currentUser.email = document.getElementById('profile-email').value.trim();
+            currentUser.photo = document.getElementById('profile-photo-input').value.trim();
+
+            const idx = users.findIndex(x => x.username === currentUser.username);
+            if (idx !== -1) users[idx] = currentUser;
+
+            await saveDatabase();
+            updateUserHeaderUI();
+            alert('Profilo aggiornato con successo.');
+        }
+
+        // CHAT GLOBALE
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages-container');
+            container.innerHTML = '';
+            chatMessages.forEach(m => {
+                const isMe = m.sender === currentUser.name;
+                const bubble = document.createElement('div');
+                bubble.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`;
+                bubble.innerHTML = `
+                    <div class="text-[10px] text-slate-400 px-1">${m.sender} <span class="text-sky-400 font-semibold">(${m.role})</span> • ${m.time}</div>
+                    <div class="max-w-md px-4 py-2.5 rounded-2xl text-sm ${isMe ? 'bg-sky-600 text-white rounded-br-none' : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'}">${m.text}</div>
+                `;
+                container.appendChild(bubble);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function handleSendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input-msg');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            chatMessages.push({ sender: currentUser.name, role: currentUser.role, text, time: timeNow });
+            input.value = '';
+            await saveDatabase();
+            renderChatMessages();
+        }
+
+        // MAGAZZINO
+        function renderStock() {
+            const grid = document.getElementById('stock-grid');
+            grid.innerHTML = '';
+            stock.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-lg';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 font-bold"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        <div class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">${s.qty} ${s.unit}</div>
+                    </div>
+                    <div><h4 class="text-base font-bold text-white">${s.name}</h4></div>
+                    ${currentUser.role === 'Amministratore' || currentUser.role === 'Manager' ? `
+                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateStockQty('${s.id}', -1)" class="w-7 h-7 bg-slate-900 hover:bg-rose-600 text-slate-300 rounded-lg">-</button>
+                            <button onclick="updateStockQty('${s.id}', 1)" class="w-7 h-7 bg-slate-900 hover:bg-emerald-600 text-slate-300 rounded-lg">+</button>
+                        </div>
+                        <button onclick="deleteStock('${s.id}')" class="text-xs text-rose-400 hover:text-rose-300">Elimina</button>
+                    </div>` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openNewStockModal() { document.getElementById('modal-new-stock').classList.remove('hidden'); document.getElementById('modal-new-stock').classList.add('flex'); }
+        function closeNewStockModal() { document.getElementById('modal-new-stock').classList.add('hidden'); document.getElementById('modal-new-stock').classList.remove('flex'); document.getElementById('form-new-stock').reset(); }
+        
+        async function handleCreateStock(e) {
+            e.preventDefault();
+            const name = document.getElementById('ns-name').value.trim();
+            const qty = parseInt(document.getElementById('ns-qty').value);
+            const unit = document.getElementById('ns-unit').value.trim();
+            stock.push({ id: `S-0${stock.length + 1}`, name, qty, unit });
+            await saveDatabase();
+            closeNewStockModal();
+            renderStock();
+        }
+
+        async function updateStockQty(id, delta) {
+            const item = stock.find(x => x.id === id);
+            if (item) {
+                item.qty = Math.max(0, item.qty + delta);
+                await saveDatabase();
+                renderStock();
+            }
+        }
+
+        async function deleteStock(id) {
+            stock = stock.filter(x => x.id !== id);
+            await saveDatabase();
+            renderStock();
+        }
+
+        // FLOTTA & MEZZI
+        function renderVehicles() {
+            const grid = document.getElementById('vehicles-grid');
+            grid.innerHTML = '';
+            vehicles.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-lg';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20 font-bold"><i class="fa-solid fa-truck"></i></div>
+                        <div class="font-mono text-xs font-bold bg-slate-900 px-2.5 py-1 rounded-lg text-sky-400 border border-slate-800">${v.plate}</div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white">${v.model}</h4>
+                        <div class="text-xs text-slate-400 mt-1 flex items-center gap-1.5"><i class="fa-solid fa-user-tie text-indigo-400"></i><span>Assegnato a: <strong class="text-slate-200">${v.driver}</strong></span></div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <select onchange="updateVehicleDriver('${v.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl py-1.5 px-3 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+                            <option value="Non assegnato" ${v.driver === 'Non assegnato' ? 'selected' : ''}>Non assegnato</option>
+                            ${users.filter(u => u.role === 'Tecnico' || u.role === 'Amministratore' || u.role === 'Manager').map(u => `<option value="${u.name}" ${v.driver === u.name ? 'selected' : ''}>${u.name}</option>`).join('')}
+                        </select>
+                        ${currentUser.role === 'Amministratore' ? `<button onclick="deleteVehicle('${v.id}')" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-rose-600 text-slate-400 hover:text-white transition-colors flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openNewVehicleModal() {
+            const select = document.getElementById('nv-driver');
+            select.innerHTML = '<option value="Non assegnato">Non assegnato</option>' + users.filter(u => u.role !== 'Cliente').map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+            document.getElementById('modal-new-vehicle').classList.remove('hidden'); document.getElementById('modal-new-vehicle').classList.add('flex');
+        }
+        function closeNewVehicleModal() { document.getElementById('modal-new-vehicle').classList.add('hidden'); document.getElementById('modal-new-vehicle').classList.remove('flex'); document.getElementById('form-new-vehicle').reset(); }
+
+        async function handleCreateVehicle(e) {
+            e.preventDefault();
+            const model = document.getElementById('nv-model').value.trim();
+            const plate = document.getElementById('nv-plate').value.trim().toUpperCase();
+            const driver = document.getElementById('nv-driver').value;
+            vehicles.push({ id: `V-0${vehicles.length + 1}`, model, plate, driver });
+            await saveDatabase();
+            closeNewVehicleModal();
+            renderVehicles();
+        }
+
+        async function updateVehicleDriver(id, newDriver) {
+            const v = vehicles.find(x => x.id === id);
+            if (v) { v.driver = newDriver; await saveDatabase(); renderVehicles(); }
+        }
+
+        async function deleteVehicle(id) {
+            vehicles = vehicles.filter(x => x.id !== id);
+            await saveDatabase();
+            renderVehicles();
+        }
+
+        // AMMINISTRAZIONE UTENTI
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-3"><div class="font-bold text-white">${u.name}</div><div class="text-[11px] text-slate-400">${u.mansione || ''}</div></td>
+                    <td class="py-3 px-3"><code class="text-sky-400">${u.username}</code> <span class="text-slate-400">(${u.role})</span></td>
+                    <td class="py-3 px-3 text-slate-300">${u.email || '-'}</td>
+                    <td class="py-3 px-3 text-right">
+                        ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-400 hover:text-white inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openNewUserModal() { document.getElementById('modal-new-user').classList.remove('hidden'); document.getElementById('modal-new-user').classList.add('flex'); }
+        function closeNewUserModal() { document.getElementById('modal-new-user').classList.add('hidden'); document.getElementById('modal-new-user').classList.remove('flex'); document.getElementById('form-new-user').reset(); }
+
+        async function handleCreateUser(e) {
+            e.preventDefault();
+            const name = document.getElementById('nu-name').value.trim();
+            const username = document.getElementById('nu-username').value.trim();
+            const pass = document.getElementById('nu-pass').value.trim();
+            const role = document.getElementById('nu-role').value;
+            const mansione = document.getElementById('nu-mansione').value.trim();
+
+            if (users.some(x => x.username === username)) { alert('Username già esistente.'); return; }
+            users.push({ name, username, pass, role, mansione, email: `${username}@mesafiber.it`, photo: '' });
+            await saveDatabase();
+            closeNewUserModal();
+            renderUsersTable();
+            alert('Utente creato con successo.');
+        }
+
+        async function deleteUser(username) {
+            if (confirm(`Eliminare l'utente ${username}?`)) {
+                users = users.filter(x => x.username !== username);
+                await saveDatabase();
+                renderUsersTable();
+            }
+        }
+
+        // MAPPA E INTERVENTI
         function updateMapMarkers() {
             if (!markersLayer) return;
             markersLayer.clearLayers();
-            faults.forEach(f => {
+            const moduleFaults = faults.filter(f => f.module === currentActiveModule);
+            moduleFaults.forEach(f => {
                 let color = '#38bdf8';
                 if (f.status === 'Aperto') color = '#ef4444';
                 if (f.status === 'In Lavorazione') color = '#f59e0b';
@@ -719,8 +1244,7 @@
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div style="background-color: ${color}; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; box-shadow: 0 0 10px rgba(0,0,0,0.5); border: 2px solid white;"><i class="fa-solid fa-network-wired"></i></div>`,
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
+                    iconSize: [28, 28], iconAnchor: [14, 14]
                 });
 
                 const marker = L.marker([f.lat, f.lng], { icon: customIcon });
@@ -729,7 +1253,6 @@
                         <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #0284c7;">${f.id} (${f.pfp})</div>
                         <div style="margin-bottom: 2px;"><b>Indirizzo:</b> ${f.address}</div>
                         <div style="margin-bottom: 2px;"><b>Stato:</b> ${f.status}</div>
-                        <div><b>Priorità:</b> ${f.priority}</div>
                         <button onclick="openDetailModal('${f.id}')" style="margin-top: 8px; width: 100%; background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">Visualizza Dettagli</button>
                     </div>
                 `);
@@ -740,25 +1263,24 @@
         function renderApp() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filterStatus = document.getElementById('filter-status').value;
-            const filterPriority = document.getElementById('filter-priority').value;
 
-            document.getElementById('kpi-total').innerText = faults.length;
-            document.getElementById('kpi-in-progress').innerText = faults.filter(x => x.status === 'In Lavorazione').length;
-            document.getElementById('kpi-resolved').innerText = faults.filter(x => x.status === 'Risolto').length;
-            document.getElementById('kpi-critical').innerText = faults.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
+            const moduleFaults = faults.filter(f => f.module === currentActiveModule);
+            document.getElementById('kpi-total').innerText = moduleFaults.length;
+            document.getElementById('kpi-in-progress').innerText = moduleFaults.filter(x => x.status === 'In Lavorazione').length;
+            document.getElementById('kpi-resolved').innerText = moduleFaults.filter(x => x.status === 'Risolto').length;
+            document.getElementById('kpi-critical').innerText = moduleFaults.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
 
-            const filtered = faults.filter(f => {
+            const filtered = moduleFaults.filter(f => {
                 const matchQ = f.address.toLowerCase().includes(query) || f.pfp.toLowerCase().includes(query) || f.id.toLowerCase().includes(query) || f.desc.toLowerCase().includes(query);
                 const matchS = filterStatus === 'ALL' || f.status === filterStatus;
-                const matchP = filterPriority === 'ALL' || f.priority === filterPriority;
-                return matchQ && matchS && matchP;
+                return matchQ && matchS;
             });
 
             const tbody = document.getElementById('faults-table-body');
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Nessun intervento trovato con i filtri correnti.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Nessun intervento trovato in questo modulo.</td></tr>`;
                 updateMapMarkers();
                 return;
             }
@@ -780,10 +1302,10 @@
                     <td class="py-3.5 px-4"><div class="text-slate-200 font-medium">${f.address}</div><div class="text-xs text-slate-500 truncate max-w-xs">${f.desc}</div></td>
                     <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor}">${f.priority}</span></td>
                     <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColor}">${f.status}</span></td>
-                    <td class="py-3.5 px-4"><div class="text-xs text-slate-300 font-medium">${currentUser.role === 'Cliente' ? 'Assegnato a Squadra Operativa' : f.assignedTo}</div></td>
+                    <td class="py-3.5 px-4"><div class="text-xs text-slate-300 font-medium">${currentUser.role === 'Cliente' ? 'Squadra Operativa' : f.assignedTo}</div></td>
                     <td class="py-3.5 px-4 text-right space-x-2">
-                        <button onclick="openDetailModal('${f.id}')" title="Visualizza Dettaglio" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-sky-600 hover:text-white text-slate-300 transition-colors inline-flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></button>
-                        ${currentUser.role === 'Amministratore' ? `<button onclick="deleteFault('${f.id}')" title="Elimina Guasto" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-300 transition-colors inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                        <button onclick="openDetailModal('${f.id}')" title="Visualizza" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-sky-600 hover:text-white text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-eye text-xs"></i></button>
+                        ${currentUser.role === 'Amministratore' || currentUser.role === 'Manager' ? `<button onclick="deleteFault('${f.id}')" title="Elimina" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-300 inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -791,20 +1313,12 @@
             updateMapMarkers();
         }
 
-        function openNewFaultModal() { 
+        function openNewFaultModal() {
             if (currentUser && currentUser.role === 'Cliente') return;
-            document.getElementById('modal-new-fault').classList.remove('hidden'); 
-            document.getElementById('modal-new-fault').classList.add('flex'); 
+            document.getElementById('modal-fault-title').innerText = `Nuovo Intervento — ${currentActiveModule}`;
+            document.getElementById('modal-new-fault').classList.remove('hidden'); document.getElementById('modal-new-fault').classList.add('flex');
         }
         function closeNewFaultModal() { document.getElementById('modal-new-fault').classList.add('hidden'); document.getElementById('modal-new-fault').classList.remove('flex'); document.getElementById('form-new-fault').reset(); }
-        function detectGPS() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    document.getElementById('nf-lat').value = pos.coords.latitude.toFixed(6);
-                    document.getElementById('nf-lng').value = pos.coords.longitude.toFixed(6);
-                }, () => alert('Impossibile rilevare la posizione GPS.'));
-            } else alert('Geolocalizzazione non supportata.');
-        }
 
         async function handleCreateFault(e) {
             e.preventDefault();
@@ -814,13 +1328,13 @@
             const lat = parseFloat(document.getElementById('nf-lat').value);
             const lng = parseFloat(document.getElementById('nf-lng').value);
             const desc = document.getElementById('nf-desc').value;
-            const photoInput = document.getElementById('nf-photo');
-            let photoUrl = photoInput.files && photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : '';
 
+            const prefix = currentActiveModule === 'Delivery' ? 'DEL' : currentActiveModule === 'Assurance' ? 'ASS' : 'GIU';
             const newFault = {
-                id: `FIB-2026-0${Math.floor(100 + Math.random() * 900)}`,
-                address, pfp, priority, status: 'Aperto', lat, lng, desc,
-                assignedTo: 'Non assegnato', photoInitial: photoUrl, photoClose: null, closingNotes: '',
+                id: `${prefix}-2026-0${Math.floor(100 + Math.random() * 900)}`,
+                module: currentActiveModule, address, pfp, priority, status: 'Aperto', lat, lng, desc,
+                assignedTo: currentUser.role === 'Tecnico' ? currentUser.name : 'Non assegnato',
+                photoInitial: '', photoClose: null, closingNotes: '',
                 createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
             };
             faults.unshift(newFault);
@@ -834,22 +1348,20 @@
             currentEditingId = id;
             const f = faults.find(x => x.id === id);
             if (!f) return;
-            document.getElementById('det-title').innerText = currentUser.role === 'Cliente' ? `Tracciabilità Intervento — ${f.id}` : `Gestione Intervento — ${f.id}`;
+            document.getElementById('det-title').innerText = `Gestione Intervento — ${f.id} (${f.module})`;
             const c = document.getElementById('det-content');
 
             if (currentUser.role === 'Cliente') {
                 c.innerHTML = `
                     <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Codice PFP / Muffola</div><div class="text-white font-bold">${f.pfp}</div></div>
-                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Stato Attuale</div><div class="text-emerald-400 font-bold">${f.status}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo Lavoro</div><div class="text-white">${f.address}</div></div>
-                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Descrizione Intervento</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
-                        ${f.closingNotes ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Note Tecniche di Chiusura</div><div class="text-sky-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.closingNotes}</div></div>` : ''}
-                        ${f.photoInitial ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase mb-1">Foto Stato Iniziale</div><img src="${f.photoInitial}" class="rounded-xl h-36 object-cover border border-slate-800"></div>` : ''}
-                        ${f.photoClose ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase mb-1">Foto Verifica / Collaudo Finale</div><img src="${f.photoClose}" class="rounded-xl h-36 object-cover border border-slate-800"></div>` : ''}
+                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Codice PFP</div><div class="text-white font-bold">${f.pfp}</div></div>
+                        <div><div class="text-xs text-slate-400 font-semibold uppercase">Stato</div><div class="text-emerald-400 font-bold">${f.status}</div></div>
+                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo</div><div class="text-white">${f.address}</div></div>
+                        <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Descrizione</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
+                        ${f.closingNotes ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Note di Chiusura / OTDR</div><div class="text-sky-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.closingNotes}</div></div>` : ''}
                     </div>
                     <div class="flex justify-end pt-3 border-t border-slate-800">
-                        <button type="button" onclick="closeDetailModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium">Chiudi</button>
+                        <button type="button" onclick="closeDetailModal()" class="px-5 py-2 rounded-xl bg-slate-800 text-slate-200 text-sm font-medium">Chiudi</button>
                     </div>
                 `;
             } else {
@@ -859,7 +1371,6 @@
                         <div><div class="text-xs text-slate-400 font-semibold uppercase">Priorità</div><div class="text-white font-bold">${f.priority}</div></div>
                         <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo</div><div class="text-white">${f.address}</div></div>
                         <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Segnalazione</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
-                        ${f.photoInitial ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase mb-1">Foto Iniziale</div><img src="${f.photoInitial}" class="rounded-xl h-36 object-cover border border-slate-800"></div>` : ''}
                     </div>
                     <div class="space-y-3 pt-2">
                         <div class="grid grid-cols-2 gap-3">
@@ -877,46 +1388,34 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Note Chiusura / Collaudo OTDR</label>
-                            <textarea id="det-notes" rows="3" placeholder="Note tecniche..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">${f.closingNotes || ''}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Foto Allegata Chiusura (es. Traccia OTDR)</label>
-                            <input type="file" id="det-photo-close" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-sky-400 hover:file:bg-slate-700 cursor-pointer">
-                            ${f.photoClose ? `<div class="mt-2"><img src="${f.photoClose}" class="rounded-xl h-24 object-cover border border-slate-800"></div>` : ''}
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Note di Chiusura / Test OTDR / Collaudo</label>
+                            <textarea id="det-notes" rows="3" placeholder="es. Giunzione eseguita con Sumitomo e test Viavi SmartOTDR OK..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">${f.closingNotes || ''}</textarea>
                         </div>
                     </div>
                     <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
                         <button type="button" onclick="closeDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium">Chiudi</button>
-                        <button type="button" onclick="saveDetailFault()" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva Aggiornamenti</button>
+                        <button type="button" onclick="saveDetailFault()" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg">Salva e Aggiorna</button>
                     </div>
                 `;
             }
-
-            document.getElementById('modal-detail').classList.remove('hidden');
-            document.getElementById('modal-detail').classList.add('flex');
+            document.getElementById('modal-detail').classList.remove('hidden'); document.getElementById('modal-detail').classList.add('flex');
         }
 
         function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); document.getElementById('modal-detail').classList.remove('flex'); currentEditingId = null; }
-        
+
         async function saveDetailFault() {
             const f = faults.find(x => x.id === currentEditingId);
             if (!f) return;
             f.status = document.getElementById('det-status').value;
             f.assignedTo = document.getElementById('det-assign').value;
             f.closingNotes = document.getElementById('det-notes').value;
-            const photoCloseInput = document.getElementById('det-photo-close');
-            if (photoCloseInput.files && photoCloseInput.files[0]) {
-                f.photoClose = URL.createObjectURL(photoCloseInput.files[0]);
-            }
             await saveDatabase();
             closeDetailModal();
             renderApp();
         }
 
         async function deleteFault(id) {
-            if (currentUser.role === 'Cliente') return;
-            if (confirm(`Eliminare il guasto ${id}?`)) {
+            if (confirm(`Eliminare l'intervento ${id}?`)) {
                 faults = faults.filter(x => x.id !== id);
                 await saveDatabase();
                 renderApp();
@@ -924,16 +1423,39 @@
         }
 
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,ID,PFP,Indirizzo,Priorita,Stato,Tecnico,DataCreazione,NoteChiusura\n";
-            faults.forEach(f => {
-                csvContent += [f.id, f.pfp, `"${f.address}"`, f.priority, f.status, `"${f.assignedTo}"`, f.createdAt, `"${f.closingNotes || ''}"`].join(",") + "\n";
+            let csvContent = "data:text/csv;charset=utf-8,ID,Modulo,PFP,Indirizzo,Priorita,Stato,Tecnico,NoteChiusura\n";
+            faults.filter(f => f.module === currentActiveModule).forEach(f => {
+                csvContent += [f.id, f.module, f.pfp, `"${f.address}"`, f.priority, f.status, `"${f.assignedTo}"`, `"${f.closingNotes || ''}"`].join(",") + "\n";
             });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", "MESA_Fiber_Guasti_Report.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.setAttribute("download", `MESA_${currentActiveModule}_Report.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function initSettingsForm() {
+            document.getElementById('set-gh-owner').value = ghConfig.owner;
+            document.getElementById('set-gh-repo').value = ghConfig.repo;
+            document.getElementById('set-gh-token').value = ghConfig.token;
+            const lbl = document.getElementById('settings-status-label');
+            if (ghConfig.owner && ghConfig.repo) {
+                lbl.innerText = `Connesso a ${ghConfig.owner}/${ghConfig.repo} (Cloud Attivo)`;
+                lbl.className = 'font-bold text-emerald-400';
+            } else {
+                lbl.innerText = 'Non configurato (Uso locale Browser)';
+                lbl.className = 'font-bold text-amber-400';
+            }
+        }
+
+        async function saveSettingsGithub() {
+            ghConfig.owner = document.getElementById('set-gh-owner').value.trim();
+            ghConfig.repo = document.getElementById('set-gh-repo').value.trim();
+            ghConfig.token = document.getElementById('set-gh-token').value.trim();
+            localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
+            initSettingsForm();
+            alert('Configurazione salvata. Sincronizzazione in corso...');
+            await loadDatabase();
+            renderUsersTable();
         }
     </script>
 </body>
