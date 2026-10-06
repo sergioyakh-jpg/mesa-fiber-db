@@ -5,6 +5,12 @@
       "username": "nikoboy87",
       "pass": "300987",
       "role": "Amministratore"
+    },
+    {
+      "name": "1",
+      "username": "1",
+      "pass": "1",
+      "role": "Amministratore"
     }
   ],
   "faults": [
