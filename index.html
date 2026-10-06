@@ -178,7 +178,7 @@
             <!-- SEZIONE GITHUB CLOUD -->
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <h3 class="font-bold text-white text-sm"><i class="fa-brands fa-github text-sky-400 mr-2"></i>Configurazione GitHub Cloud</h3>
-                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database sul Cloud.</p>
+                <p class="text-xs text-slate-400">Inserisci i dati per sincronizzare il database sul Cloud (il Token non viene mai esposto nel repository).</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">GitHub Owner (Username)</label>
@@ -314,7 +314,7 @@
                 ghConfig = { owner, repo, token };
                 saveLocalDb();
                 await pushToCloud();
-                alert("Connessione GitHub Riuscita e Database Sincronizzato!");
+                alert("Connessione GitHub Riuscita e Database Sincronizzato con successo!");
             } catch (e) {
                 alert("ERRORE:\n\n" + e.message);
             } finally {
@@ -356,7 +356,7 @@
             }
         }
 
-        // MOTORE DI SCRITTURA FORZATA (INTERCETTA IL CONFLITTO E RECUPERA LO SHA FRESCO)
+        // MOTORE DI SCRITTURA SICURO (ESCLUDE IL TOKEN DAL FILE JSON PER EVITARE BLOCCHI DI SICUREZZA GITHUB)
         async function pushToCloud() {
             saveLocalDb();
             if(!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
@@ -367,11 +367,12 @@
             sub.innerText = "Salvataggio Cloud...";
 
             const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/mesa_suite_db.json`;
-            const dbObj = { users, faults, stock, vehicles, chatMessages, ghConfig };
-            const encodedContent = encodeBase64Unicode(JSON.stringify(dbObj, null, 2));
+            
+            // INVIO SOLO I DATI PULITI (IL TOKEN NON VIENE MAI SCRITTO NEL JSON)
+            const cleanDbObj = { users, faults, stock, vehicles, chatMessages };
+            const encodedContent = encodeBase64Unicode(JSON.stringify(cleanDbObj, null, 2));
 
             let sha = undefined;
-            // 1. Chiede sempre lo SHA aggiornato appena prima di scrivere per evitare disallineamenti
             try {
                 const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
                 if (getRes.ok) {
@@ -380,7 +381,6 @@
                 }
             } catch (err) {}
 
-            // 2. Invia i dati
             const putRes = await fetch(url, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
@@ -392,7 +392,7 @@
                 sub.innerText = "Database Sincronizzato";
             } else {
                 const errData = await putRes.json().catch(() => ({}));
-                throw new Error(errData.message || `Errore GitHub (Codice ${putRes.status}). Verifica i permessi di scrittura.`);
+                throw new Error(errData.message || `Errore GitHub (Codice ${putRes.status}).`);
             }
         }
 
