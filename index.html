@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MESA Fiber Solutions — Suite Operativa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS per la mappa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .leaflet-container { height: 100%; width: 100%; border-radius: 0.75rem; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-4 text-2xl font-bold border border-sky-500/20">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">MESA Fiber Solutions</h1>
+                <p class="text-sm text-slate-400 mt-1">Suite Operativa di Rete FTTH</p>
+            </div>
+
+            <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Username Utente</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="login-username" required placeholder="es. admin o tecnico" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors">
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 space-y-1">
+                    <div class="font-medium text-slate-300">Credenziali di accesso:</div>
+                    <div>• Amministratore: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
+                    <div>• Tecnico Campo: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 text-center"></div>
+
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-sky-600/20 flex items-center justify-center gap-2">
+                    <span>Accedi alla Suite</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="hidden flex-1 flex flex-col">
+        <!-- HEADER -->
+        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div onclick="navigateTo('home')" class="cursor-pointer flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base text-white tracking-wide">MESA Fiber Solutions</h1>
+                        <p class="text-xs text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                            <span>Modena — Rete FTTH</span>
+                        </p>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex items-center gap-2 pl-6 border-l border-slate-800 text-xs">
+                    <button onclick="navigateTo('home')" class="text-slate-400 hover:text-white transition-colors">Suite Home</button>
+                    <span id="nav-breadcrumb-sub" class="hidden items-center gap-2 text-slate-500">
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        <span id="nav-breadcrumb-title" class="text-sky-400 font-semibold">Gestione Guasti</span>
+                    </span>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- MENU PROFILO UTENTE (IN ALTO A DESTRA) -->
+                <div class="relative">
+                    <button onclick="toggleProfileDropdown()" class="flex items-center gap-3 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl px-3 py-1.5 transition-colors">
+                        <div class="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs" id="user-avatar-initials">S</div>
+                        <div class="text-left hidden sm:block">
+                            <div class="text-xs font-bold text-white" id="user-display-name">Utente</div>
+                            <div class="text-[10px] text-sky-400 uppercase tracking-wider font-semibold" id="user-display-role">Ruolo</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1"></i>
+                    </button>
+
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
+                        <div class="px-4 py-2 border-b border-slate-800">
+                            <div class="text-xs text-slate-400">Connesso come</div>
+                            <div class="text-sm font-bold text-white truncate" id="dropdown-username">username</div>
+                        </div>
+                        <button onclick="navigateTo('settings'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2.5">
+                            <i class="fa-solid fa-gear text-sky-400"></i>
+                            <span>Impostazioni & GitHub DB</span>
+                        </button>
+                        <div class="h-px bg-slate-800 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5">
+                            <i class="fa-solid fa-power-off"></i>
+                            <span>Disconnetti</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- VIEW 1: HOME / SELETTORE APP -->
+        <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-8">
+            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-3xl p-8 shadow-xl">
+                <div class="max-w-2xl space-y-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        <i class="fa-solid fa-circle-check"></i> Sessione Attiva
+                    </span>
+                    <h2 class="text-3xl font-bold text-white tracking-tight">Benvenuto nella Suite MESA Fiber</h2>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Piattaforma centralizzata per la gestione delle infrastrutture in fibra ottica FTTH, interventi di giunzione, collaudi OTDR e monitoraggio guasti geolocalizzati. Seleziona un'applicazione per iniziare.
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Applicazioni Aziendali Disponibili</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="navigateTo('guasti')" class="group bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-6 transition-all cursor-pointer shadow-lg space-y-4 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl group-hover:bg-sky-500/10 transition-all"></div>
+                        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl border border-sky-500/20 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">Gestione Guasti FTTH</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                                Monitoraggio guasti in tempo reale, mappa interattiva di Modena, assegnazione tecnici, allegati foto e collaudi OTDR.
+                            </p>
+                        </div>
+                        <div class="pt-2 flex items-center gap-2 text-xs font-semibold text-sky-400">
+                            <span>Apri Applicazione</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-6 space-y-4 opacity-60">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-500 flex items-center justify-center text-xl border border-slate-700/50">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-300">Magazzino & Splicer</h4>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                Gestione scorte materiali passivi, bretelle, muffole e inventario giuntatrici (Sumitomo / Qiirun).
+                            </p>
+                        </div>
+                        <div class="pt-2 text-xs text-slate-500 font-medium">Prossimamente</div>
+                    </div>
+
+                    <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-6 space-y-4 opacity-60">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-500 flex items-center justify-center text-xl border border-slate-700/50">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-300">Report & Collaudi OTDR</h4>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                Generazione automatica report di misura riflettometrica e certificati di collaudo linea.
+                            </p>
+                        </div>
+                        <div class="pt-2 text-xs text-slate-500 font-medium">Prossimamente</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: APP GESTIONE GUASTI -->
+        <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateTo('home')" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home Suite</span>
+                </button>
+                <div class="text-xs text-slate-400">Modulo Operativo: <span class="text-white font-bold">Gestione Guasti</span></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg border border-sky-500/20"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div>
+                        <div class="text-2xl font-bold text-white" id="kpi-total">0</div>
+                        <div class="text-xs text-slate-400 font-medium">Guasti Totali</div>
+                    </div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20"><i class="fa-solid fa-spinner"></i></div>
+                    <div>
+                        <div class="text-2xl font-bold text-amber-400" id="kpi-in-progress">0</div>
+                        <div class="text-xs text-slate-400 font-medium">In Lavorazione</div>
+                    </div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <div class="text-2xl font-bold text-emerald-400" id="kpi-resolved">0</div>
+                        <div class="text-xs text-slate-400 font-medium">Risolti / Chiusi</div>
+                    </div>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg border border-rose-500/20"><i class="fa-solid fa-fire"></i></div>
+                    <div>
+                        <div class="text-2xl font-bold text-rose-400" id="kpi-critical">0</div>
+                        <div class="text-xs text-slate-400 font-medium">Criticità Alta</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-sm font-semibold text-white">
+                        <i class="fa-solid fa-map-location-dot text-sky-400"></i>
+                        <span>Mappa Interattiva Interventi & Muffole</span>
+                    </div>
+                    <div class="text-xs text-slate-400">Clicca sui marker per dettagli rapidi</div>
+                </div>
+                <div id="map" class="h-80 w-full rounded-xl border border-slate-800"></div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <div class="flex flex-wrap items-center gap-3 flex-1">
+                    <div class="relative flex-1 min-w-[220px]">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><i class="fa-solid fa-search"></i></span>
+                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca per indirizzo, PFP, codice guasto..." class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                    </div>
+                    <select id="filter-status" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
+                        <option value="ALL">Tutti gli stati</option>
+                        <option value="Aperto">Aperto</option>
+                        <option value="In Lavorazione">In Lavorazione</option>
+                        <option value="Risolto">Risolto</option>
+                    </select>
+                    <select id="filter-priority" onchange="renderApp()" class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
+                        <option value="ALL">Tutte le priorità</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Media">Media</option>
+                        <option value="Bassa">Bassa</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="exportCSV()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-file-arrow-down text-sky-400"></i>
+                        <span>Esporta CSV</span>
+                    </button>
+                    <button onclick="openNewFaultModal()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-sky-600/25">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nuovo Guasto</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-900/50 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3.5 px-4">Codice / App apparato</th>
+                                <th class="py-3.5 px-4">Indirizzo & Zona</th>
+                                <th class="py-3.5 px-4">Priorità</th>
+                                <th class="py-3.5 px-4">Stato Intervento</th>
+                                <th class="py-3.5 px-4">Tecnico Assegnato</th>
+                                <th class="py-3.5 px-4 text-right">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faults-table-body" class="divide-y divide-slate-800/60 text-sm">
+                            <!-- Inserito via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW 3: IMPOSTAZIONI & GITHUB DB -->
+        <main id="view-settings" class="hidden flex-1 max-w-4xl w-full mx-auto p-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigateTo('home')" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Torna alla Home Suite</span>
+                </button>
+                <div class="text-xs text-slate-400">Configurazioni di Sistema</div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-xl">
+                <div class="flex items-center gap-3 pb-4 border-b border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
+                        <i class="fa-brands fa-github text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-base">Connessione Database GitHub</h3>
+                        <p class="text-xs text-slate-400">Sincronizza i guasti in tempo reale tramite un file JSON su repository GitHub</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Username / Organizzazione GitHub</label>
+                        <input type="text" id="set-gh-owner" placeholder="es. tuonome" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Nome Repository</label>
+                        <input type="text" id="set-gh-repo" placeholder="es. mesa-fiber-db" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Personal Access Token (PAT)</label>
+                        <input type="password" id="set-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+
+                    <div id="settings-status-box" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+                        Stato attuale: <span id="settings-status-label" class="font-bold text-sky-400">Non configurato (Uso locale Browser)</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="saveSettingsGithub()" class="px-6 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva Configurazione</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: NUOVO GUASTO -->
+    <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5 font-bold text-white text-base">
+                    <i class="fa-solid fa-triangle-exclamation text-sky-400"></i>
+                    <span>Segnalazione Nuovo Guasto Fibra</span>
+                </div>
+                <button onclick="closeNewFaultModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="form-new-fault" onsubmit="handleCreateFault(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Indirizzo / Ubicazione</label>
+                    <input type="text" id="nf-address" required placeholder="es. Via Emilia Est 142, Modena" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Codice PFP / Muffola</label>
+                        <input type="text" id="nf-pfp" required placeholder="es. PFP-MO-04" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Priorità</label>
+                        <select id="nf-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-slate-300 focus:outline-none focus:border-sky-500">
+                            <option value="Alta">Alta (Critical)</option>
+                            <option value="Media" selected>Media</option>
+                            <option value="Bassa">Bassa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Latitudine</label>
+                        <input type="number" step="any" id="nf-lat" required value="44.6471" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Longitudine</label>
+                        <input type="number" step="any" id="nf-lng" required value="10.9252" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="button" onclick="detectGPS()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-location-crosshairs text-sky-400"></i>
+                        <span>Acquisisci GPS Attuale</span>
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Descrizione Anomalia / Ticket</label>
+                    <textarea id="nf-desc" rows="3" required placeholder="es. Rottura cavo multifibra in pozzetto, segnale OTDR assente..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Foto Anomalia (Iniziale)</label>
+                    <input type="file" id="nf-photo" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-sky-400 hover:file:bg-slate-700 cursor-pointer">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeNewFaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700">Annulla</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Crea Guasto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: DETTAGLIO & RISOLUZIONE GUASTO -->
+    <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5 font-bold text-white text-base">
+                    <i class="fa-solid fa-circle-info text-sky-400"></i>
+                    <span id="det-title">Dettaglio Intervento</span>
+                </div>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="det-content" class="space-y-4 text-sm text-slate-300">
+                <!-- Popolato via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT APPLICAZIONE -->
+    <script>
+        const USERS = [
+            { username: 'admin', pass: 'admin123', name: 'Ing. Serhiy Yakh\'yayev', role: 'Amministratore' },
+            { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi (Tecnico FTTH)', role: 'Tecnico' }
+        ];
+
+        let currentUser = null;
+        let map = null;
+        let markersLayer = null;
+
+        let defaultFaults = [
+            {
+                id: 'FIB-2026-001',
+                address: 'Via Emilia Est 142, Modena',
+                pfp: 'PFP-MO-01',
+                priority: 'Alta',
+                status: 'In Lavorazione',
+                lat: 44.6471,
+                lng: 10.9252,
+                desc: 'Rottura cavo multifibra in pozzetto BT. Segnale OTDR azzerato a 1.2km.',
+                assignedTo: 'Marco Rossi (Tecnico FTTH)',
+                photoInitial: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+                photoClose: null,
+                closingNotes: '',
+                createdAt: '2026-10-06 08:30'
+            },
+            {
+                id: 'FIB-2026-002',
+                address: 'Viale Caduti in Guerra 25, Modena',
+                pfp: 'PFP-MO-04',
+                priority: 'Media',
+                status: 'Aperto',
+                lat: 44.6515,
+                lng: 10.9321,
+                desc: 'Attenuazione elevata su splitter secondario PFS 04.',
+                assignedTo: 'Non assegnato',
+                photoInitial: '',
+                photoClose: null,
+                closingNotes: '',
+                createdAt: '2026-10-06 10:15'
+            },
+            {
+                id: 'FIB-2026-003',
+                address: 'Via Giardini 450, Modena',
+                pfp: 'PFP-MO-09',
+                priority: 'Alta',
+                status: 'Risolto',
+                lat: 44.6280,
+                lng: 10.9100,
+                desc: 'Muffola interrata allagata e danneggiata da scavi terzi.',
+                assignedTo: 'Marco Rossi (Tecnico FTTH)',
+                photoInitial: '',
+                photoClose: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
+                closingNotes: 'Giunzione eseguita con Sumitomo Type-72C+ e test Viavi SmartOTDR superato. OK collaudo.',
+                createdAt: '2026-10-05 14:20'
+            }
+        ];
+
+        let faults = [];
+        let ghConfig = { owner: '', repo: '', token: '' };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDataFromStorage();
+            initMap();
+        });
+
+        function navigateTo(viewName) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-guasti').classList.add('hidden');
+            document.getElementById('view-settings').classList.add('hidden');
+
+            const sub = document.getElementById('nav-breadcrumb-sub');
+            const crumbTitle = document.getElementById('nav-breadcrumb-title');
+
+            if (viewName === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+                sub.classList.remove('flex');
+                sub.classList.add('hidden');
+            } else if (viewName === 'guasti') {
+                document.getElementById('view-guasti').classList.remove('hidden');
+                crumbTitle.innerText = 'Gestione Guasti';
+                sub.classList.remove('hidden');
+                sub.classList.add('flex');
+                setTimeout(() => { if(map) map.invalidateSize(); }, 200);
+                renderApp();
+            } else if (viewName === 'settings') {
+                document.getElementById('view-settings').classList.remove('hidden');
+                crumbTitle.innerText = 'Impostazioni';
+                sub.classList.remove('hidden');
+                sub.classList.add('flex');
+                initSettingsForm();
+            }
+        }
+
+        function toggleProfileDropdown() {
+            const drop = document.getElementById('profile-dropdown');
+            drop.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('#profile-dropdown') && !e.target.closest('button[onclick="toggleProfileDropdown()"]')) {
+                const drop = document.getElementById('profile-dropdown');
+                if (drop) drop.classList.add('hidden');
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+            const found = USERS.find(x => x.username === u && x.pass === p);
+
+            if (found) {
+                currentUser = found;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-wrapper').classList.remove('hidden');
+                
+                document.getElementById('user-display-name').innerText = currentUser.name;
+                document.getElementById('user-display-role').innerText = currentUser.role;
+                document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
+                document.getElementById('dropdown-username').innerText = `${currentUser.username} (${currentUser.role})`;
+
+                navigateTo('home');
+            } else {
+                const err = document.getElementById('login-error');
+                err.innerText = 'Username o password errati.';
+                err.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app-wrapper').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function loadDataFromStorage() {
+            const savedGh = localStorage.getItem('mesa_gh_config');
+            if (savedGh) ghConfig = JSON.parse(savedGh);
+
+            const savedFaults = localStorage.getItem('mesa_faults');
+            if (savedFaults) {
+                faults = JSON.parse(savedFaults);
+            } else {
+                faults = defaultFaults;
+                saveDataToStorage();
+            }
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem('mesa_faults', JSON.stringify(faults));
+            syncWithGitHub();
+        }
+
+        async function syncWithGitHub() {
+            if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) return;
+            try {
+                const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/faults.json`;
+                const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${ghConfig.token}` } });
+                let sha = '';
+                if (getRes.ok) {
+                    const fileData = await getRes.json();
+                    sha = fileData.sha;
+                }
+                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(faults, null, 2))));
+                await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${ghConfig.token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'MESA Fiber Auto-Sync Guasti Database', content: contentB64, sha: sha ? sha : undefined })
+                });
+            } catch (err) {
+                console.error('Errore sync GitHub:', err);
+            }
+        }
+
+        function initSettingsForm() {
+            document.getElementById('set-gh-owner').value = ghConfig.owner;
+            document.getElementById('set-gh-repo').value = ghConfig.repo;
+            document.getElementById('set-gh-token').value = ghConfig.token;
+            const lbl = document.getElementById('settings-status-label');
+            if (ghConfig.owner && ghConfig.repo) {
+                lbl.innerText = `Connesso a ${ghConfig.owner}/${ghConfig.repo} (Cloud attivo)`;
+                lbl.className = 'font-bold text-emerald-400';
+            } else {
+                lbl.innerText = 'Non configurato (Uso locale Browser)';
+                lbl.className = 'font-bold text-sky-400';
+            }
+        }
+
+        function saveSettingsGithub() {
+            ghConfig.owner = document.getElementById('set-gh-owner').value.trim();
+            ghConfig.repo = document.getElementById('set-gh-repo').value.trim();
+            ghConfig.token = document.getElementById('set-gh-token').value.trim();
+            localStorage.setItem('mesa_gh_config', JSON.stringify(ghConfig));
+            initSettingsForm();
+            alert('Configurazione salvata con successo.');
+            syncWithGitHub();
+        }
+
+        function initMap() {
+            map = L.map('map').setView([44.6471, 10.9252], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap & CARTO',
+                maxZoom: 19
+            }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+        }
+
+        function updateMapMarkers() {
+            if (!markersLayer) return;
+            markersLayer.clearLayers();
+            faults.forEach(f => {
+                let color = '#38bdf8';
+                if (f.status === 'Aperto') color = '#ef4444';
+                if (f.status === 'In Lavorazione') color = '#f59e0b';
+                if (f.status === 'Risolto') color = '#10b981';
+
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: ${color}; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; box-shadow: 0 0 10px rgba(0,0,0,0.5); border: 2px solid white;"><i class="fa-solid fa-network-wired"></i></div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker([f.lat, f.lng], { icon: customIcon });
+                marker.bindPopup(`
+                    <div style="color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; min-width: 180px;">
+                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #0284c7;">${f.id} (${f.pfp})</div>
+                        <div style="margin-bottom: 2px;"><b>Indirizzo:</b> ${f.address}</div>
+                        <div style="margin-bottom: 2px;"><b>Stato:</b> ${f.status}</div>
+                        <div><b>Priorità:</b> ${f.priority}</div>
+                        <button onclick="openDetailModal('${f.id}')" style="margin-top: 8px; width: 100%; background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: bold;">Apri Dettaglio</button>
+                    </div>
+                `);
+                markersLayer.addLayer(marker);
+            });
+        }
+
+        function renderApp() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterPriority = document.getElementById('filter-priority').value;
+
+            document.getElementById('kpi-total').innerText = faults.length;
+            document.getElementById('kpi-in-progress').innerText = faults.filter(x => x.status === 'In Lavorazione').length;
+            document.getElementById('kpi-resolved').innerText = faults.filter(x => x.status === 'Risolto').length;
+            document.getElementById('kpi-critical').innerText = faults.filter(x => x.priority === 'Alta' && x.status !== 'Risolto').length;
+
+            const filtered = faults.filter(f => {
+                const matchQ = f.address.toLowerCase().includes(query) || f.pfp.toLowerCase().includes(query) || f.id.toLowerCase().includes(query) || f.desc.toLowerCase().includes(query);
+                const matchS = filterStatus === 'ALL' || f.status === filterStatus;
+                const matchP = filterPriority === 'ALL' || f.priority === filterPriority;
+                return matchQ && matchS && matchP;
+            });
+
+            const tbody = document.getElementById('faults-table-body');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Nessun guasto trovato con i filtri correnti.</td></tr>`;
+                updateMapMarkers();
+                return;
+            }
+
+            filtered.forEach(f => {
+                let badgeColor = 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+                if (f.priority === 'Alta') badgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+                if (f.priority === 'Media') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+                let statusColor = 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+                if (f.status === 'Aperto') statusColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+                if (f.status === 'In Lavorazione') statusColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                if (f.status === 'Risolto') statusColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4"><div class="font-bold text-white">${f.id}</div><div class="text-xs text-slate-400 font-mono">${f.pfp}</div></td>
+                    <td class="py-3.5 px-4"><div class="text-slate-200 font-medium">${f.address}</div><div class="text-xs text-slate-500 truncate max-w-xs">${f.desc}</div></td>
+                    <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor}">${f.priority}</span></td>
+                    <td class="py-3.5 px-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColor}">${f.status}</span></td>
+                    <td class="py-3.5 px-4"><div class="text-xs text-slate-300 font-medium">${f.assignedTo}</div></td>
+                    <td class="py-3.5 px-4 text-right space-x-2">
+                        <button onclick="openDetailModal('${f.id}')" title="Dettaglio e Gestione" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-sky-600 hover:text-white text-slate-300 transition-colors inline-flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                        ${currentUser.role === 'Amministratore' ? `<button onclick="deleteFault('${f.id}')" title="Elimina Guasto" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-300 transition-colors inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateMapMarkers();
+        }
+
+        function openNewFaultModal() { document.getElementById('modal-new-fault').classList.remove('hidden'); document.getElementById('modal-new-fault').classList.add('flex'); }
+        function closeNewFaultModal() { document.getElementById('modal-new-fault').classList.add('hidden'); document.getElementById('modal-new-fault').classList.remove('flex'); document.getElementById('form-new-fault').reset(); }
+        function detectGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('nf-lat').value = pos.coords.latitude.toFixed(6);
+                    document.getElementById('nf-lng').value = pos.coords.longitude.toFixed(6);
+                }, () => alert('Impossibile rilevare la posizione GPS.'));
+            } else alert('Geolocalizzazione non supportata.');
+        }
+
+        function handleCreateFault(e) {
+            e.preventDefault();
+            const address = document.getElementById('nf-address').value;
+            const pfp = document.getElementById('nf-pfp').value;
+            const priority = document.getElementById('nf-priority').value;
+            const lat = parseFloat(document.getElementById('nf-lat').value);
+            const lng = parseFloat(document.getElementById('nf-lng').value);
+            const desc = document.getElementById('nf-desc').value;
+            const photoInput = document.getElementById('nf-photo');
+            let photoUrl = photoInput.files && photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : '';
+
+            const newFault = {
+                id: `FIB-2026-0${Math.floor(100 + Math.random() * 900)}`,
+                address, pfp, priority, status: 'Aperto', lat, lng, desc,
+                assignedTo: 'Non assegnato', photoInitial: photoUrl, photoClose: null, closingNotes: '',
+                createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+            };
+            faults.unshift(newFault);
+            saveDataToStorage();
+            closeNewFaultModal();
+            renderApp();
+        }
+
+        let currentEditingId = null;
+        function openDetailModal(id) {
+            currentEditingId = id;
+            const f = faults.find(x => x.id === id);
+            if (!f) return;
+            document.getElementById('det-title').innerText = `Gestione Intervento — ${f.id}`;
+            const c = document.getElementById('det-content');
+            c.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div><div class="text-xs text-slate-400 font-semibold uppercase">Codice PFP</div><div class="text-white font-bold">${f.pfp}</div></div>
+                    <div><div class="text-xs text-slate-400 font-semibold uppercase">Priorità</div><div class="text-white font-bold">${f.priority}</div></div>
+                    <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Indirizzo</div><div class="text-white">${f.address}</div></div>
+                    <div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase">Segnalazione</div><div class="text-slate-300 bg-slate-900 p-3 rounded-lg border border-slate-800 mt-1">${f.desc}</div></div>
+                    ${f.photoInitial ? `<div class="col-span-2"><div class="text-xs text-slate-400 font-semibold uppercase mb-1">Foto Iniziale</div><img src="${f.photoInitial}" class="rounded-xl h-36 object-cover border border-slate-800"></div>` : ''}
+                </div>
+                <div class="space-y-3 pt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Stato</label>
+                            <select id="det-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                                <option value="Aperto" ${f.status === 'Aperto' ? 'selected' : ''}>Aperto</option>
+                                <option value="In Lavorazione" ${f.status === 'In Lavorazione' ? 'selected' : ''}>In Lavorazione</option>
+                                <option value="Risolto" ${f.status === 'Risolto' ? 'selected' : ''}>Risolto (Chiuso)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Assegnatario</label>
+                            <input type="text" id="det-assign" value="${f.assignedTo}" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Note Chiusura / Collaudo OTDR</label>
+                        <textarea id="det-notes" rows="3" placeholder="Note tecniche..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">${f.closingNotes || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Foto Allegata Chiusura (es. Traccia OTDR)</label>
+                        <input type="file" id="det-photo-close" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-sky-400 hover:file:bg-slate-700 cursor-pointer">
+                        ${f.photoClose ? `<div class="mt-2"><img src="${f.photoClose}" class="rounded-xl h-24 object-cover border border-slate-800"></div>` : ''}
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeDetailModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium">Chiudi</button>
+                    <button type="button" onclick="saveDetailFault()" class="px-5 py-2 rounded-xl bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 shadow-lg shadow-sky-600/20">Salva Aggiornamenti</button>
+                </div>
+            `;
+            document.getElementById('modal-detail').classList.remove('hidden');
+            document.getElementById('modal-detail').classList.add('flex');
+        }
+
+        function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); document.getElementById('modal-detail').classList.remove('flex'); currentEditingId = null; }
+        
+        function saveDetailFault() {
+            const f = faults.find(x => x.id === currentEditingId);
+            if (!f) return;
+            f.status = document.getElementById('det-status').value;
+            f.assignedTo = document.getElementById('det-assign').value;
+            f.closingNotes = document.getElementById('det-notes').value;
+            const photoCloseInput = document.getElementById('det-photo-close');
+            if (photoCloseInput.files && photoCloseInput.files[0]) {
+                f.photoClose = URL.createObjectURL(photoCloseInput.files[0]);
+            }
+            saveDataToStorage();
+            closeDetailModal();
+            renderApp();
+        }
+
+        function deleteFault(id) {
+            if (confirm(`Eliminare il guasto ${id}?`)) {
+                faults = faults.filter(x => x.id !== id);
+                saveDataToStorage();
+                renderApp();
+            }
+        }
+
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,PFP,Indirizzo,Priorita,Stato,Tecnico,DataCreazione,NoteChiusura\n";
+            faults.forEach(f => {
+                csvContent += [f.id, f.pfp, `"${f.address}"`, f.priority, f.status, `"${f.assignedTo}"`, f.createdAt, `"${f.closingNotes || ''}"`].join(",") + "\n";
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "MESA_Fiber_Guasti_Report.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
