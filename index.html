@@ -3,473 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MESA Fiber Solutions — Cloud Unico</title>
+    <title>MESA Fiber - Field Manager WRM</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome per icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        #map { height: 260px; width: 100%; border-radius: 0.75rem; z-index: 1; }
-        @media (min-width: 768px) { #map { height: 350px; } }
-    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
-            <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-4 text-2xl font-bold border border-sky-500/20 shadow-lg">
-                    <i class="fa-solid fa-network-wired"></i>
-                </div>
-                <h1 class="text-2xl font-bold tracking-tight text-white">MESA Fiber</h1>
-                <p class="text-sm text-slate-400 mt-1">Suite Cloud Condivisa</p>
-            </div>
-            <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
+    <!-- Navbar Superiore -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-network-wired text-blue-500 text-xl"></i>
+            <span class="font-bold text-lg tracking-wide">MESA <span class="text-blue-500">Fiber</span></span>
+        </div>
+        <div id="user-menu" class="hidden flex items-center space-x-3">
+            <span id="user-badge" class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700"></span>
+            <button id="btn-logout" class="text-rose-400 hover:text-rose-300 text-sm font-medium">
+                <i class="fa-solid fa-right-from-bracket"></i> Esci
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenitore Principale -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4">
+
+        <!-- SEZIONE 1: FORM DI LOGIN (Mostrato se non autenticato) -->
+        <section id="auth-section" class="max-w-md mx-auto mt-12 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl">
+            <h2 class="text-xl font-bold mb-1 text-white">Accesso Portale</h2>
+            <p class="text-sm text-slate-400 mb-6">Inserisci le credenziali fornite dall'amministratore.</p>
+            
+            <form id="login-form" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Username</label>
-                    <input type="text" id="login-username" required placeholder="admin o tecnico" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-sky-500">
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Password</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-sky-500">
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
-                <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-xs text-slate-400 space-y-1">
-                    <div>• Admin: <code class="text-sky-400">admin</code> / <code class="text-sky-400">admin123</code></div>
-                    <div>• Tecnico: <code class="text-amber-400">tecnico</code> / <code class="text-amber-400">tecnico123</code></div>
-                </div>
-                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 rounded-lg p-2.5 text-center font-bold"></div>
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2">
-                    Accedi <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-lg text-sm transition">
+                    Accedi al Sistema
                 </button>
+                <p id="login-error" class="text-rose-400 text-xs text-center hidden mt-2"></p>
             </form>
-        </div>
-    </div>
+        </section>
 
-    <!-- MAIN APP WRAPPER -->
-    <div id="app-wrapper" class="hidden flex-1 flex flex-col">
-        <!-- HEADER -->
-        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="navigateToHome()">
-                <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 font-bold">
-                    <i class="fa-solid fa-network-wired"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-white">MESA Fiber</h1>
-                    <p class="text-[10px] text-slate-400 flex items-center gap-1.5">
-                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                        <span id="header-subtitle">Connessione Cloud...</span>
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="forceCloudRefresh()" class="bg-slate-900 border border-slate-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-rotate mr-1"></i> Aggiorna</button>
-                <button onclick="navigateTo('chat')" class="bg-slate-900 border border-slate-800 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-slate-800"><i class="fa-solid fa-comments"></i> Chat</button>
-                <div class="relative">
-                    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1.5 sm:px-3 sm:py-1.5">
-                        <div id="user-avatar-initials" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs">S</div>
-                        <div class="text-left hidden sm:block">
-                            <div class="text-xs font-bold text-white" id="user-display-name">Utente</div>
-                            <div class="text-[10px] text-sky-400 uppercase font-semibold" id="user-display-role">Ruolo</div>
-                        </div>
+        <!-- SEZIONE 2: DASHBOARD APPLICATIVA (Mostrato dopo il login) -->
+        <section id="dashboard-section" class="hidden space-y-6">
+            
+            <!-- Pannello di Controllo Admin (Visibile solo agli Admin) -->
+            <div id="admin-panel" class="hidden bg-slate-900 border border-amber-500/30 rounded-xl p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide"><i class="fa-solid fa-shield-halved"></i> Area Amministrazione</h3>
+                    <button onclick="window.openNewTicketModal()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition">
+                        + Nuovo Intervento (Ticket)
                     </button>
-                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
-                        <button onclick="navigateTo('profile'); toggleProfileDropdown();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800"><i class="fa-solid fa-user-gear mr-2 text-sky-400"></i> Profilo</button>
-                        <button id="menu-settings-btn" onclick="navigateTo('settings'); toggleProfileDropdown();" class="hidden w-full text-left px-4 py-2.5 text-xs text-amber-400 hover:bg-slate-800"><i class="fa-solid fa-gear mr-2"></i> Gestione Personale</button>
-                        <div class="h-px bg-slate-800 my-1"></div>
-                        <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-slate-800"><i class="fa-solid fa-power-off mr-2"></i> Disconnetti</button>
+                </div>
+                <p class="text-xs text-slate-400">Pannello di controllo globale per la distribuzione carichi di lavoro e monitoraggio tecnici.</p>
+            </div>
+
+            <!-- Lista Interventi / Workflow -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-base text-slate-200">Coda Interventi (WRM)</h3>
+                    <div class="flex space-x-2 text-xs">
+                        <button onclick="window.filterTickets('all')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300">Tutti</button>
+                        <button onclick="window.filterTickets('assigned')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300">Assegnati</button>
+                        <button onclick="window.filterTickets('completed')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300">Chiusi</button>
                     </div>
                 </div>
-            </div>
-        </header>
-
-        <!-- VIEW: HOME -->
-        <div id="view-home" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-sky-950/30 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3"><i class="fa-solid fa-cloud"></i> Database Cloud Condiviso (npoint.io)</span>
-                <h2 class="text-2xl font-bold text-white">MESA Fiber Solutions</h2>
-                <p class="text-sm text-slate-400">Gestione operativa centralizzata per attivazioni, guasti e logistica.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="home-modules-grid"></div>
-        </div>
-
-        <!-- VIEW: GUASTI -->
-        <main id="view-guasti" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
-            <div class="flex items-center justify-between">
-                <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-                <div class="text-xs text-slate-400">Modulo: <span class="text-white font-bold" id="current-module-name">Delivery</span></div>
-            </div>
-
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 space-y-2 shadow-xl">
-                <div class="text-xs font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-sky-400"></i> Mappa Territoriale</div>
-                <div id="map"></div>
-            </div>
-
-            <div class="flex justify-between items-center bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 shadow-xl">
-                <input type="text" id="search-input" oninput="renderApp()" placeholder="Cerca indirizzo o PFP..." class="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white">
-                <button onclick="openNewFaultModal()" class="bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow"><i class="fa-solid fa-plus mr-2"></i>Nuova Pratica</button>
-            </div>
-
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead><tr class="bg-slate-900/50 text-slate-400 border-b border-slate-800"><th class="py-3 px-3">ID / PFP</th><th class="py-3 px-3">Indirizzo</th><th class="py-3 px-3">Stato</th><th class="py-3 px-3 text-right">Azioni</th></tr></thead>
-                        <tbody id="faults-table-body" class="divide-y divide-slate-800/60"></tbody>
-                    </table>
+                
+                <div id="tickets-container" class="space-y-3">
+                    <!-- Iniettato via JS -->
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- VIEW: MAGAZZINO -->
-        <main id="view-magazzino" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
-            <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl"><h3 class="font-bold text-white text-sm">Inventario Magazzino FTTH</h3></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid"></div>
-        </main>
+    </main>
 
-        <!-- VIEW: FLOTTA -->
-        <main id="view-flotta" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
-            <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-xl"><h3 class="font-bold text-white text-sm">Flotta Mezzi Aziendali</h3></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vehicles-grid"></div>
-        </main>
+    <!-- MODALE CHIUSURA INTERVENTO FTTH -->
+    <div id="closure-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-white mb-1">Chiusura Intervento FTTH</h3>
+            <p id="modal-ticket-info" class="text-xs text-slate-400 mb-4"></p>
 
-        <!-- VIEW: CHAT -->
-        <main id="view-chat" class="hidden flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col h-[calc(100vh-70px)] space-y-3">
-            <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 self-start text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div id="chat-messages-container" class="flex-1 bg-slate-950/60 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-3 shadow-xl text-xs"></div>
-            <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5">
-                <input type="text" id="chat-input-msg" required placeholder="Scrivi messaggio..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-white">
-                <button type="submit" class="bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-semibold">Invia</button>
-            </form>
-        </main>
-
-        <!-- VIEW: PROFILO -->
-        <main id="view-profile" class="hidden flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-5">
-            <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 shadow-xl text-center">
-                <div class="w-20 h-20 bg-sky-600 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl font-bold mb-4" id="profile-big-initial">S</div>
-                <h3 class="text-xl font-bold text-white" id="profile-name-title">Nome</h3>
-                <p class="text-sm text-sky-400 font-semibold" id="profile-role-title">Ruolo</p>
-            </div>
-        </main>
-
-        <!-- VIEW: IMPOSTAZIONI ADMIN -->
-        <main id="view-settings" class="hidden flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
-            <div class="flex items-center justify-between">
-                <button onclick="navigateToHome()" class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-arrow-left mr-2"></i>Home</button>
-                <div class="text-xs text-amber-400 font-bold">Pannello Amministratore — Gestione Personale</div>
-            </div>
-
-            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <form id="closure-form" class="space-y-4">
+                <input type="hidden" id="closure-ticket-id">
+                
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <h3 class="font-bold text-white text-sm">Personale & Ruoli Autorizzati</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Database Cloud centralizzato attivo e sincronizzato.</p>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Potenza Ottica (1310nm)</label>
+                        <input type="text" id="pwr-1310" placeholder="es. -18.5 dBm" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-white">
                     </div>
-                    <button onclick="openModal('modal-new-user')" class="bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i> Nuovo Utente</button>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Potenza Ottica (1490nm)</label>
+                        <input type="text" id="pwr-1490" placeholder="es. -16.2 dBm" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-white">
+                    </div>
                 </div>
-                <table class="w-full text-left text-xs">
-                    <thead class="border-b border-slate-800 text-slate-400"><tr><th class="py-2">Nome</th><th class="py-2">Ruolo</th><th class="py-2 text-right">Azioni</th></tr></thead>
-                    <tbody id="users-table-body" class="divide-y divide-slate-800/60"></tbody>
-                </table>
-            </div>
-        </main>
-    </div>
 
-    <!-- MODALI -->
-    <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
-            <div class="flex justify-between font-bold text-white mb-4"><span id="det-title">Dettaglio</span><button onclick="closeModal('modal-detail')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
-            <div id="det-content" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1 mb-4"></div>
-            <div id="det-actions" class="space-y-2"></div>
-            <div class="grid grid-cols-2 gap-3 mt-3">
-                <button onclick="shareViaWhatsApp()" class="bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold"><i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp</button>
-                <button onclick="shareViaEmail()" class="bg-sky-600 text-white py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-envelope mr-1"></i> Email</button>
-            </div>
-        </div>
-    </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Esito Test OTDR (Viavi / SmartOTDR)</label>
+                    <select id="otdr-result" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-white">
+                        <option value="Pass">PASS (Tratta Conforme)</option>
+                        <option value="Fail">FAIL (Anomalia / Attenuazione Alta)</option>
+                    </select>
+                </div>
 
-    <div id="modal-new-fault" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
-            <div class="flex justify-between font-bold text-white mb-4"><span>Nuova Pratica</span><button onclick="closeModal('modal-new-fault')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
-            <form onsubmit="handleCreateFault(event)" class="space-y-3 text-xs">
-                <input type="text" id="nf-address" required placeholder="Indirizzo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-                <input type="text" id="nf-pfp" required placeholder="PFP" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-                <textarea id="nf-desc" required placeholder="Descrizione..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></textarea>
-                <button type="submit" class="w-full py-2.5 bg-sky-600 text-white rounded-xl font-bold shadow-lg">Salva e Sincronizza</button>
-            </form>
-        </div>
-    </div>
-    
-    <div id="modal-new-user" class="fixed inset-0 z-50 bg-slate-950/80 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
-            <div class="flex justify-between font-bold text-white mb-4"><span>Nuovo Utente</span><button onclick="closeModal('modal-new-user')" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
-            <form onsubmit="handleCreateUser(event)" class="space-y-3 text-xs">
-                <input type="text" id="nu-name" required placeholder="Nome" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-                <input type="text" id="nu-username" required placeholder="Username" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-                <input type="password" id="nu-pass" required placeholder="Password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
-                <select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300">
-                    <option value="Tecnico">Tecnico</option><option value="Amministratore">Amministratore</option>
-                </select>
-                <button type="submit" class="w-full py-2.5 bg-amber-600 text-white rounded-xl font-bold shadow-lg">Crea e Sincronizza</button>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Codice Apparato / Piastra / Porta</label>
+                    <input type="text" id="port-code" placeholder="es. PFP-04 / PFS-12 / Port 08" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Note Tecniche / Lavorazioni Eseguite</label>
+                    <textarea id="tech-notes" rows="3" placeholder="Es. Sostituita bretella ottica, giunzione eseguita su muffola..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-white"></textarea>
+                </div>
+
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-lg text-sm transition">Annulla</button>
+                    <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-lg text-sm transition">Registra Chiusura</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <script>
-        // ID NPOINT.IO INTEGRATO
-        const npointId = "a75e87e73a684d0246f9";
-
-        let appModules = [
-            { id: 'Delivery', name: 'Delivery', icon: 'fa-house-signal', color: 'emerald', desc: 'Attivazioni' },
-            { id: 'Assurance', name: 'Assurance', icon: 'fa-triangle-exclamation', color: 'rose', desc: 'Guasti' },
-            { id: 'magazzino', name: 'Magazzino', icon: 'fa-boxes-stacked', color: 'amber', desc: 'Inventario' },
-            { id: 'flotta', name: 'Flotta', icon: 'fa-truck', color: 'indigo', desc: 'Mezzi' },
-            { id: 'chat', name: 'Chat', icon: 'fa-comments', color: 'violet', desc: 'Chat' }
-        ];
-
-        let db = {
-            users: [
-                { username: 'admin', pass: 'admin123', name: 'Serhiy Y.', role: 'Amministratore' },
-                { username: 'tecnico', pass: 'tecnico123', name: 'Marco Rossi', role: 'Tecnico' }
-            ],
-            faults: [{ id: 'DEL-001', module: 'Delivery', address: 'Via Roma 1, Modena', pfp: 'PFP-01', status: 'Aperto', desc: 'Test' }],
-            stock: [{ name: 'Bretella SC/APC', qty: 120, unit: 'Pz' }],
-            vehicles: [{ model: 'Peugeot Partner', plate: 'GH456XY', driver: 'Marco Rossi' }],
-            chatMessages: [{ sender: 'Admin', text: 'Benvenuti nel database cloud npoint.io.' }]
-        };
-
-        let currentUser = null;
-        let currentActiveModule = 'Delivery';
-        let currentEditingFault = null;
-        let map = null;
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            checkSession();
-            await forceCloudRefresh();
-        });
-
-        async function forceCloudRefresh() {
-            const ind = document.getElementById('sync-indicator');
-            const sub = document.getElementById('header-subtitle');
-
-            try {
-                ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse';
-                sub.innerText = "Sincronizzazione in corso...";
-
-                const res = await fetch(`https://api.npoint.io/${npointId}`);
-                if (res.ok) {
-                    const cloudData = await res.json();
-                    if(cloudData && cloudData.users) db = cloudData;
-                    
-                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-                    sub.innerText = "Database Sincronizzato";
-                    
-                    if(currentUser && !document.getElementById('view-guasti').classList.contains('hidden')) renderApp();
-                }
-            } catch(e) {
-                ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                sub.innerText = "Errore Cloud";
-            }
-        }
-
-        async function pushToCloud() {
-            const ind = document.getElementById('sync-indicator');
-            const sub = document.getElementById('header-subtitle');
-            ind.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block animate-ping';
-            sub.innerText = "Salvataggio Cloud...";
-
-            try {
-                const res = await fetch(`https://api.npoint.io/${npointId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(db)
-                });
-
-                if (res.ok) {
-                    ind.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block';
-                    sub.innerText = "Database Sincronizzato";
-                }
-            } catch(e) {
-                ind.className = 'w-2 h-2 rounded-full bg-rose-500 inline-block';
-                sub.innerText = "Errore salvataggio";
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            await forceCloudRefresh(); // Scarica gli utenti aggiornati prima di verificare
-            
-            const u = document.getElementById('login-username').value.trim();
-            const p = document.getElementById('login-password').value.trim();
-            const found = db.users.find(x => x.username === u && x.pass === p);
-            
-            if (found) { 
-                currentUser = found; 
-                localStorage.setItem('mesa_session_u', JSON.stringify(found)); 
-                document.getElementById('login-screen').classList.add('hidden'); 
-                document.getElementById('app-wrapper').classList.remove('hidden'); 
-                updateUI(); 
-                navigateTo('home'); 
-            } else { 
-                const err = document.getElementById('login-error'); 
-                err.innerText = 'Credenziali errate o utente non trovato nel Cloud.'; 
-                err.classList.remove('hidden'); 
-            }
-        }
-
-        function checkSession() {
-            const u = localStorage.getItem('mesa_session_u');
-            if (u) { currentUser = JSON.parse(u); document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-wrapper').classList.remove('hidden'); updateUI(); navigateTo('home'); }
-        }
-        function logout() { localStorage.removeItem('mesa_session_u'); location.reload(); }
-        
-        function updateUI() {
-            document.getElementById('user-display-name').innerText = currentUser.name;
-            document.getElementById('user-display-role').innerText = currentUser.role;
-            document.getElementById('user-avatar-initials').innerText = currentUser.name.charAt(0);
-            if(currentUser.role === 'Amministratore') document.getElementById('menu-settings-btn').classList.remove('hidden');
-        }
-        function toggleProfileDropdown() { document.getElementById('profile-dropdown').classList.toggle('hidden'); }
-
-        function navigateToHome() { navigateTo('home'); }
-        async function navigateTo(view) {
-            if (view === 'settings' && currentUser.role !== 'Amministratore') { alert('Accesso negato.'); return; }
-            await forceCloudRefresh();
-            
-            ['home', 'guasti', 'magazzino', 'flotta', 'chat', 'profile', 'settings'].forEach(id => document.getElementById(`view-${id}`).classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-
-            if(view === 'home') renderHome();
-            if(view === 'guasti') {
-                setTimeout(() => {
-                    if(!map) { map = L.map('map').setView([44.6471, 10.9252], 13); L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map); }
-                    else map.invalidateSize();
-                    renderApp();
-                }, 150);
-            }
-            if(view === 'magazzino') renderStock();
-            if(view === 'flotta') renderVehicles();
-            if(view === 'chat') renderChatMessages();
-            if(view === 'profile') {
-                document.getElementById('profile-name-title').innerText = currentUser.name;
-                document.getElementById('profile-role-title').innerText = currentUser.role;
-                document.getElementById('profile-big-initial').innerText = currentUser.name.charAt(0);
-            }
-            if(view === 'settings') {
-                renderUsersTable();
-            }
-        }
-
-        function renderHome() {
-            document.getElementById('home-modules-grid').innerHTML = appModules.map(m => `
-                <div onclick="openMod('${m.id}')" class="group bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-${m.color}-500/50 shadow-lg">
-                    <div class="w-10 h-10 rounded-xl bg-${m.color}-500/10 text-${m.color}-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition"><i class="fa-solid ${m.icon}"></i></div>
-                    <h4 class="text-white font-bold group-hover:text-${m.color}-400">${m.name}</h4>
-                    <p class="text-xs text-slate-400 mt-1">${m.desc}</p>
-                </div>
-            `).join('');
-        }
-        function openMod(id) {
-            if(['magazzino','flotta','chat'].includes(id)) navigateTo(id);
-            else { currentActiveModule = id; document.getElementById('current-module-name').innerText = id; navigateTo('guasti'); }
-        }
-
-        function renderApp() {
-            const q = document.getElementById('search-input').value.toLowerCase();
-            const f = db.faults.filter(x => x.module === currentActiveModule && (x.address.toLowerCase().includes(q) || x.pfp.toLowerCase().includes(q)));
-            document.getElementById('faults-table-body').innerHTML = f.map(x => `
-                <tr class="hover:bg-slate-900/60">
-                    <td class="py-3 px-3"><div class="font-bold text-white">${x.id}</div><div class="text-[10px] text-sky-400">${x.pfp}</div></td>
-                    <td class="py-3 px-3 text-slate-300">${x.address}</td>
-                    <td class="py-3 px-3"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[10px] font-bold">${x.status}</span></td>
-                    <td class="py-3 px-3 text-right"><button onclick="viewDetail('${x.id}')" class="bg-slate-800 p-2 rounded hover:bg-sky-600"><i class="fa-solid fa-eye text-white"></i></button></td>
-                </tr>
-            `).join('');
-        }
-        
-        async function handleCreateFault(e) {
-            e.preventDefault();
-            db.faults.unshift({ id:`PRT-0${Math.floor(100+Math.random()*900)}`, module: currentActiveModule, address: document.getElementById('nf-address').value, pfp: document.getElementById('nf-pfp').value, desc: document.getElementById('nf-desc').value, status: 'Aperto' });
-            closeModal('modal-new-fault');
-            renderApp();
-            await pushToCloud();
-        }
-
-        function viewDetail(id) {
-            currentEditingFault = db.faults.find(x => x.id === id);
-            document.getElementById('det-title').innerText = currentEditingFault.id;
-            document.getElementById('det-content').innerHTML = `<div><b>PFP:</b> ${currentEditingFault.pfp}</div><div><b>Indirizzo:</b> ${currentEditingFault.address}</div><div class="mt-2"><b>Descrizione:</b><br>${currentEditingFault.desc}</div><div class="mt-2"><b>Stato:</b> <span class="text-emerald-400 font-bold">${currentEditingFault.status}</span></div>`;
-            document.getElementById('det-actions').innerHTML = `
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Aggiorna Stato:</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'Aperto')" class="py-2 bg-slate-800 text-white rounded text-xs">Aperto</button>
-                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'In Lavorazione')" class="py-2 bg-amber-600 text-white rounded text-xs">In Corso</button>
-                    <button onclick="updateFaultStatus('${currentEditingFault.id}', 'Risolto')" class="py-2 bg-emerald-600 text-white rounded text-xs font-bold">Risolto</button>
-                </div>
-            `;
-            openModal('modal-detail');
-        }
-
-        async function updateFaultStatus(id, newStatus) {
-            const f = db.faults.find(x => x.id === id);
-            if(f) {
-                f.status = newStatus;
-                closeModal('modal-detail');
-                renderApp();
-                await pushToCloud();
-            }
-        }
-
-        function shareViaWhatsApp() { if(!currentEditingFault) return; window.open(`https://api.whatsapp.com/send?text=*MESA Fiber - ${currentEditingFault.id}*%0APFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AStato: ${currentEditingFault.status}%0AInfo: ${currentEditingFault.desc}`, '_blank'); }
-        function shareViaEmail() { if(!currentEditingFault) return; window.open(`mailto:?subject=Pratica ${currentEditingFault.id}&body=PFP: ${currentEditingFault.pfp}%0AIndirizzo: ${currentEditingFault.address}%0AStato: ${currentEditingFault.status}%0AInfo: ${currentEditingFault.desc}`); }
-
-        function renderStock() { document.getElementById('stock-grid').innerHTML = db.stock.map(s => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl flex justify-between font-bold text-white text-sm"><span>${s.name}</span><span class="text-amber-400">${s.qty} ${s.unit}</span></div>`).join(''); }
-        function renderVehicles() { document.getElementById('vehicles-grid').innerHTML = db.vehicles.map(v => `<div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl font-bold text-white text-sm"><div>${v.model} - <span class="text-sky-400 font-mono">${v.plate}</span></div><div class="text-xs text-slate-400 mt-1 font-normal">Autista: ${v.driver}</div></div>`).join(''); }
-        
-        function renderChatMessages() { 
-            const c = document.getElementById('chat-messages-container');
-            c.innerHTML = db.chatMessages.map(m => `<div class="flex flex-col ${m.sender === currentUser.name ? 'items-end' : 'items-start'}"><div class="text-[10px] text-slate-400 mb-0.5">${m.sender}</div><div class="px-3 py-2 rounded-xl text-xs ${m.sender === currentUser.name ? 'bg-sky-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-200'}">${m.text}</div></div>`).join('');
-            c.scrollTop = c.scrollHeight;
-        }
-        async function handleSendChatMessage(e) {
-            e.preventDefault();
-            const i = document.getElementById('chat-input-msg');
-            db.chatMessages.push({ sender: currentUser.name, text: i.value });
-            i.value = '';
-            renderChatMessages();
-            await pushToCloud();
-        }
-
-        function renderUsersTable() {
-            document.getElementById('users-table-body').innerHTML = db.users.map(u => `<tr class="hover:bg-slate-900/60"><td class="py-2.5 font-bold text-white">${u.name}</td><td class="py-2.5"><code class="text-sky-400">${u.username}</code><br><span class="text-[10px] uppercase text-slate-400">${u.role}</span></td><td class="py-2.5 text-right">${u.username !== 'admin' ? `<button onclick="deleteUser('${u.username}')" class="text-rose-400"><i class="fa-solid fa-trash"></i></button>` : ''}</td></tr>`).join('');
-        }
-        async function handleCreateUser(e) {
-            e.preventDefault();
-            db.users.push({ name: document.getElementById('nu-name').value, username: document.getElementById('nu-username').value, pass: document.getElementById('nu-pass').value, role: document.getElementById('nu-role').value });
-            closeModal('modal-new-user');
-            renderUsersTable();
-            await pushToCloud();
-            alert("Utente creato e salvato nel Database Cloud!");
-        }
-        async function deleteUser(u) {
-            if(confirm('Vuoi eliminare questo utente dal cloud?')) {
-                db.users = db.users.filter(x => x.username !== u);
-                renderUsersTable();
-                await pushToCloud();
-            }
-        }
-
-        function openModal(id) { document.getElementById(id).classList.add('flex'); document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-        function openNewFaultModal() { openModal('modal-new-fault'); }
-    </script>
+    <!-- Script Principale di Inizio Moduli -->
+    <script type="module" src="./js/app.js"></script>
 </body>
 </html>
