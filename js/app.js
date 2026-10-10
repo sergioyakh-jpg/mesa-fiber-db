@@ -103,3 +103,44 @@ window.closeModal = () => {
     document.getElementById('closure-modal').classList.add('hidden');
     document.getElementById('closure-modal').classList.remove('flex');
 };
+// Gestione Modale Nuovo Ticket (Admin)
+window.openNewTicketModal = () => {
+    document.getElementById('new-ticket-modal').classList.remove('hidden');
+    document.getElementById('new-ticket-modal').classList.add('flex');
+};
+
+window.closeNewTicketModal = () => {
+    document.getElementById('new-ticket-modal').classList.add('hidden');
+    document.getElementById('new-ticket-modal').classList.remove('flex');
+};
+
+// Invio dati nuovo ticket a Supabase
+document.getElementById('new-ticket-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const clientName = document.getElementById('new-client').value;
+    const address = document.getElementById('new-address').value;
+    const city = document.getElementById('new-city').value;
+    const workType = document.getElementById('new-work-type').value;
+    let assignedTo = document.getElementById('new-assigned-to').value.trim();
+
+    if (!assignedTo) assignedTo = null; // Se vuoto, viene salvato senza tecnico assegnato fisso
+
+    const { error } = await supabase
+        .from('interventions')
+        .insert([{
+            client_name: clientName,
+            address: address,
+            city: city,
+            work_type: workType,
+            status: 'assigned',
+            assigned_to: assignedTo
+        }]);
+
+    if (!error) {
+        window.closeNewTicketModal();
+        document.getElementById('new-ticket-form').reset();
+        loadData(); // Ricarica la lista ticket
+    } else {
+        alert("Errore durante la creazione del ticket: " + error.message);
+    }
+});
