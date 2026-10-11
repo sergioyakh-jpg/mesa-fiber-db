@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MESA Fiber</title>
+    <title>MESA Fiber - Field Manager</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href="./manifest.json">
+    <!-- PWA Manifest inline / compatibile -->
     <meta name="theme-color" content="#0f172a">
     <script>
         tailwind.config = {
@@ -25,6 +27,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
 
+    <!-- HEADER STILE TELEGRAM -->
     <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center space-x-3">
             <div class="w-9 h-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold">
@@ -32,42 +35,488 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm tracking-tight text-white">MESA Fiber</h1>
-                <p class="text-[10px] text-sky-400 font-medium">Field Manager</p>
+                <p id="header-subtitle" class="text-[10px] text-sky-400 font-medium">Field Manager</p>
             </div>
         </div>
         <div id="header-user-slot" class="flex items-center space-x-2"></div>
     </header>
 
+    <!-- CONTENITORE PRINCIPALE DINAMICO -->
     <main class="flex-grow max-w-2xl w-full mx-auto p-4 pb-28">
-        <div id="app-view-container">
+        <div id="app-view">
             <div class="flex flex-col items-center justify-center mt-24 space-y-3">
                 <div class="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-xs text-slate-400">Avvio moduli in corso...</p>
+                <p class="text-xs text-slate-400">Caricamento sistema in corso...</p>
             </div>
         </div>
     </main>
 
+    <!-- MENU DI NAVIGAZIONE INFERIORE (STILE TELEGRAM) -->
     <nav id="telegram-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2.5 z-50 flex justify-between items-center max-w-2xl mx-auto md:rounded-t-2xl shadow-2xl">
-        <button onclick="window.router('dashboard')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="dashboard">
+        <button onclick="window.appRouter('dashboard')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="dashboard">
             <i class="fa-solid fa-chart-pie text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Home</span>
         </button>
-        <button onclick="window.router('delivery')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="delivery">
+        <button onclick="window.appRouter('delivery')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="delivery">
             <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Delivery</span>
         </button>
-        <button onclick="window.router('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="profile">
+        <button onclick="window.appRouter('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="profile">
             <i class="fa-solid fa-user text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Profilo</span>
         </button>
-        <button onclick="window.router('settings')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="settings">
+        <button onclick="window.appRouter('settings')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="settings">
             <i class="fa-solid fa-gear text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Impostazioni</span>
         </button>
     </nav>
 
+    <!-- SLOT MODALI GLOBALI -->
     <div id="global-modal-slot"></div>
 
-    <script type="module" src="./modules/core.js"></script>
+    <!-- LOGICA APPLICATIVA INTEGRATA (SUPABASE + ROUTER + VISTE) -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabase;
+
+        let currentUser = null;
+        let currentProfile = null;
+
+        // INIZIALIZZAZIONE SISTEMA
+        async function initApp() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
+
+                    document.getElementById('telegram-nav').classList.remove('hidden');
+                    renderHeaderUser();
+                    window.appRouter('dashboard');
+                } else {
+                    renderLogin();
+                }
+            } catch (err) {
+                console.error("Errore inizializzazione:", err);
+                document.getElementById('app-view').innerHTML = `
+                    <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-2xl text-center text-rose-400 text-xs mt-10">
+                        Errore di connessione a Supabase. Controlla la console.
+                    </div>
+                `;
+            }
+        }
+
+        function renderHeaderUser() {
+            document.getElementById('header-user-slot').innerHTML = `
+                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${currentProfile.full_name} (${currentProfile.role})</span>
+                </div>
+            `;
+        }
+
+        // SCHERMATA LOGIN
+        function renderLogin() {
+            document.getElementById('telegram-nav').classList.add('hidden');
+            document.getElementById('app-view').innerHTML = `
+                <div class="max-w-sm mx-auto mt-16 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl">
+                    <div class="text-center mb-6">
+                        <div class="w-14 h-14 bg-sky-500/10 border border-sky-500/20 rounded-2xl mx-auto flex items-center justify-center text-sky-400 text-xl mb-3">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Accesso Riservato</h2>
+                        <p class="text-xs text-slate-400 mt-1">Inserisci le credenziali MESA</p>
+                    </div>
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Email</label>
+                            <input type="email" id="l-email" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Password</label>
+                            <input type="password" id="l-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                        <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-sky-500/20">
+                            Accedi
+                        </button>
+                        <p id="l-err" class="text-rose-400 text-xs text-center hidden mt-2"></p>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('login-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('l-email').value;
+                const password = document.getElementById('l-pass').value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (!error) {
+                    window.location.reload();
+                } else {
+                    const errBox = document.getElementById('l-err');
+                    errBox.textContent = "Credenziali non valide.";
+                    errBox.classList.remove('hidden');
+                }
+            };
+        }
+
+        // GESTORE ROUTER (NAVIGAZIONE)
+        window.appRouter = function(route) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === route) {
+                    btn.classList.add('text-sky-400');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('text-sky-400');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            if (route === 'dashboard') renderDashboard();
+            else if (route === 'delivery') renderDelivery();
+            else if (route === 'profile') renderProfile();
+            else if (route === 'settings') renderSettings();
+        };
+
+        // 1. DASHBOARD
+        async function renderDashboard() {
+            const container = document.getElementById('app-view');
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-sky-900/30 via-slate-900 to-slate-900 border border-sky-500/20 p-6 rounded-3xl shadow-xl">
+                        <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${currentProfile.full_name}</h2>
+                        <p class="text-xs text-slate-400">Sistema operativo di gestione campi FTTH attivo.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Assegnati</span>
+                            <h3 id="stat-today" class="text-2xl font-black text-white mt-1">-</h3>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Completati</span>
+                            <h3 id="stat-done" class="text-2xl font-black text-emerald-400 mt-1">-</h3>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Congelati</span>
+                            <h3 id="stat-frozen" class="text-2xl font-black text-amber-400 mt-1">-</h3>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Totale</span>
+                            <h3 id="stat-total" class="text-2xl font-black text-sky-400 mt-1">-</h3>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Moduli Operativi</h3>
+                        <div onclick="window.appRouter('delivery')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-sky-500/50 transition cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Delivery FTTH</h4>
+                                    <p class="text-xs text-slate-400">Gestione interventi, chiusure e certificazioni</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 transition text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let query = supabase.from('interventions').select('*');
+            if (currentProfile.role !== 'admin') {
+                query = query.eq('assigned_to', currentUser.id);
+            }
+            const { data } = await query;
+            if (data) {
+                document.getElementById('stat-total').textContent = data.length;
+                document.getElementById('stat-done').textContent = data.filter(i => i.status === 'completed').length;
+                document.getElementById('stat-frozen').textContent = data.filter(i => i.status === 'frozen' || i.status === 'cancelled').length;
+                document.getElementById('stat-today').textContent = data.filter(i => i.status === 'assigned').length;
+            }
+        }
+
+        // 2. DELIVERY FTTH
+        async function renderDelivery() {
+            const container = document.getElementById('app-view');
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-white"><i class="fa-solid fa-screwdriver-wrench text-sky-400 mr-2"></i> Delivery FTTH</h2>
+                            <p class="text-xs text-slate-400">Coda ordini e chiusura lavori</p>
+                        </div>
+                        <div>
+                            <select id="delivery-status-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <option value="all">Tutti gli stati</option>
+                                <option value="assigned">Assegnati</option>
+                                <option value="completed">Completati</option>
+                                <option value="frozen">Congelati / Annullati</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="delivery-tickets-list" class="space-y-3">
+                        <p class="text-slate-500 text-xs text-center py-8">Caricamento interventi...</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('delivery-status-filter').onchange = (e) => loadTickets(e.target.value);
+            loadTickets('all');
+        }
+
+        async function loadTickets(statusFilter) {
+            let query = supabase.from('interventions').select('*').order('created_at', { ascending: false });
+            if (currentProfile.role !== 'admin') {
+                query = query.eq('assigned_to', currentUser.id);
+            }
+            if (statusFilter !== 'all') {
+                query = query.eq('status', statusFilter);
+            }
+
+            const { data, error } = await query;
+            const listContainer = document.getElementById('delivery-tickets-list');
+            if (!listContainer) return;
+
+            if (error || !data || data.length === 0) {
+                listContainer.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs">Nessun intervento trovato.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = data.map(t => {
+                let badge = `<span class="bg-sky-500/10 text-sky-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-sky-500/20">Assegnato</span>`;
+                if (t.status === 'completed') badge = `<span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-emerald-500/20">Completato</span>`;
+                if (t.status === 'frozen') badge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-amber-500/20">Congelato</span>`;
+                if (t.status === 'cancelled') badge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-rose-500/20">Annullato</span>`;
+
+                return `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>
+                            ${badge}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm">${t.client_name}</h3>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address}, ${t.city}</p>
+                        </div>
+
+                        ${t.status === 'completed' ? `
+                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800/80">
+                                <p><strong>Potenze (1310/1490):</strong> ${t.pwr_1310} /${t.pwr_1490} dBm</p>
+                                <p><strong>OTDR:</strong> <span class="text-emerald-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
+                                <p class="text-slate-400 italic">Note: ${t.notes || 'Nessuna nota'}</p>
+                            </div>
+                        ` : t.status === 'frozen' || t.status === 'cancelled' ? `
+                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs text-amber-400 border border-slate-800">
+                                <p><strong>Motivo:</strong> ${t.notes || 'Non specificato'}</p>
+                            </div>
+                        ` : `
+                            <div class="flex space-x-2 pt-1">
+                                <button onclick="window.openCloseModal('${t.id}', '${t.client_name.replace(/'/g, "")}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
+                                    Chiudi Lavoro
+                                </button>
+                                <button onclick="window.openFreezeModal('${t.id}', '${t.client_name.replace(/'/g, "")}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-ban"></i>
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Modali Globali Chiusura / Congelamento
+        window.openCloseModal = function(id, name) {
+            document.getElementById('global-modal-slot').innerHTML = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-sm font-bold text-white mb-1">Chiusura Lavoro FTTH</h3>
+                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
+                        <form id="close-form" class="space-y-3">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1310 nm (dBm)</label>
+                                    <input type="text" id="cf-1310" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1490 nm (dBm)</label>
+                                    <input type="text" id="cf-1490" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Esito OTDR</label>
+                                <select id="cf-otdr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <option value="Pass">PASS (Conforme)</option>
+                                    <option value="Fail">FAIL (Anomalia)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Codice PFP / Porta</label>
+                                <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Note Tecniche</label>
+                                <textarea id="cf-notes" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></textarea>
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Annulla</button>
+                                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Salva Chiusura</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('close-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await supabase.from('interventions').update({
+                    status: 'completed',
+                    pwr_1310: document.getElementById('cf-1310').value,
+                    pwr_1490: document.getElementById('cf-1490').value,
+                    otdr_result: document.getElementById('cf-otdr').value,
+                    port_code: document.getElementById('cf-port').value,
+                    notes: document.getElementById('cf-notes').value,
+                    closed_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (!error) {
+                    window.closeModal();
+                    renderDelivery();
+                } else {
+                    alert("Errore durante il salvataggio.");
+                }
+            };
+        };
+
+        window.openFreezeModal = function(id, name) {
+            document.getElementById('global-modal-slot').innerHTML = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+                        <h3 class="text-sm font-bold text-rose-400 mb-1">Blocco / Congelamento Pratica</h3>
+                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
+                        <form id="freeze-form" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Azione</label>
+                                <select id="ff-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <option value="frozen">Congela (Sospesa)</option>
+                                    <option value="cancelled">Annulla Intervento</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione Obbligatoria</label>
+                                <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Cliente irreperibile..."></textarea>
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Indietro</button>
+                                <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Conferma</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('freeze-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await supabase.from('interventions').update({
+                    status: document.getElementById('ff-status').value,
+                    notes: document.getElementById('ff-notes').value,
+                    closed_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (!error) {
+                    window.closeModal();
+                    renderDelivery();
+                } else {
+                    alert("Errore.");
+                }
+            };
+        };
+
+        window.closeModal = function() {
+            document.getElementById('global-modal-slot').innerHTML = '';
+        };
+
+        // 3. PROFILO
+        function renderProfile() {
+            document.getElementById('app-view').innerHTML = `
+                <div class="max-w-md mx-auto space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl text-center">
+                        <div class="w-16 h-16 bg-sky-500/10 border border-sky-500/25 text-sky-400 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3 font-bold">
+                            ${currentProfile.full_name ? currentProfile.full_name[0].toUpperCase() : 'U'}
+                        </div>
+                        <h2 class="text-base font-bold text-white">${currentProfile.full_name}</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">${currentUser.email}</p>
+                        <span class="inline-block mt-3 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Sessione</h3>
+                        <button onclick="window.doLogout()" class="w-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 font-bold py-3 rounded-xl text-xs transition">
+                            Disconnetti Account
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            window.doLogout = async () => {
+                await supabase.auth.signOut();
+                window.location.reload();
+            };
+        }
+
+        // 4. IMPOSTAZIONI
+        function renderSettings() {
+            document.getElementById('app-view').innerHTML = `
+                <div class="max-w-md mx-auto space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+                        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gear text-sky-400 mr-2"></i> Impostazioni Personali</h2>
+                        
+                        <form id="settings-form" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
+                                <input type="text" id="st-name" value="${currentProfile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nuova Password (opzionale)</label>
+                                <input type="password" id="st-pass" placeholder="Minimo 6 caratteri" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                            </div>
+                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                                Salva Modifiche
+                            </button>
+                            <p id="st-msg" class="text-emerald-400 text-xs text-center hidden mt-2">Modifiche salvate con successo!</p>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('settings-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const newName = document.getElementById('st-name').value;
+                const newPass = document.getElementById('st-pass').value;
+
+                await supabase.from('profiles').update({ full_name: newName }).eq('id', currentUser.id);
+                if (newPass.trim().length >= 6) {
+                    await supabase.auth.updateUser({ password: newPass });
+                }
+
+                currentProfile.full_name = newName;
+                renderHeaderUser();
+                const msg = document.getElementById('st-msg');
+                msg.classList.remove('hidden');
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            };
+        }
+
+        // Avvio applicazione
+        initApp();
+    </script>
 </body>
 </html>
