@@ -1,25 +1,25 @@
-import './auth-plugin.js';
-import './dashboard-plugin.js';
-import './delivery-plugin.js';
-import './profile-plugin.js';   // <-- Riattiva
-import './settings-plugin.js';  // <-- Riattiva
+import { AuthPlugin } from './auth-plugin.js';
+import { DashboardPlugin } from './dashboard-plugin.js';
+import { DeliveryPlugin } from './delivery-plugin.js';
+import { ProfilePlugin } from './profile-plugin.js';
+import { SettingsPlugin } from './settings-plugin.js';
 
 class Core {
     constructor() {
-        this.plugins = {};
+        this.plugins = {
+            auth: AuthPlugin,
+            dashboard: DashboardPlugin,
+            delivery: DeliveryPlugin,
+            profile: ProfilePlugin,
+            settings: SettingsPlugin
+        };
         this.currentRoute = 'dashboard';
-    }
-
-    register(name, plugin) {
-        this.plugins[name] = plugin;
     }
 
     async init() {
         try {
-            for (const name in this.plugins) {
-                if (typeof this.plugins[name].preInit === 'function') {
-                    await this.plugins[name].preInit();
-                }
+            if (this.plugins.auth && typeof this.plugins.auth.preInit === 'function') {
+                await this.plugins.auth.preInit();
             }
             window.router = (route) => this.navigate(route);
         } catch (err) {
