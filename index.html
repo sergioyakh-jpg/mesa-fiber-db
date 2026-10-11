@@ -82,7 +82,7 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Ikwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabase;
@@ -96,11 +96,12 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session) {
                     currentUser = session.user;
+                    
+                    // Ricarica sempre il profilo fresco dal database
                     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
 
-                    const { data: techs } = await supabase.from('profiles').select('*');
-                    allTechnicians = techs || [];
+                    await refreshTechniciansList();
 
                     document.getElementById('telegram-nav').classList.remove('hidden');
                     if (currentProfile.role === 'admin') {
@@ -115,6 +116,11 @@
             } catch (err) {
                 console.error("Errore inizializzazione:", err);
             }
+        }
+
+        async function refreshTechniciansList() {
+            const { data: techs } = await supabase.from('profiles').select('*');
+            allTechnicians = techs || [];
         }
 
         function renderHeaderUser() {
@@ -236,7 +242,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Pannello Admin</h4>
-                                    <p class="text-xs text-slate-400">Nuove pratiche e assegnazioni</p>
+                                    <p class="text-xs text-slate-400">Utenti, pratiche e assegnazioni</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
@@ -259,18 +265,59 @@
             }
         }
 
+        // 2. PANNELLO ADMIN (Gestione Utenti + Nuove Pratiche)
         async function renderAdminPanel() {
             if (currentProfile.role !== 'admin') {
                 window.appRouter('dashboard');
                 return;
             }
 
+            await refreshTechniciansList();
+
             const container = document.getElementById('app-view');
             container.innerHTML = `
                 <div class="space-y-6">
+                    <!-- Sezione Creazione Nuovo Utente / Tecnico -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
                         <h2 class="text-sm font-bold text-white mb-3 flex items-center">
-                            <i class="fa-solid fa-plus-circle text-amber-400 mr-2"></i> Nuova Pratica & Assegnazione
+                            <i class="fa-solid fa-user-plus text-amber-400 mr-2"></i> Crea Nuovo Utente / Tecnico
+                        </h2>
+                        <form id="new-user-form" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
+                                    <input type="text" id="nu-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Mario Rossi">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Email</label>
+                                    <input type="email" id="nu-email" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="mario@mesa.it">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Password</label>
+                                    <input type="password" id="nu-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Minimo 6 caratteri">
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 pt-1">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Ruolo</label>
+                                    <select id="nu-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                        <option value="technician">Tecnico</option>
+                                        <option value="admin">Amministratore</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1 pt-4">
+                                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
+                                        Registra Utente
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Sezione Nuova Pratica -->
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                        <h2 class="text-sm font-bold text-white mb-3 flex items-center">
+                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica & Assegnazione
                         </h2>
                         <form id="new-ticket-form" class="space-y-3">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -296,16 +343,17 @@
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico</label>
                                 <select id="nt-technician" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                    <option value="${currentUser.id}">-- Assegna a me stesso --</option>
+                                    <option value="${currentUser.id}">-- Assegna a me stesso (${currentProfile.full_name}) --</option>
                                     ${allTechnicians.filter(t => t.id !== currentUser.id).map(t => `<option value="${t.id}">${t.full_name} (${t.role})</option>`).join('')}
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
+                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
                                 Crea e Assegna Pratica
                             </button>
                         </form>
                     </div>
 
+                    <!-- Gestione pratiche esistenti -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
                         <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel Sistema</h3>
                         <div id="admin-tickets-list" class="space-y-3">
@@ -315,6 +363,37 @@
                 </div>
             `;
 
+            // Form Creazione Utente
+            document.getElementById('new-user-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('nu-email').value;
+                const password = document.getElementById('nu-pass').value;
+                const fullName = document.getElementById('nu-name').value;
+                const role = document.getElementById('nu-role').value;
+
+                // Registrazione su Auth di Supabase
+                const { data, error: authError } = await supabase.auth.signUp({ email, password });
+                if (authError) {
+                    alert("Errore creazione utente: " + authError.message);
+                    return;
+                }
+
+                if (data.user) {
+                    // Inserimento profilo collegato
+                    const { error: profileError } = await supabase.from('profiles').upsert([
+                        { id: data.user.id, full_name: fullName, role: role }
+                    ]);
+
+                    if (!profileError) {
+                        alert(`Utente ${fullName} (${role}) creato con successo!`);
+                        renderAdminPanel();
+                    } else {
+                        alert("Errore salvataggio profilo: " + profileError.message);
+                    }
+                }
+            };
+
+            // Form Creazione Pratica
             document.getElementById('new-ticket-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const { error } = await supabase.from('interventions').insert([{
@@ -356,11 +435,12 @@
                         <div>
                             <span class="text-[9px] font-mono uppercase bg-slate-900 text-sky-400 px-2 py-0.5 rounded border border-slate-800">${t.status}</span>
                             <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Assegnato a: <span class="text-amber-400 font-medium">${techName}</span></p>
                         </div>
                         <div class="flex items-center space-x-2 w-full md:w-auto">
-                            <select onchange="window.reassignTicket('${t.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1 text-xs text-white">
-                                <option value="${t.assigned_to}">Tecnico: ${techName}</option>
-                                <option value="${currentUser.id}">Assegna a me (${currentUser.email})</option>
+                            <select onchange="window.reassignTicket('${t.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white">
+                                <option value="${t.assigned_to}">Riassegna...</option>
+                                <option value="${currentUser.id}">A me (${currentProfile.full_name})</option>
                                 ${allTechnicians.filter(tc => tc.id !== t.assigned_to).map(tc => `<option value="${tc.id}">${tc.full_name}</option>`).join('')}
                             </select>
                         </div>
@@ -378,6 +458,7 @@
             }
         };
 
+        // 3. DELIVERY FTTH
         async function renderDelivery() {
             const container = document.getElementById('app-view');
             container.innerHTML = `
@@ -385,7 +466,7 @@
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
                         <div>
                             <h2 class="text-sm font-bold text-white"><i class="fa-solid fa-screwdriver-wrench text-sky-400 mr-2"></i> Delivery FTTH</h2>
-                            <p class="text-xs text-slate-400">I tuoi interventi assegnati e note di squadra</p>
+                            <p class="text-xs text-slate-400">Interventi assegnati e note di squadra</p>
                         </div>
                         <div>
                             <select id="delivery-status-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
@@ -695,16 +776,23 @@
                 const newName = document.getElementById('st-name').value;
                 const newPass = document.getElementById('st-pass').value;
 
-                await supabase.from('profiles').update({ full_name: newName }).eq('id', currentUser.id);
-                if (newPass && newPass.trim().length >= 6) {
-                    await supabase.auth.updateUser({ password: newPass });
-                }
+                // Aggiornamento corretto nel database e in memoria
+                const { error } = await supabase.from('profiles').update({ full_name: newName }).eq('id', currentUser.id);
+                
+                if (!error) {
+                    currentProfile.full_name = newName;
+                    renderHeaderUser();
+                    
+                    if (newPass && newPass.trim().length >= 6) {
+                        await supabase.auth.updateUser({ password: newPass });
+                    }
 
-                currentProfile.full_name = newName;
-                renderHeaderUser();
-                const msg = document.getElementById('st-msg');
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 3000);
+                    const msg = document.getElementById('st-msg');
+                    msg.classList.remove('hidden');
+                    setTimeout(() => msg.classList.add('hidden'), 3000);
+                } else {
+                    alert("Errore durante il salvataggio del nome: " + error.message);
+                }
             };
         }
 
