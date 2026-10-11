@@ -1,10 +1,11 @@
 {
   "name": "MESA Fiber Field",
   "short_name": "MESA Fiber",
-  "start_url": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#030712",
-  "theme_color": "#030712",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3067/3067400.png",
