@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MESA Fiber - WRM Workflow Management System</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SUPABASE CARICATO COME SCRIPT NORMALE (RISOLVE IL BLOCCO SILENZIOSO) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <meta name="theme-color" content="#0f172a">
     <script>
         tailwind.config = {
@@ -77,15 +83,13 @@
     <!-- SLOT MODALI GLOBALI -->
     <div id="global-modal-slot"></div>
 
-    <!-- LOGICA APPLICATIVA INTEGRATA WRM -->
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
+    <!-- LOGICA APPLICATIVA INTEGRATA WRM (Senza Type Module) -->
+    <script>
         const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Ikwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        window.supabaseClient = supabase;
+        // Creazione client usando la libreria globale caricata nell'head
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let currentProfile = null;
@@ -93,11 +97,17 @@
 
         async function initApp() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data, error } = await db.auth.getSession();
+                if (error) throw error;
+                
+                const session = data.session;
+
                 if (session) {
                     currentUser = session.user;
                     
-                    const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+                    const { data: profile, error: profileError } = await db.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+                    if (profileError) console.warn("Errore caricamento profilo:", profileError);
+                    
                     currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
 
                     await refreshTechniciansList();
@@ -115,12 +125,22 @@
                     renderLogin();
                 }
             } catch (err) {
-                console.error("Errore inizializzazione WRM:", err);
+                console.error("Errore critico inizializzazione WRM:", err);
+                document.getElementById('app-view').innerHTML = `
+                    <div class="max-w-sm mx-auto mt-20 bg-slate-900 border border-rose-500/50 p-6 rounded-3xl text-center shadow-xl">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl text-rose-500 mb-3"></i>
+                        <h2 class="text-white font-bold text-sm">Errore di Sistema</h2>
+                        <p class="text-xs text-slate-400 mt-2">Impossibile connettersi al database MESA.</p>
+                        <div class="mt-4 p-3 bg-slate-950 rounded-xl text-[10px] text-rose-400 font-mono break-words border border-slate-800">
+                            ${err.message || err}
+                        </div>
+                    </div>
+                `;
             }
         }
 
         async function refreshTechniciansList() {
-            const { data: techs } = await supabase.from('profiles').select('*');
+            const { data: techs } = await db.from('profiles').select('*');
             allTechnicians = techs || [];
         }
 
@@ -172,11 +192,11 @@
                 const errBox = document.getElementById('l-err');
                 errBox.classList.add('hidden');
 
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await db.auth.signInWithPassword({ email, password });
                 if (!error) {
                     window.location.reload();
                 } else {
-                    errBox.textContent = "Errore accesso: Credenziali errate o utente non abilitato.";
+                    errBox.textContent = "Credenziali errate o account inesistente.";
                     errBox.classList.remove('hidden');
                 }
             };
@@ -215,7 +235,7 @@
                             </div>
                             <div>
                                 <h4 class="font-bold text-white text-sm">Pannello Admin & WRM</h4>
-                                <p class="text-xs text-slate-400">Utenze, TT, pratiche e flussi di rete</p>
+                                <p class="text-xs text-slate-400">Utenze, pratiche e flussi di rete</p>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
@@ -227,7 +247,7 @@
                 <div class="space-y-6">
                     <div class="bg-gradient-to-r from-sky-900/30 via-slate-900 to-slate-900 border border-sky-500/20 p-6 rounded-3xl shadow-xl">
                         <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${welcomeName}</h2>
-                        <p class="text-xs text-slate-400">Workflow Management System - Modena & Emilia Romagna</p>
+                        <p class="text-xs text-slate-400">Workflow Management System - MESA Fiber</p>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -257,7 +277,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Delivery FTTH</h4>
-                                    <p class="text-xs text-slate-400">Interventi, misure OTDR e note squadra</p>
+                                    <p class="text-xs text-slate-400">Interventi, misure OTDR e note</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 transition text-sm"></i>
@@ -267,7 +287,7 @@
                 </div>
             `;
 
-            let query = supabase.from('interventions').select('*');
+            let query = db.from('interventions').select('*');
             if (currentProfile.role !== 'admin') {
                 query = query.eq('assigned_to', currentUser.id);
             }
@@ -304,7 +324,7 @@
                 <div class="space-y-6">
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
                         <h2 class="text-sm font-bold text-white mb-3 flex items-center">
-                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica FTTH & Assegnazione WRM
+                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica FTTH & Assegnazione
                         </h2>
                         <form id="new-ticket-form" class="space-y-3">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -328,13 +348,13 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico On-Field</label>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico</label>
                                 <select id="nt-technician" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                                     ${techOptionsHtml}
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
-                                Registra e Invia in Workflow
+                                Registra e Assegna
                             </button>
                         </form>
                     </div>
@@ -343,7 +363,7 @@
                         <h3 class="text-sm font-bold text-white flex items-center">
                             <i class="fa-solid fa-users-gear text-amber-400 mr-2"></i> Gestione Utenze & Ruoli Squadra
                         </h3>
-                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                        <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
                             ${allTechnicians.map(tech => `
                                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
                                     <div>
@@ -362,7 +382,7 @@
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
-                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel WRM</h3>
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche</h3>
                         <div id="admin-tickets-list" class="space-y-3">
                             <p class="text-slate-500 text-xs text-center py-4">Caricamento...</p>
                         </div>
@@ -372,7 +392,7 @@
 
             document.getElementById('new-ticket-form').onsubmit = async (e) => {
                 e.preventDefault();
-                const { error } = await supabase.from('interventions').insert([{
+                const { error } = await db.from('interventions').insert([{
                     client_name: document.getElementById('nt-client').value,
                     work_type: document.getElementById('nt-type').value,
                     address: document.getElementById('nt-address').value,
@@ -382,7 +402,7 @@
                 }]);
 
                 if (!error) {
-                    alert("Pratica creata e inserita nel workflow con successo!");
+                    alert("Pratica creata e assegnata con successo!");
                     renderAdminPanel();
                 } else {
                     alert("Errore: " + error.message);
@@ -393,7 +413,7 @@
         }
 
         window.updateUserRole = async function(userId, newRole) {
-            const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+            const { error } = await db.from('profiles').update({ role: newRole }).eq('id', userId);
             if (!error) {
                 alert("Ruolo utente aggiornato con successo!");
                 await refreshTechniciansList();
@@ -404,7 +424,7 @@
         };
 
         async function loadAdminTickets() {
-            const { data } = await supabase.from('interventions').select('*').order('created_at', { ascending: false });
+            const { data } = await db.from('interventions').select('*').order('created_at', { ascending: false });
             const list = document.getElementById('admin-tickets-list');
             if (!list) return;
 
@@ -429,7 +449,7 @@
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
                             <span class="text-[9px] font-mono uppercase bg-slate-900 text-sky-400 px-2 py-0.5 rounded border border-slate-800">${t.status}</span>
-                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address},${t.city}</span></h4>
+                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
                             <p class="text-[11px] text-slate-400 mt-0.5">Assegnato a: <span class="text-amber-400 font-medium">${techName}</span></p>
                         </div>
                         <div class="flex items-center space-x-2 w-full md:w-auto">
@@ -443,7 +463,7 @@
         }
 
         window.reassignTicket = async function(ticketId, newTechId) {
-            const { error } = await supabase.from('interventions').update({ assigned_to: newTechId }).eq('id', ticketId);
+            const { error } = await db.from('interventions').update({ assigned_to: newTechId }).eq('id', ticketId);
             if (!error) {
                 loadAdminTickets();
             } else {
@@ -481,7 +501,7 @@
         }
 
         async function loadTickets(statusFilter) {
-            let query = supabase.from('interventions').select('*').order('created_at', { ascending: false });
+            let query = db.from('interventions').select('*').order('created_at', { ascending: false });
             if (currentProfile.role !== 'admin') {
                 query = query.eq('assigned_to', currentUser.id);
             }
@@ -509,11 +529,12 @@
                 return `
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
                         <div class="flex justify-between items-start">
-                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>${badge}
+                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>
+                            ${badge}
                         </div>
                         <div>
                             <h3 class="font-bold text-white text-sm">${t.client_name}</h3>
-                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address},${t.city}</p>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address}, ${t.city}</p>
                         </div>
 
                         <!-- SEZIONE NOTE TRA COLLEGHI -->
@@ -521,4 +542,280 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold uppercase text-sky-400"><i class="fa-solid fa-comments mr-1"></i> Note e Comunicazioni Squadra</span>
                             </div>
-                            <div id="notes-box-${t.id}" class="text-xs text-slate-3
+                            <div id="notes-box-${t.id}" class="text-xs text-slate-300 space-y-1 max-h-28 overflow-y-auto">
+                                ${t.notes ? `<p class="bg-slate-900 p-2 rounded-lg border border-slate-800/60">${t.notes}</p>` : `<p class="text-slate-500 italic text-[11px]">Nessuna nota lasciata.</p>`}
+                            </div>
+                            <div class="flex space-x-2 pt-1">
+                                <input type="text" id="note-input-${t.id}" placeholder="Scrivi una nota per i colleghi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <button onclick="window.addColleagueNote('${t.id}')" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition">Invia</button>
+                            </div>
+                        </div>
+
+                        ${t.status === 'completed' ? `
+                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800">
+                                <p><strong>Potenze (1310/1490):</strong> ${t.pwr_1310} /${t.pwr_1490} dBm</p>
+                                <p><strong>OTDR:</strong> <span class="text-emerald-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
+                            </div>
+                        ` : t.status === 'frozen' || t.status === 'cancelled' ? `` : `
+                            <div class="flex space-x-2 pt-1">
+                                <button onclick="window.openCloseModal('${t.id}', '${cleanClientName}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
+                                    Chiudi Lavoro
+                                </button>
+                                <button onclick="window.openFreezeModal('${t.id}', '${cleanClientName}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-ban"></i>
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addColleagueNote = async function(ticketId) {
+            const input = document.getElementById(`note-input-${ticketId}`);
+            if (!input) return;
+            const noteText = input.value.trim();
+            if (!noteText) return;
+
+            const formattedNote = `[${currentProfile.full_name || currentUser.email}]: ${noteText}`;
+            const { data: ticket } = await db.from('interventions').select('notes').eq('id', ticketId).single();
+            const existingNotes = ticket && ticket.notes ? ticket.notes : '';
+            const updatedNotes = existingNotes ? `${existingNotes}\n${formattedNote}` : formattedNote;
+
+            const { error } = await db.from('interventions').update({ notes: updatedNotes }).eq('id', ticketId);
+            if (!error) {
+                input.value = '';
+                loadTickets('all');
+            } else {
+                alert("Errore invio nota: " + error.message);
+            }
+        };
+
+        window.openCloseModal = function(id, name) {
+            document.getElementById('global-modal-slot').innerHTML = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-sm font-bold text-white mb-1">Chiusura Lavoro FTTH</h3>
+                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
+                        <form id="close-form" class="space-y-3">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1310 nm (dBm)</label>
+                                    <input type="text" id="cf-1310" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1490 nm (dBm)</label>
+                                    <input type="text" id="cf-1490" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Esito OTDR</label>
+                                <select id="cf-otdr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <option value="Pass">PASS (Conforme)</option>
+                                    <option value="Fail">FAIL (Anomalia)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Codice PFP / Porta</label>
+                                <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Annulla</button>
+                                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Salva Chiusura</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('close-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await db.from('interventions').update({
+                    status: 'completed',
+                    pwr_1310: document.getElementById('cf-1310').value,
+                    pwr_1490: document.getElementById('cf-1490').value,
+                    otdr_result: document.getElementById('cf-otdr').value,
+                    port_code: document.getElementById('cf-port').value,
+                    closed_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (!error) {
+                    window.closeModal();
+                    renderDelivery();
+                } else {
+                    alert("Errore salvataggio: " + error.message);
+                }
+            };
+        };
+
+        window.openFreezeModal = function(id, name) {
+            document.getElementById('global-modal-slot').innerHTML = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+                        <h3 class="text-sm font-bold text-rose-400 mb-1">Blocco / Congelamento Pratica</h3>
+                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
+                        <form id="freeze-form" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Azione</label>
+                                <select id="ff-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <option value="frozen">Congela (Sospesa)</option>
+                                    <option value="cancelled">Annulla Intervento</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione</label>
+                                <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Cliente irreperibile..."></textarea>
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Indietro</button>
+                                <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Conferma</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('freeze-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await db.from('interventions').update({
+                    status: document.getElementById('ff-status').value,
+                    notes: document.getElementById('ff-notes').value,
+                    closed_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (!error) {
+                    window.closeModal();
+                    renderDelivery();
+                } else {
+                    alert("Errore: " + error.message);
+                }
+            };
+        };
+
+        window.closeModal = function() {
+            document.getElementById('global-modal-slot').innerHTML = '';
+        };
+
+        function renderProfile() {
+            const avatarHtml = currentProfile.avatar_url 
+                ? `<img src="${currentProfile.avatar_url}" class="w-20 h-20 rounded-2xl object-cover mx-auto mb-3 border border-sky-500/30 shadow-inner">`
+                : `<div class="w-20 h-20 bg-sky-500/10 border border-sky-500/25 text-sky-400 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-3 font-bold">${currentProfile.full_name ? currentProfile.full_name[0].toUpperCase() : 'U'}</div>`;
+
+            document.getElementById('app-view').innerHTML = `
+                <div class="max-w-md mx-auto space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl text-center">
+                        <div id="avatar-container">${avatarHtml}</div>
+                        <h2 class="text-base font-bold text-white">${currentProfile.full_name || currentUser.email}</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">${currentUser.email}</p>
+                        <span class="inline-block mt-2 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800">
+                            <label class="cursor-pointer bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-bold py-2 px-4 rounded-xl transition inline-flex items-center space-x-2">
+                                <i class="fa-solid fa-camera text-sky-400"></i>
+                                <span id="upload-label-text">Cambia Foto Profilo</span>
+                                <input type="file" id="avatar-file-input" accept="image/*" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Sessione</h3>
+                        <button onclick="window.doLogout()" class="w-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 font-bold py-3 rounded-xl text-xs transition">
+                            Disconnetti Account
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('avatar-file-input').onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const labelText = document.getElementById('upload-label-text');
+                labelText.textContent = "Caricamento...";
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
+
+                const { error: uploadError } = await db.storage.from('avatars').upload(fileName, file);
+                if (uploadError) {
+                    alert("Errore upload: " + uploadError.message);
+                    labelText.textContent = "Cambia Foto Profilo";
+                    return;
+                }
+
+                const { data: { publicUrl } } = db.storage.from('avatars').getPublicUrl(fileName);
+                const { error: updateError } = await db.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+
+                if (!updateError) {
+                    currentProfile.avatar_url = publicUrl;
+                    renderProfile();
+                } else {
+                    alert("Errore salvataggio profilo: " + updateError.message);
+                    labelText.textContent = "Cambia Foto Profilo";
+                }
+            };
+
+            window.doLogout = async () => {
+                await db.auth.signOut();
+                window.location.reload();
+            };
+        }
+
+        function renderSettings() {
+            document.getElementById('app-view').innerHTML = `
+                <div class="max-w-md mx-auto space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+                        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gear text-sky-400 mr-2"></i> Impostazioni Personali</h2>
+                        
+                        <form id="settings-form" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
+                                <input type="text" id="st-name" value="${currentProfile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nuova Password (opzionale)</label>
+                                <input type="password" id="st-pass" placeholder="Minimo 6 caratteri" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                            </div>
+                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                                Salva Modifiche
+                            </button>
+                            <p id="st-msg" class="text-emerald-400 text-xs text-center hidden mt-2">Modifiche salvate con successo!</p>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('settings-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const newName = document.getElementById('st-name').value.trim();
+                const newPass = document.getElementById('st-pass').value;
+
+                const { error } = await db.from('profiles').upsert({
+                    id: currentUser.id,
+                    full_name: newName,
+                    role: currentProfile.role
+                });
+
+                if (!error) {
+                    currentProfile.full_name = newName;
+                    renderHeaderUser();
+                    
+                    if (newPass && newPass.trim().length >= 6) {
+                        await db.auth.updateUser({ password: newPass });
+                    }
+
+                    const msg = document.getElementById('st-msg');
+                    msg.classList.remove('hidden');
+                    setTimeout(() => msg.classList.add('hidden'), 3000);
+                } else {
+                    alert("Errore salvataggio: " + error.message);
+                }
+            };
+        }
+
+        // Avvio dell'app non appena la pagina viene caricata
+        document.addEventListener("DOMContentLoaded", initApp);
+    </script>
+</body>
+</html>
