@@ -169,12 +169,15 @@
                 e.preventDefault();
                 const email = document.getElementById('l-email').value;
                 const password = document.getElementById('l-pass').value;
+                const errBox = document.getElementById('l-err');
+                errBox.classList.add('hidden');
+
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (!error) {
                     window.location.reload();
                 } else {
-                    document.getElementById('l-err').textContent = "Credenziali non valide.";
-                    document.getElementById('l-err').classList.remove('hidden');
+                    errBox.textContent = "Errore accesso: Credenziali errate o utente non abilitato.";
+                    errBox.classList.remove('hidden');
                 }
             };
         }
@@ -299,7 +302,6 @@
 
             container.innerHTML = `
                 <div class="space-y-6">
-                    <!-- Sezione Nuova Pratica / Workflow -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
                         <h2 class="text-sm font-bold text-white mb-3 flex items-center">
                             <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica FTTH & Assegnazione WRM
@@ -337,7 +339,6 @@
                         </form>
                     </div>
 
-                    <!-- Sezione Gestione Utenze / Ruoli del Team -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
                         <h3 class="text-sm font-bold text-white flex items-center">
                             <i class="fa-solid fa-users-gear text-amber-400 mr-2"></i> Gestione Utenze & Ruoli Squadra
@@ -360,7 +361,6 @@
                         </div>
                     </div>
 
-                    <!-- Gestione pratiche esistenti -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
                         <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel WRM</h3>
                         <div id="admin-tickets-list" class="space-y-3">
@@ -429,7 +429,7 @@
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
                             <span class="text-[9px] font-mono uppercase bg-slate-900 text-sky-400 px-2 py-0.5 rounded border border-slate-800">${t.status}</span>
-                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
+                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address},${t.city}</span></h4>
                             <p class="text-[11px] text-slate-400 mt-0.5">Assegnato a: <span class="text-amber-400 font-medium">${techName}</span></p>
                         </div>
                         <div class="flex items-center space-x-2 w-full md:w-auto">
@@ -509,12 +509,11 @@
                 return `
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
                         <div class="flex justify-between items-start">
-                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>
-                            ${badge}
+                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>${badge}
                         </div>
                         <div>
                             <h3 class="font-bold text-white text-sm">${t.client_name}</h3>
-                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address}, ${t.city}</p>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address},${t.city}</p>
                         </div>
 
                         <!-- SEZIONE NOTE TRA COLLEGHI -->
@@ -522,279 +521,4 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold uppercase text-sky-400"><i class="fa-solid fa-comments mr-1"></i> Note e Comunicazioni Squadra</span>
                             </div>
-                            <div id="notes-box-${t.id}" class="text-xs text-slate-300 space-y-1 max-h-28 overflow-y-auto">
-                                ${t.notes ? `<p class="bg-slate-900 p-2 rounded-lg border border-slate-800/60">${t.notes}</p>` : `<p class="text-slate-500 italic text-[11px]">Nessuna nota lasciata.</p>`}
-                            </div>
-                            <div class="flex space-x-2 pt-1">
-                                <input type="text" id="note-input-${t.id}" placeholder="Scrivi una nota per i colleghi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">
-                                <button onclick="window.addColleagueNote('${t.id}')" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition">Invia</button>
-                            </div>
-                        </div>
-
-                        ${t.status === 'completed' ? `
-                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800">
-                                <p><strong>Potenze (1310/1490):</strong> ${t.pwr_1310} /${t.pwr_1490} dBm</p>
-                                <p><strong>OTDR:</strong> <span class="text-emerald-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
-                            </div>
-                        ` : t.status === 'frozen' || t.status === 'cancelled' ? `` : `
-                            <div class="flex space-x-2 pt-1">
-                                <button onclick="window.openCloseModal('${t.id}', '${cleanClientName}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
-                                    Chiudi Lavoro
-                                </button>
-                                <button onclick="window.openFreezeModal('${t.id}', '${cleanClientName}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
-                                    <i class="fa-solid fa-ban"></i>
-                                </button>
-                            </div>
-                        `}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        window.addColleagueNote = async function(ticketId) {
-            const input = document.getElementById(`note-input-${ticketId}`);
-            if (!input) return;
-            const noteText = input.value.trim();
-            if (!noteText) return;
-
-            const formattedNote = `[${currentProfile.full_name || currentUser.email}]: ${noteText}`;
-            const { data: ticket } = await supabase.from('interventions').select('notes').eq('id', ticketId).single();
-            const existingNotes = ticket && ticket.notes ? ticket.notes : '';
-            const updatedNotes = existingNotes ? `${existingNotes}\n${formattedNote}` : formattedNote;
-
-            const { error } = await supabase.from('interventions').update({ notes: updatedNotes }).eq('id', ticketId);
-            if (!error) {
-                input.value = '';
-                loadTickets('all');
-            } else {
-                alert("Errore invio nota: " + error.message);
-            }
-        };
-
-        window.openCloseModal = function(id, name) {
-            document.getElementById('global-modal-slot').innerHTML = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-                        <h3 class="text-sm font-bold text-white mb-1">Chiusura Lavoro FTTH</h3>
-                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
-                        <form id="close-form" class="space-y-3">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1310 nm (dBm)</label>
-                                    <input type="text" id="cf-1310" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1490 nm (dBm)</label>
-                                    <input type="text" id="cf-1490" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Esito OTDR</label>
-                                <select id="cf-otdr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                    <option value="Pass">PASS (Conforme)</option>
-                                    <option value="Fail">FAIL (Anomalia)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Codice PFP / Porta</label>
-                                <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div class="flex space-x-2 pt-2">
-                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Annulla</button>
-                                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Salva Chiusura</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('close-form').onsubmit = async (e) => {
-                e.preventDefault();
-                const { error } = await supabase.from('interventions').update({
-                    status: 'completed',
-                    pwr_1310: document.getElementById('cf-1310').value,
-                    pwr_1490: document.getElementById('cf-1490').value,
-                    otdr_result: document.getElementById('cf-otdr').value,
-                    port_code: document.getElementById('cf-port').value,
-                    closed_at: new Date().toISOString()
-                }).eq('id', id);
-
-                if (!error) {
-                    window.closeModal();
-                    renderDelivery();
-                } else {
-                    alert("Errore salvataggio: " + error.message);
-                }
-            };
-        };
-
-        window.openFreezeModal = function(id, name) {
-            document.getElementById('global-modal-slot').innerHTML = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
-                        <h3 class="text-sm font-bold text-rose-400 mb-1">Blocco / Congelamento Pratica</h3>
-                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
-                        <form id="freeze-form" class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Azione</label>
-                                <select id="ff-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                    <option value="frozen">Congela (Sospesa)</option>
-                                    <option value="cancelled">Annulla Intervento</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione</label>
-                                <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Cliente irreperibile..."></textarea>
-                            </div>
-                            <div class="flex space-x-2 pt-2">
-                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Indietro</button>
-                                <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Conferma</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('freeze-form').onsubmit = async (e) => {
-                e.preventDefault();
-                const { error } = await supabase.from('interventions').update({
-                    status: document.getElementById('ff-status').value,
-                    notes: document.getElementById('ff-notes').value,
-                    closed_at: new Date().toISOString()
-                }).eq('id', id);
-
-                if (!error) {
-                    window.closeModal();
-                    renderDelivery();
-                } else {
-                    alert("Errore: " + error.message);
-                }
-            };
-        };
-
-        window.closeModal = function() {
-            document.getElementById('global-modal-slot').innerHTML = '';
-        };
-
-        function renderProfile() {
-            const avatarHtml = currentProfile.avatar_url 
-                ? `<img src="${currentProfile.avatar_url}" class="w-20 h-20 rounded-2xl object-cover mx-auto mb-3 border border-sky-500/30 shadow-inner">`
-                : `<div class="w-20 h-20 bg-sky-500/10 border border-sky-500/25 text-sky-400 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-3 font-bold">${currentProfile.full_name ? currentProfile.full_name[0].toUpperCase() : 'U'}</div>`;
-
-            document.getElementById('app-view').innerHTML = `
-                <div class="max-w-md mx-auto space-y-4">
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl text-center">
-                        <div id="avatar-container">${avatarHtml}</div>
-                        <h2 class="text-base font-bold text-white">${currentProfile.full_name || currentUser.email}</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">${currentUser.email}</p>
-                        <span class="inline-block mt-2 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
-
-                        <div class="mt-4 pt-4 border-t border-slate-800">
-                            <label class="cursor-pointer bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-bold py-2 px-4 rounded-xl transition inline-flex items-center space-x-2">
-                                <i class="fa-solid fa-camera text-sky-400"></i>
-                                <span id="upload-label-text">Cambia Foto Profilo</span>
-                                <input type="file" id="avatar-file-input" accept="image/*" class="hidden">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
-                        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Sessione</h3>
-                        <button onclick="window.doLogout()" class="w-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 font-bold py-3 rounded-xl text-xs transition">
-                            Disconnetti Account
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('avatar-file-input').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const labelText = document.getElementById('upload-label-text');
-                labelText.textContent = "Caricamento...";
-
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
-
-                const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file);
-                if (uploadError) {
-                    alert("Errore upload: " + uploadError.message);
-                    labelText.textContent = "Cambia Foto Profilo";
-                    return;
-                }
-
-                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-                const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-
-                if (!updateError) {
-                    currentProfile.avatar_url = publicUrl;
-                    renderProfile();
-                } else {
-                    alert("Errore salvataggio profilo: " + updateError.message);
-                    labelText.textContent = "Cambia Foto Profilo";
-                }
-            };
-
-            window.doLogout = async () => {
-                await supabase.auth.signOut();
-                window.location.reload();
-            };
-        }
-
-        function renderSettings() {
-            document.getElementById('app-view').innerHTML = `
-                <div class="max-w-md mx-auto space-y-4">
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
-                        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gear text-sky-400 mr-2"></i> Impostazioni Personali</h2>
-                        
-                        <form id="settings-form" class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
-                                <input type="text" id="st-name" value="${currentProfile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nuova Password (opzionale)</label>
-                                <input type="password" id="st-pass" placeholder="Minimo 6 caratteri" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
-                            </div>
-                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg">
-                                Salva Modifiche
-                            </button>
-                            <p id="st-msg" class="text-emerald-400 text-xs text-center hidden mt-2">Modifiche salvate con successo!</p>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('settings-form').onsubmit = async (e) => {
-                e.preventDefault();
-                const newName = document.getElementById('st-name').value.trim();
-                const newPass = document.getElementById('st-pass').value;
-
-                const { error } = await supabase.from('profiles').upsert({
-                    id: currentUser.id,
-                    full_name: newName,
-                    role: currentProfile.role
-                });
-
-                if (!error) {
-                    currentProfile.full_name = newName;
-                    renderHeaderUser();
-                    
-                    if (newPass && newPass.trim().length >= 6) {
-                        await supabase.auth.updateUser({ password: newPass });
-                    }
-
-                    const msg = document.getElementById('st-msg');
-                    msg.classList.remove('hidden');
-                    setTimeout(() => msg.classList.add('hidden'), 3000);
-                } else {
-                    alert("Errore salvataggio: " + error.message);
-                }
-            };
-        }
-
-        initApp();
-    </script>
-</body>
-</html>
+                            <div id="notes-box-${t.id}" class="text-xs text-slate-3
