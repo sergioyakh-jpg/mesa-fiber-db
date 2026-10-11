@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MESA Fiber - Field Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#030712">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#020617',
+                        card: '#0f172a',
+                        borderc: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darker text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- TOP HEADER (Desktop & Mobile) -->
+    <header class="bg-card border-b border-borderc px-4 py-3 flex justify-between items-center sticky top-0 z-40 backdrop-blur-md bg-opacity-9ossal">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold shadow-lg shadow-blue-500/10">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div>
+                <h1 class="font-black text-sm tracking-wider uppercase bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">MESA <span class="text-blue-500">Fiber</span></h1>
+                <p id="app-subtitle" class="text-[10px] text-slate-400 font-mono">Field Management System</p>
+            </div>
+        </div>
+        <div id="header-user-slot" class="flex items-center space-x-2"></div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 pb-24 md:pb-8">
+        <div id="app-view-container">
+            <!-- Динамические модули подгружаются сюда -->
+        </div>
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Стильное мобильное меню снизу как в app) -->
+    <nav id="mobile-nav" class="hidden md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-borderc px-4 py-2 z-50 flex justify-around items-center">
+        <button onclick="window.router('dashboard')" class="flex flex-col items-center text-slate-400 hover:text-blue-400 nav-btn" data-target="dashboard">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Home</span>
+        </button>
+        <button onclick="window.router('delivery')" class="flex flex-col items-center text-slate-400 hover:text-blue-400 nav-btn" data-target="delivery">
+            <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Delivery</span>
+        </button>
+        <button onclick="window.router('profile')" class="flex flex-col items-center text-slate-400 hover:text-blue-400 nav-btn" data-target="profile">
+            <i class="fa-solid fa-user-gear text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Profilo</span>
+        </button>
+        <button onclick="window.router('settings')" class="flex flex-col items-center text-slate-400 hover:text-blue-400 nav-btn" data-target="settings">
+            <i class="fa-solid fa-sliders text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Impostazioni</span>
+        </button>
+    </nav>
+
+    <!-- GLOBAL MODAL SLOT -->
+    <div id="global-modal-slot"></div>
+
+    <!-- START CORE -->
+    <script type="module" src="./modules/core.js"></script>
+</body>
+</html>
