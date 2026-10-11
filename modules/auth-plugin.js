@@ -6,33 +6,29 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export const AuthPlugin = {
+const AuthPlugin = {
     name: 'auth',
-    user: null,
-    profile: null,
 
     async preInit() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            this.user = session.user;
-            const { data } = await supabase.from('profiles').select('*').eq('id', this.user.id).single();
-            this.profile = data || { full_name: this.user.email, role: 'technician' };
-            
             document.getElementById('telegram-nav').classList.remove('hidden');
-            this.renderHeaderUser();
+            
+            // Recupera profilo utente
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+            const fullName = profile ? profile.full_name : session.user.email;
+            const role = profile ? profile.role : 'technician';
+
+            document.getElementById('header-user-slot').innerHTML = `
+                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${fullName} (${role})</span>
+                </div>
+            `;
             window.router('dashboard');
         } else {
             this.renderLoginScreen();
         }
-    },
-
-    renderHeaderUser() {
-        document.getElementById('header-user-slot').innerHTML = `
-            <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-xs font-medium text-slate-200 hidden sm:inline">${this.profile.full_name}</span>
-            </div>
-        `;
     },
 
     renderLoginScreen() {
