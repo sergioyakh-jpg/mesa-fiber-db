@@ -12,10 +12,12 @@ class Core {
 
     register(name, plugin) {
         this.plugins[name] = plugin;
+        console.log(`Plugin registrato: ${name}`);
     }
 
     async init() {
         try {
+            console.log("Core in avvio...");
             for (const name in this.plugins) {
                 if (typeof this.plugins[name].preInit === 'function') {
                     await this.plugins[name].preInit();
@@ -23,10 +25,10 @@ class Core {
             }
             window.router = (route) => this.navigate(route);
         } catch (err) {
-            console.error("Errore Core:", err);
+            console.error("Errore critico in init:", err);
             document.getElementById('app-view-container').innerHTML = `
-                <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-2xl text-center text-rose-400 text-xs mt-10">
-                    Errore caricamento moduli. Apri la console (F12).
+                <div class="bg-rose-500/20 border border-rose-500/40 p-4 rounded-2xl text-rose-300 text-xs mt-6">
+                    <strong>Errore Moduli:</strong> ${err.message}
                 </div>
             `;
         }
