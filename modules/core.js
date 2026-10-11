@@ -1,8 +1,8 @@
 import './auth-plugin.js';
 import './dashboard-plugin.js';
 import './delivery-plugin.js';
-// import './profile-plugin.js';   <-- Commentato temporaneamente
-// import './settings-plugin.js';  <-- Commentato temporaneamente
+import './profile-plugin.js';   // <-- Riattiva
+import './settings-plugin.js';  // <-- Riattiva
 
 class Core {
     constructor() {
