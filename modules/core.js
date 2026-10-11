@@ -1,8 +1,8 @@
 import './auth-plugin.js';
 import './dashboard-plugin.js';
 import './delivery-plugin.js';
-import './profile-plugin.js';
-import './settings-plugin.js';
+// import './profile-plugin.js';   <-- Commentato temporaneamente
+// import './settings-plugin.js';  <-- Commentato temporaneamente
 
 class Core {
     constructor() {
@@ -12,12 +12,10 @@ class Core {
 
     register(name, plugin) {
         this.plugins[name] = plugin;
-        console.log(`Plugin registrato: ${name}`);
     }
 
     async init() {
         try {
-            console.log("Core in avvio...");
             for (const name in this.plugins) {
                 if (typeof this.plugins[name].preInit === 'function') {
                     await this.plugins[name].preInit();
@@ -25,12 +23,7 @@ class Core {
             }
             window.router = (route) => this.navigate(route);
         } catch (err) {
-            console.error("Errore critico in init:", err);
-            document.getElementById('app-view-container').innerHTML = `
-                <div class="bg-rose-500/20 border border-rose-500/40 p-4 rounded-2xl text-rose-300 text-xs mt-6">
-                    <strong>Errore Moduli:</strong> ${err.message}
-                </div>
-            `;
+            console.error("Errore Core:", err);
         }
     }
 
