@@ -11,7 +11,7 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SUPABASE CARICATO COME SCRIPT NORMALE (RISOLVE IL BLOCCO SILENZIOSO) -->
+    <!-- SUPABASE CLIENT -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <meta name="theme-color" content="#0f172a">
@@ -83,12 +83,11 @@
     <!-- SLOT MODALI GLOBALI -->
     <div id="global-modal-slot"></div>
 
-    <!-- LOGICA APPLICATIVA INTEGRATA WRM (Senza Type Module) -->
+    <!-- LOGICA APPLICATIVA INTEGRATA WRM -->
     <script>
         const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Ikwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
+        const SUPABASE_ANON_KEY = 'sb_publishable_1evuSLtiqGEBboDPek92Yw_ilaMFdKm';
 
-        // Creazione client usando la libreria globale caricata nell'head
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
@@ -814,7 +813,6 @@
             };
         }
 
-        // Avvio dell'app non appena la pagina viene caricata
         document.addEventListener("DOMContentLoaded", initApp);
     </script>
 </body>
