@@ -50,8 +50,8 @@
         </div>
     </main>
 
-    <!-- MENU DI NAVIGAZIONE INFERIORE (STILE TELEGRAM) -->
-    <nav id="telegram-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2.5 z-50 flex justify-between items-center max-w-2xl mx-auto md:rounded-t-2xl shadow-2xl">
+    <!-- MENU DI NAVIGAZIONE INFERIORE -->
+    <nav id="telegram-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-4 py-2.5 z-50 flex justify-around items-center max-w-2xl mx-auto md:rounded-t-2xl shadow-2xl">
         <button onclick="window.appRouter('dashboard')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="dashboard">
             <i class="fa-solid fa-chart-pie text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Home</span>
@@ -59,6 +59,10 @@
         <button onclick="window.appRouter('delivery')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="delivery">
             <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
             <span class="text-[10px] mt-0.5 font-medium">Delivery</span>
+        </button>
+        <button id="admin-nav-btn" onclick="window.appRouter('admin')" class="hidden flex flex-col items-center py-1 px-3 text-slate-400 hover:text-amber-400 transition nav-btn" data-target="admin">
+            <i class="fa-solid fa-user-shield text-lg"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Admin</span>
         </button>
         <button onclick="window.appRouter('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="profile">
             <i class="fa-solid fa-user text-lg"></i>
@@ -78,13 +82,14 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Ikwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabase;
 
         let currentUser = null;
         let currentProfile = null;
+        let allTechnicians = [];
 
         async function initApp() {
             try {
@@ -94,7 +99,15 @@
                     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
 
+                    // Carica lista tecnici per le assegnazioni admin
+                    const { data: techs } = await supabase.from('profiles').select('*');
+                    allTechnicians = techs || [];
+
                     document.getElementById('telegram-nav').classList.remove('hidden');
+                    if (currentProfile.role === 'admin') {
+                        document.getElementById('admin-nav-btn').classList.remove('hidden');
+                    }
+
                     renderHeaderUser();
                     window.appRouter('dashboard');
                 } else {
@@ -159,20 +172,22 @@
         window.appRouter = function(route) {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if(btn.dataset.target === route) {
-                    btn.classList.add('text-sky-400');
+                    btn.classList.add(currentProfile.role === 'admin' && route === 'admin' ? 'text-amber-400' : 'text-sky-400');
                     btn.classList.remove('text-slate-400');
                 } else {
-                    btn.classList.remove('text-sky-400');
+                    btn.classList.remove('text-sky-400', 'text-amber-400');
                     btn.classList.add('text-slate-400');
                 }
             });
 
             if (route === 'dashboard') renderDashboard();
             else if (route === 'delivery') renderDelivery();
+            else if (route === 'admin') renderAdminPanel();
             else if (route === 'profile') renderProfile();
             else if (route === 'settings') renderSettings();
         };
 
+        // 1. DASHBOARD
         async function renderDashboard() {
             const container = document.getElementById('app-view');
             container.innerHTML = `
@@ -201,8 +216,7 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Moduli Operativi</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div onclick="window.appRouter('delivery')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-sky-500/50 transition cursor-pointer flex items-center justify-between group">
                             <div class="flex items-center space-x-3">
                                 <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
@@ -210,11 +224,26 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Delivery FTTH</h4>
-                                    <p class="text-xs text-slate-400">Gestione interventi, chiusure e certificazioni</p>
+                                    <p class="text-xs text-slate-400">Gestione interventi e note colleghi</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 transition text-sm"></i>
                         </div>
+
+                        ${currentProfile.role === 'admin' ? `
+                        <div onclick="window.appRouter('admin')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-amber-500/50 transition cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Pannello Admin</h4>
+                                    <p class="text-xs text-slate-400">Nuove pratiche e assegnazioni</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -232,6 +261,128 @@
             }
         }
 
+        // 2. PANNELLO ADMIN (Crea pratiche e assegna tecnici)
+        async function renderAdminPanel() {
+            if (currentProfile.role !== 'admin') {
+                window.appRouter('dashboard');
+                return;
+            }
+
+            const container = document.getElementById('app-view');
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                        <h2 class="text-sm font-bold text-white mb-3 flex items-center">
+                            <i class="fa-solid fa-plus-circle text-amber-400 mr-2"></i> Nuova Pratica & Assegnazione
+                        </h2>
+                        <form id="new-ticket-form" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Cliente</label>
+                                    <input type="text" id="nt-client" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Tipo Lavoro</label>
+                                    <input type="text" id="nt-type" value="FTTH Installazione" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Indirizzo</label>
+                                    <input type="text" id="nt-address" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Città</label>
+                                    <input type="text" id="nt-city" value="Modena" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico</label>
+                                <select id="nt-technician" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <option value="${currentUser.id}">-- Assegna a me stesso --</option>
+                                    ${allTechnicians.filter(t => t.id !== currentUser.id).map(t => `<option value="${t.id}">${t.full_name} (${t.role})</option>`).join('')}
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
+                                Crea e Assegna Pratica
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Gestione pratiche esistenti -->
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel Sistema</h3>
+                        <div id="admin-tickets-list" class="space-y-3">
+                            <p class="text-slate-500 text-xs text-center py-4">Caricamento...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('new-ticket-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const { error } = await supabase.from('interventions').insert([{
+                    client_name: document.getElementById('nt-client').value,
+                    work_type: document.getElementById('nt-type').value,
+                    address: document.getElementById('nt-address').value,
+                    city: document.getElementById('nt-city').value,
+                    assigned_to: document.getElementById('nt-technician').value,
+                    status: 'assigned'
+                }]);
+
+                if (!error) {
+                    alert("Pratica creata e assegnata con successo!");
+                    renderAdminPanel();
+                } else {
+                    alert("Errore: " + error.message);
+                }
+            };
+
+            loadAdminTickets();
+        }
+
+        async function loadAdminTickets() {
+            const { data } = await supabase.from('interventions').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('admin-tickets-list');
+            if (!list) return;
+
+            if (!data || data.length === 0) {
+                list.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Nessuna pratica trovata.</p>`;
+                return;
+            }
+
+            list.innerHTML = data.map(t => {
+                const assignedTech = allTechnicians.find(tc => tc.id === t.assigned_to);
+                const techName = assignedTech ? assignedTech.full_name : 'Non assegnato';
+
+                return `
+                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                        <div>
+                            <span class="text-[9px] font-mono uppercase bg-slate-900 text-sky-400 px-2 py-0.5 rounded border border-slate-800">${t.status}</span>
+                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
+                        </div>
+                        <div class="flex items-center space-x-2 w-full md:w-auto">
+                            <select onchange="window.reassignTicket('${t.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1 text-xs text-white">
+                                <option value="${t.assigned_to}">Tecnico: ${techName}</option>
+                                <option value="${currentUser.id}">Assegna a me (${currentUser.email})</option>
+                                ${allTechnicians.filter(tc => tc.id !== t.assigned_to).map(tc => `<option value="${tc.id}">${tc.full_name}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.reassignTicket = async function(ticketId, newTechId) {
+            const { error } = await supabase.from('interventions').update({ assigned_to: newTechId }).eq('id', ticketId);
+            if (!error) {
+                loadAdminTickets();
+            } else {
+                alert("Errore riassegnazione.");
+            }
+        };
+
+        // 3. DELIVERY FTTH & NOTE TRA COLLEGHI
         async function renderDelivery() {
             const container = document.getElementById('app-view');
             container.innerHTML = `
@@ -239,7 +390,7 @@
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
                         <div>
                             <h2 class="text-sm font-bold text-white"><i class="fa-solid fa-screwdriver-wrench text-sky-400 mr-2"></i> Delivery FTTH</h2>
-                            <p class="text-xs text-slate-400">Coda ordini e chiusura lavori</p>
+                            <p class="text-xs text-slate-400">I tuoi interventi assegnati e note di squadra</p>
                         </div>
                         <div>
                             <select id="delivery-status-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
@@ -275,7 +426,7 @@
             if (!listContainer) return;
 
             if (error || !data || data.length === 0) {
-                listContainer.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs">Nessun intervento trovato.</div>`;
+                listContainer.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs">Nessun intervento trovato per te.</div>`;
                 return;
             }
 
@@ -286,7 +437,7 @@
                 if (t.status === 'cancelled') badge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-rose-500/20">Annullato</span>`;
 
                 return `
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-2">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
                         <div class="flex justify-between items-start">
                             <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>
                             ${badge}
@@ -296,17 +447,26 @@
                             <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address}, ${t.city}</p>
                         </div>
 
+                        <!-- SEZIONE NOTE TRA COLLEGHI -->
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase text-sky-400"><i class="fa-solid fa-comments mr-1"></i> Note e Comunicazioni Squadra</span>
+                            </div>
+                            <div id="notes-box-${t.id}" class="text-xs text-slate-300 space-y-1 max-h-28 overflow-y-auto">
+                                ${t.notes ? `<p class="bg-slate-900 p-2 rounded-lg border border-slate-800/60">${t.notes}</p>` : `<p class="text-slate-500 italic text-[11px]">Nessuna nota lasciata.</p>`}
+                            </div>
+                            <div class="flex space-x-2 pt-1">
+                                <input type="text" id="note-input-${t.id}" placeholder="Scrivi una nota per i colleghi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <button onclick="window.addColleagueNote('${t.id}')" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition">Invia</button>
+                            </div>
+                        </div>
+
                         ${t.status === 'completed' ? `
-                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800/80">
+                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800">
                                 <p><strong>Potenze (1310/1490):</strong> ${t.pwr_1310} /${t.pwr_1490} dBm</p>
                                 <p><strong>OTDR:</strong> <span class="text-emerald-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
-                                <p class="text-slate-400 italic">Note: ${t.notes || 'Nessuna nota'}</p>
                             </div>
-                        ` : t.status === 'frozen' || t.status === 'cancelled' ? `
-                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs text-amber-400 border border-slate-800">
-                                <p><strong>Motivo:</strong> ${t.notes || 'Non specificato'}</p>
-                            </div>
-                        ` : `
+                        ` : t.status === 'frozen' || t.status === 'cancelled' ? `` : `
                             <div class="flex space-x-2 pt-1">
                                 <button onclick="window.openCloseModal('${t.id}', '${t.client_name.replace(/'/g, "")}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
                                     Chiudi Lavoro
@@ -320,6 +480,28 @@
                 `;
             }).join('');
         }
+
+        // Funzione per aggiungere note tra colleghi in tempo reale
+        window.addColleagueNote = async function(ticketId) {
+            const input = document.getElementById(`note-input-${ticketId}`);
+            const noteText = input.value.trim();
+            if (!noteText) return;
+
+            const formattedNote = `[${currentProfile.full_name}]: ${noteText}`;
+
+            // Preleva le note esistenti
+            const { data: ticket } = await supabase.from('interventions').select('notes').eq('id', ticketId).single();
+            const existingNotes = ticket && ticket.notes ? ticket.notes : '';
+            const updatedNotes = existingNotes ? `${existingNotes}\n${formattedNote}` : formattedNote;
+
+            const { error } = await supabase.from('interventions').update({ notes: updatedNotes }).eq('id', ticketId);
+            if (!error) {
+                input.value = '';
+                loadTickets('all');
+            } else {
+                alert("Errore invio nota.");
+            }
+        };
 
         window.openCloseModal = function(id, name) {
             document.getElementById('global-modal-slot').innerHTML = `
@@ -349,10 +531,6 @@
                                 <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Codice PFP / Porta</label>
                                 <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Note Tecniche</label>
-                                <textarea id="cf-notes" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"></textarea>
-                            </div>
                             <div class="flex space-x-2 pt-2">
                                 <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Annulla</button>
                                 <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Salva Chiusura</button>
@@ -370,7 +548,6 @@
                     pwr_1490: document.getElementById('cf-1490').value,
                     otdr_result: document.getElementById('cf-otdr').value,
                     port_code: document.getElementById('cf-port').value,
-                    notes: document.getElementById('cf-notes').value,
                     closed_at: new Date().toISOString()
                 }).eq('id', id);
 
@@ -378,7 +555,7 @@
                     window.closeModal();
                     renderDelivery();
                 } else {
-                    alert("Errore durante il salvataggio.");
+                    alert("Errore salvataggio.");
                 }
             };
         };
@@ -398,7 +575,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione Obbligatoria</label>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione</label>
                                 <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Cliente irreperibile..."></textarea>
                             </div>
                             <div class="flex space-x-2 pt-2">
@@ -431,7 +608,7 @@
             document.getElementById('global-modal-slot').innerHTML = '';
         };
 
-        // 3. PROFILO CON SUPABASE STORAGE UPLOAD FOTO
+        // 4. PROFILO
         function renderProfile() {
             const avatarHtml = currentProfile.avatar_url 
                 ? `<img src="${currentProfile.avatar_url}" class="w-20 h-20 rounded-2xl object-cover mx-auto mb-3 border border-sky-500/30 shadow-inner">`
@@ -440,10 +617,7 @@
             document.getElementById('app-view').innerHTML = `
                 <div class="max-w-md mx-auto space-y-4">
                     <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl text-center">
-                        <div id="avatar-container">
-                            ${avatarHtml}
-                        </div>
-                        
+                        <div id="avatar-container">${avatarHtml}</div>
                         <h2 class="text-base font-bold text-white">${currentProfile.full_name}</h2>
                         <p class="text-xs text-slate-400 mt-0.5">${currentUser.email}</p>
                         <span class="inline-block mt-2 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
@@ -476,30 +650,21 @@
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
 
-                const { error: uploadError } = await supabase.storage
-                    .from('avatars')
-                    .upload(fileName, file);
-
+                const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file);
                 if (uploadError) {
                     alert("Errore upload: " + uploadError.message);
                     labelText.textContent = "Cambia Foto Profilo";
                     return;
                 }
 
-                const { data: { publicUrl } } = supabase.storage
-                    .from('avatars')
-                    .getPublicUrl(fileName);
-
-                const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', currentUser.id);
+                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
 
                 if (!updateError) {
                     currentProfile.avatar_url = publicUrl;
                     renderProfile();
                 } else {
-                    alert("Errore salvataggio profilo: " + updateError.message);
+                    alert("Errore salvataggio profilo.");
                     labelText.textContent = "Cambia Foto Profilo";
                 }
             };
@@ -510,7 +675,7 @@
             };
         }
 
-        // 4. IMPOSTAZIONI
+        // 5. IMPOSTAZIONI
         function renderSettings() {
             document.getElementById('app-view').innerHTML = `
                 <div class="max-w-md mx-auto space-y-4">
@@ -538,10 +703,10 @@
             document.getElementById('settings-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const newName = document.getElementById('st-name').value;
-                const newPass = document.getElementById('st-pass').value;
+                const newPass = document.getElementById('st-pass'].value;
 
                 await supabase.from('profiles').update({ full_name: newName }).eq('id', currentUser.id);
-                if (newPass.trim().length >= 6) {
+                if (newPass && newPass.trim().length >= 6) {
                     await supabase.auth.updateUser({ password: newPass });
                 }
 
