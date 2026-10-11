@@ -1,12 +1,11 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-import { core } from './core.js';
 
 const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbHhoc3h6dW9ocHFhcWVpdG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NjM5NTcsImV4cCI6MjEwNzIzOTk1N30.U367ZgtU4ZzXanHxSs6GP4zL0aZlJe0byjlTCP9-n5c';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const AuthPlugin = {
+export const AuthPlugin = {
     name: 'auth',
 
     async preInit() {
@@ -15,7 +14,6 @@ const AuthPlugin = {
             const nav = document.getElementById('telegram-nav');
             if (nav) nav.classList.remove('hidden');
             
-            // Recupera profilo utente
             const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
             const fullName = profile ? profile.full_name : session.user.email;
             const role = profile ? profile.role : 'technician';
@@ -71,7 +69,7 @@ const AuthPlugin = {
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('l-email').value;
-            const password = document.getElementById('l-pass'].value;
+            const password = document.getElementById('l-pass').value;
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (!error) {
                 window.location.reload();
@@ -82,6 +80,3 @@ const AuthPlugin = {
         };
     }
 };
-
-// Registrazione sicura nel core
-core.register('auth', AuthPlugin);
