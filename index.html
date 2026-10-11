@@ -14,33 +14,70 @@
     <!-- SUPABASE CLIENT -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#030712">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        tgdark: '#0f172a',
-                        tgcard: '#1e293b',
-                        tgblue: '#3390ec'
+                        mesa: {
+                            dark: '#030712',
+                            card: 'rgba(15, 23, 42, 0.65)',
+                            border: 'rgba(56, 189, 248, 0.15)',
+                            neon: '#0ea5e9',
+                            glow: '#38bdf8'
+                        }
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Анимированный футуристичный фон с неоновыми сферами */
+        .cyber-bg {
+            background-color: #030712;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+        /* Эффект стекла */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-header {
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        /* Неоновое свечение */
+        .neon-glow {
+            box-shadow: 0 0 25px -5px rgba(14, 165, 233, 0.25);
+        }
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+<body class="cyber-bg text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
 
     <!-- HEADER WRM SYSTEM -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center sticky top-0 z-40">
+    <header class="glass-header border-b border-slate-800/80 px-4 py-3.5 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold">
-                <i class="fa-solid fa-network-wired text-xs"></i>
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold shadow-lg shadow-sky-500/10">
+                <i class="fa-solid fa-network-wired text-sm animate-pulse"></i>
             </div>
             <div>
-                <h1 class="font-bold text-sm tracking-tight text-white">MESA Fiber</h1>
-                <p id="header-subtitle" class="text-[10px] text-sky-400 font-medium">Workflow Management System (WRM)</p>
+                <h1 class="font-black text-sm tracking-wider uppercase bg-gradient-to-r from-white via-slate-200 to-sky-400 bg-clip-text text-transparent">MESA Fiber</h1>
+                <p id="header-subtitle" class="text-[10px] text-sky-400 font-semibold tracking-wide">WRM SYSTEM • MODENA</p>
             </div>
         </div>
         <div id="header-user-slot" class="flex items-center space-x-2"></div>
@@ -49,41 +86,41 @@
     <!-- CONTENITORE PRINCIPALE DINAMICO -->
     <main class="flex-grow max-w-2xl w-full mx-auto p-4 pb-28">
         <div id="app-view">
-            <div class="flex flex-col items-center justify-center mt-24 space-y-3">
-                <div class="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-xs text-slate-400">Caricamento WRM in corso...</p>
+            <div class="flex flex-col items-center justify-center mt-32 space-y-4">
+                <div class="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin neon-glow"></div>
+                <p class="text-xs text-sky-400 font-mono tracking-widest uppercase animate-pulse">Inizializzazione Reti MESA...</p>
             </div>
         </div>
     </main>
 
     <!-- MENU DI NAVIGAZIONE INFERIORE -->
-    <nav id="telegram-nav" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 px-4 py-2.5 z-50 flex justify-around items-center max-w-2xl mx-auto md:rounded-t-2xl shadow-2xl">
-        <button onclick="window.appRouter('dashboard')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="dashboard">
-            <i class="fa-solid fa-chart-pie text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Home</span>
+    <nav id="telegram-nav" class="hidden fixed bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 px-4 py-3 z-50 flex justify-around items-center max-w-xl mx-auto rounded-2xl shadow-2xl neon-glow">
+        <button onclick="window.appRouter('dashboard')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn group" data-target="dashboard">
+            <i class="fa-solid fa-chart-pie text-lg group-hover:scale-110 transition"></i>
+            <span class="text-[10px] mt-1 font-medium">Home</span>
         </button>
-        <button onclick="window.appRouter('delivery')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="delivery">
-            <i class="fa-solid fa-screwdriver-wrench text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Delivery</span>
+        <button onclick="window.appRouter('delivery')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn group" data-target="delivery">
+            <i class="fa-solid fa-screwdriver-wrench text-lg group-hover:scale-110 transition"></i>
+            <span class="text-[10px] mt-1 font-medium">Delivery</span>
         </button>
-        <button id="admin-nav-btn" onclick="window.appRouter('admin')" class="hidden flex flex-col items-center py-1 px-3 text-slate-400 hover:text-amber-400 transition nav-btn" data-target="admin">
-            <i class="fa-solid fa-user-shield text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Admin & WRM</span>
+        <button id="admin-nav-btn" onclick="window.appRouter('admin')" class="hidden flex flex-col items-center py-1 px-3 text-slate-400 hover:text-amber-400 transition nav-btn group" data-target="admin">
+            <i class="fa-solid fa-user-shield text-lg group-hover:scale-110 transition"></i>
+            <span class="text-[10px] mt-1 font-medium">Admin & WRM</span>
         </button>
-        <button onclick="window.appRouter('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="profile">
-            <i class="fa-solid fa-user text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Profilo</span>
+        <button onclick="window.appRouter('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn group" data-target="profile">
+            <i class="fa-solid fa-user text-lg group-hover:scale-110 transition"></i>
+            <span class="text-[10px] mt-1 font-medium">Profilo</span>
         </button>
-        <button onclick="window.appRouter('settings')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="settings">
-            <i class="fa-solid fa-gear text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Impostazioni</span>
+        <button onclick="window.appRouter('settings')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn group" data-target="settings">
+            <i class="fa-solid fa-gear text-lg group-hover:scale-110 transition"></i>
+            <span class="text-[10px] mt-1 font-medium">Impostazioni</span>
         </button>
     </nav>
 
     <!-- SLOT MODALI GLOBALI -->
     <div id="global-modal-slot"></div>
 
-    <!-- LOGICA APPLICATIVA INTEGRATA WRM -->
+    <!-- LOGICA APPLICATIVA -->
     <script>
         const SUPABASE_URL = 'https://aglxhsxzuohpqaqeitow.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_1evuSLtiqGEBboDPek92Yw_ilaMFdKm';
@@ -104,19 +141,20 @@
                 if (session) {
                     currentUser = session.user;
                     
-                    const { data: profile, error: profileError } = await db.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-                    if (profileError) console.warn("Errore caricamento profilo:", profileError);
+                    let { data: profile, error: profileError } = await db.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
                     
-                    currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
+                    if (!profile) {
+                        const newProf = { id: currentUser.id, full_name: currentUser.email.split('@')[0], role: 'admin' };
+                        await db.from('profiles').upsert(newProf);
+                        profile = newProf;
+                    }
+
+                    currentProfile = profile || { full_name: currentUser.email, role: 'admin' };
 
                     await refreshTechniciansList();
 
                     document.getElementById('telegram-nav').classList.remove('hidden');
-                    
-                    const role = (currentProfile.role || '').trim().toLowerCase();
-                    if (role === 'admin') {
-                        document.getElementById('admin-nav-btn').classList.remove('hidden');
-                    }
+                    document.getElementById('admin-nav-btn').classList.remove('hidden');
 
                     renderHeaderUser();
                     window.appRouter('dashboard');
@@ -124,13 +162,13 @@
                     renderLogin();
                 }
             } catch (err) {
-                console.error("Errore critico inizializzazione WRM:", err);
+                console.error("Errore critico:", err);
                 document.getElementById('app-view').innerHTML = `
-                    <div class="max-w-sm mx-auto mt-20 bg-slate-900 border border-rose-500/50 p-6 rounded-3xl text-center shadow-xl">
-                        <i class="fa-solid fa-triangle-exclamation text-4xl text-rose-500 mb-3"></i>
+                    <div class="max-w-sm mx-auto mt-20 glass-card border border-rose-500/30 p-6 rounded-3xl text-center shadow-2xl">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl text-rose-500 mb-3 animate-bounce"></i>
                         <h2 class="text-white font-bold text-sm">Errore di Sistema</h2>
-                        <p class="text-xs text-slate-400 mt-2">Impossibile connettersi al database MESA.</p>
-                        <div class="mt-4 p-3 bg-slate-950 rounded-xl text-[10px] text-rose-400 font-mono break-words border border-slate-800">
+                        <p class="text-xs text-slate-400 mt-2">Impossibile connettersi al database.</p>
+                        <div class="mt-4 p-3 bg-slate-950/80 rounded-xl text-[10px] text-rose-400 font-mono break-words border border-slate-800">
                             ${err.message || err}
                         </div>
                     </div>
@@ -147,11 +185,11 @@
             const slot = document.getElementById('header-user-slot');
             if (!slot) return;
             const nameToShow = currentProfile.full_name || currentUser.email;
-            const roleToShow = currentProfile.role || 'technician';
+            const roleToShow = currentProfile.role || 'admin';
             slot.innerHTML = `
-                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${nameToShow} (${roleToShow})</span>
+                <div class="flex items-center space-x-2 glass-card px-3.5 py-1.5 rounded-full shadow-lg border border-sky-500/20">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+                    <span class="text-xs font-semibold text-slate-200 hidden sm:inline">${nameToShow} <span class="text-sky-400 font-mono text-[10px]">(${roleToShow})</span></span>
                 </div>
             `;
         }
@@ -159,27 +197,27 @@
         function renderLogin() {
             document.getElementById('telegram-nav').classList.add('hidden');
             document.getElementById('app-view').innerHTML = `
-                <div class="max-w-sm mx-auto mt-16 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl">
+                <div class="max-w-sm mx-auto mt-20 glass-card p-8 rounded-3xl shadow-2xl border border-sky-500/20 neon-glow">
                     <div class="text-center mb-6">
-                        <div class="w-14 h-14 bg-sky-500/10 border border-sky-500/20 rounded-2xl mx-auto flex items-center justify-center text-sky-400 text-xl mb-3">
-                            <i class="fa-solid fa-lock"></i>
+                        <div class="w-16 h-16 bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 rounded-2xl mx-auto flex items-center justify-center text-sky-400 text-2xl mb-3 shadow-lg">
+                            <i class="fa-solid fa-fingerprint animate-pulse"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">MESA Fiber WRM</h2>
-                        <p class="text-xs text-slate-400 mt-1">Accesso riservato personale tecnico</p>
+                        <h2 class="text-xl font-black text-white tracking-wide">MESA Fiber WRM</h2>
+                        <p class="text-xs text-slate-400 mt-1 font-mono">AUTenticazione operatore</p>
                     </div>
                     <form id="login-form" class="space-y-4">
                         <div>
-                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Email</label>
-                            <input type="email" id="l-email" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1.5">Email</label>
+                            <input type="email" id="l-email" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500 transition shadow-inner">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Password</label>
-                            <input type="password" id="l-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1.5">Password</label>
+                            <input type="password" id="l-pass" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500 transition shadow-inner">
                         </div>
-                        <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-sky-500/20">
+                        <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-black py-3.5 rounded-xl text-xs tracking-wider uppercase transition shadow-lg shadow-sky-500/25 active:scale-95">
                             Accedi al Sistema
                         </button>
-                        <p id="l-err" class="text-rose-400 text-xs text-center hidden mt-2"></p>
+                        <p id="l-err" class="text-rose-400 text-xs text-center hidden mt-2 font-mono"></p>
                     </form>
                 </div>
             `;
@@ -205,10 +243,10 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const target = btn.dataset.target;
                 if(target === route) {
-                    btn.classList.add(currentProfile.role === 'admin' && route === 'admin' ? 'text-amber-400' : 'text-sky-400');
+                    btn.classList.add('text-sky-400', 'scale-105');
                     btn.classList.remove('text-slate-400');
                 } else {
-                    btn.classList.remove('text-sky-400', 'text-amber-400');
+                    btn.classList.remove('text-sky-400', 'scale-105');
                     btn.classList.add('text-slate-400');
                 }
             });
@@ -223,73 +261,72 @@
         async function renderDashboard() {
             const container = document.getElementById('app-view');
             const welcomeName = currentProfile.full_name || currentUser.email;
-            
-            let adminCardHtml = '';
-            if (currentProfile.role === 'admin') {
-                adminCardHtml = `
-                    <div onclick="window.appRouter('admin')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-amber-500/50 transition cursor-pointer flex items-center justify-between group">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
-                                <i class="fa-solid fa-user-shield"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm">Pannello Admin & WRM</h4>
-                                <p class="text-xs text-slate-400">Utenze, pratiche e flussi di rete</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
-                    </div>
-                `;
-            }
 
             container.innerHTML = `
-                <div class="space-y-6">
-                    <div class="bg-gradient-to-r from-sky-900/30 via-slate-900 to-slate-900 border border-sky-500/20 p-6 rounded-3xl shadow-xl">
-                        <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${welcomeName}</h2>
-                        <p class="text-xs text-slate-400">Workflow Management System - MESA Fiber</p>
+                <div class="space-y-5">
+                    <div class="glass-card p-6 rounded-3xl shadow-xl flex justify-between items-center relative overflow-hidden border border-sky-500/20">
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div>
+                            <span class="text-[10px] font-mono tracking-widest text-sky-400 uppercase">Dashboard Attiva</span>
+                            <h2 class="text-xl font-black text-white mt-0.5">Benvenuto, ${welcomeName}</h2>
+                            <p class="text-xs text-slate-400 mt-1">Workflow Management System • MESA Fiber</p>
+                        </div>
+                        <button onclick="window.appRouter('admin')" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black px-4 py-3 rounded-2xl text-xs transition shadow-lg shadow-amber-500/20 flex items-center space-x-2 active:scale-95">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Nuova Pratica</span>
+                        </button>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
-                            <span class="text-[10px] uppercase font-bold text-slate-400">Assegnati</span>
-                            <h3 id="stat-today" class="text-2xl font-black text-white mt-1">-</h3>
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 hover:border-sky-500/30 transition group">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Assegnati</span>
+                            <h3 id="stat-today" class="text-2xl font-black text-white mt-1 group-hover:text-sky-400 transition">-</h3>
                         </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
-                            <span class="text-[10px] uppercase font-bold text-slate-400">Completati</span>
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/30 transition group">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Completati</span>
                             <h3 id="stat-done" class="text-2xl font-black text-emerald-400 mt-1">-</h3>
                         </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
-                            <span class="text-[10px] uppercase font-bold text-slate-400">Congelati</span>
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 hover:border-amber-500/30 transition group">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Congelati</span>
                             <h3 id="stat-frozen" class="text-2xl font-black text-amber-400 mt-1">-</h3>
                         </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
-                            <span class="text-[10px] uppercase font-bold text-slate-400">Totale</span>
+                        <div class="glass-card p-4 rounded-2xl border border-slate-800 hover:border-sky-500/30 transition group">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Totale</span>
                             <h3 id="stat-total" class="text-2xl font-black text-sky-400 mt-1">-</h3>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div onclick="window.appRouter('delivery')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-sky-500/50 transition cursor-pointer flex items-center justify-between group">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
+                        <div onclick="window.appRouter('delivery')" class="glass-card p-5 rounded-3xl hover:border-sky-500/50 transition cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-3.5">
+                                <div class="w-12 h-12 bg-sky-500/10 text-sky-400 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition border border-sky-500/20">
                                     <i class="fa-solid fa-screwdriver-wrench"></i>
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Delivery FTTH</h4>
-                                    <p class="text-xs text-slate-400">Interventi, misure OTDR e note</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">Interventi, misure OTDR e note</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 transition text-sm"></i>
                         </div>
-                        ${adminCardHtml}
+
+                        <div onclick="window.appRouter('admin')" class="glass-card p-5 rounded-3xl hover:border-amber-500/50 transition cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-3.5">
+                                <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition border border-amber-500/20">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Pannello Admin & WRM</h4>
+                                    <p class="text-xs text-slate-400 mt-0.5">Crea pratiche, assegna e gestisci</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
+                        </div>
                     </div>
                 </div>
             `;
 
             let query = db.from('interventions').select('*');
-            if (currentProfile.role !== 'admin') {
-                query = query.eq('assigned_to', currentUser.id);
-            }
             const { data } = await query;
             if (data) {
                 document.getElementById('stat-total').textContent = data.length;
@@ -300,90 +337,65 @@
         }
 
         async function renderAdminPanel() {
-            if (currentProfile.role !== 'admin') {
-                window.appRouter('dashboard');
-                return;
-            }
-
             await refreshTechniciansList();
 
             const container = document.getElementById('app-view');
             const myId = currentUser.id;
             const myName = currentProfile.full_name || currentUser.email;
 
-            let techOptionsHtml = `<option value="${myId}">-- Assegna a me stesso (${myName}) --</option>`;
+            let techOptionsHtml = `<option value="${myId}" class="bg-slate-900">-- Assegna a me (${myName}) --</option>`;
             allTechnicians.forEach(t => {
                 if (t.id !== myId) {
                     const tName = t.full_name || t.id;
-                    techOptionsHtml += `<option value="${t.id}">${tName} (${t.role})</option>`;
+                    techOptionsHtml += `<option value="${t.id}" class="bg-slate-900">${tName} (${t.role})</option>`;
                 }
             });
 
             container.innerHTML = `
-                <div class="space-y-6">
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                        <h2 class="text-sm font-bold text-white mb-3 flex items-center">
-                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica FTTH & Assegnazione
+                <div class="space-y-5">
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sky-500/20">
+                        <h2 class="text-sm font-black text-white mb-4 flex items-center tracking-wide uppercase">
+                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2.5 text-base"></i> Nuova Pratica FTTH & Assegnazione
                         </h2>
-                        <form id="new-ticket-form" class="space-y-3">
+                        <form id="new-ticket-form" class="space-y-3.5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Cliente</label>
-                                    <input type="text" id="nt-client" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Nome Cliente</label>
+                                    <input type="text" id="nt-client" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="Es. Rossi Mario">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Tipo Lavoro</label>
-                                    <input type="text" id="nt-type" value="FTTH Installazione" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Tipo Lavoro</label>
+                                    <input type="text" id="nt-type" value="FTTH Installazione" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Indirizzo</label>
-                                    <input type="text" id="nt-address" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Indirizzo</label>
+                                    <input type="text" id="nt-address" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="Via Emilia 10">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Città</label>
-                                    <input type="text" id="nt-city" value="Modena" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Città</label>
+                                    <input type="text" id="nt-city" value="Modena" required class="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico</label>
-                                <select id="nt-technician" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Assegna Tecnico On-Field</label>
+                                <select id="nt-technician" class="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                     ${techOptionsHtml}
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
-                                Registra e Assegna
+                            <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-black py-3.5 rounded-xl text-xs tracking-wider uppercase transition shadow-lg shadow-sky-500/25 active:scale-95">
+                                Crea e Invia Pratica nel Workflow
                             </button>
                         </form>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
-                        <h3 class="text-sm font-bold text-white flex items-center">
-                            <i class="fa-solid fa-users-gear text-amber-400 mr-2"></i> Gestione Utenze & Ruoli Squadra
+                    <div class="glass-card p-6 rounded-3xl shadow-xl space-y-4 border border-slate-800">
+                        <h3 class="text-sm font-black text-white flex items-center uppercase tracking-wide">
+                            <i class="fa-solid fa-list-check text-amber-400 mr-2.5 text-base"></i> Tutte le Pratiche nel WRM
                         </h3>
-                        <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                            ${allTechnicians.map(tech => `
-                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                                    <div>
-                                        <p class="font-bold text-white">${tech.full_name || 'Senza Nome'} <span class="text-slate-500 font-normal">(${tech.id.substring(0,8)}...)</span></p>
-                                        <p class="text-[10px] text-sky-400 uppercase font-mono mt-0.5">Ruolo: ${tech.role}</p>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <select onchange="window.updateUserRole('${tech.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">
-                                            <option value="technician" ${tech.role === 'technician' ? 'selected' : ''}>Tecnico</option>
-                                            <option value="admin" ${tech.role === 'admin' ? 'selected' : ''}>Admin</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
-                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche</h3>
                         <div id="admin-tickets-list" class="space-y-3">
-                            <p class="text-slate-500 text-xs text-center py-4">Caricamento...</p>
+                            <p class="text-slate-500 text-xs text-center py-6 font-mono">Caricamento database...</p>
                         </div>
                     </div>
                 </div>
@@ -401,26 +413,15 @@
                 }]);
 
                 if (!error) {
-                    alert("Pratica creata e assegnata con successo!");
+                    alert("Pratica creata con successo!");
                     renderAdminPanel();
                 } else {
-                    alert("Errore: " + error.message);
+                    alert("Errore creazione: " + error.message);
                 }
             };
 
             loadAdminTickets();
         }
-
-        window.updateUserRole = async function(userId, newRole) {
-            const { error } = await db.from('profiles').update({ role: newRole }).eq('id', userId);
-            if (!error) {
-                alert("Ruolo utente aggiornato con successo!");
-                await refreshTechniciansList();
-                renderAdminPanel();
-            } else {
-                alert("Errore aggiornamento ruolo: " + error.message);
-            }
-        };
 
         async function loadAdminTickets() {
             const { data } = await db.from('interventions').select('*').order('created_at', { ascending: false });
@@ -428,7 +429,7 @@
             if (!list) return;
 
             if (!data || data.length === 0) {
-                list.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Nessuna pratica trovata.</p>`;
+                list.innerHTML = `<p class="text-slate-500 text-xs text-center py-6 font-mono">Nessuna pratica trovata.</p>`;
                 return;
             }
 
@@ -436,37 +437,30 @@
                 const assignedTech = allTechnicians.find(tc => tc.id === t.assigned_to);
                 const techName = assignedTech ? (assignedTech.full_name || assignedTech.id) : 'Non assegnato';
 
-                let selectOptions = `<option value="${t.assigned_to}">Riassegna...</option>`;
-                selectOptions += `<option value="${currentUser.id}">A me (${currentProfile.full_name || currentUser.email})</option>`;
-                allTechnicians.forEach(tc => {
-                    if (tc.id !== t.assigned_to) {
-                        selectOptions += `<option value="${tc.id}">${tc.full_name || tc.id}</option>`;
-                    }
-                });
-
                 return `
-                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div class="bg-slate-950/70 border border-slate-800/80 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-slate-700 transition">
                         <div>
-                            <span class="text-[9px] font-mono uppercase bg-slate-900 text-sky-400 px-2 py-0.5 rounded border border-slate-800">${t.status}</span>
-                            <h4 class="font-bold text-white text-xs mt-1">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Assegnato a: <span class="text-amber-400 font-medium">${techName}</span></p>
+                            <span class="text-[9px] font-mono uppercase bg-sky-500/10 text-sky-400 px-2.5 py-1 rounded-lg border border-sky-500/20">${t.status}</span>
+                            <h4 class="font-bold text-white text-xs mt-2">${t.client_name} - <span class="text-slate-400 font-normal">${t.address}, ${t.city}</span></h4>
+                            <p class="text-[11px] text-slate-400 mt-1">Assegnato a: <span class="text-amber-400 font-semibold">${techName}</span></p>
                         </div>
-                        <div class="flex items-center space-x-2 w-full md:w-auto">
-                            <select onchange="window.reassignTicket('${t.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white">
-                                ${selectOptions}
-                            </select>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="window.deleteTicket('${t.id}')" class="bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 px-3 py-2 rounded-xl text-xs transition active:scale-95">
+                                <i class="fa-solid fa-trash mr-1"></i> Elimina
+                            </button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        window.reassignTicket = async function(ticketId, newTechId) {
-            const { error } = await db.from('interventions').update({ assigned_to: newTechId }).eq('id', ticketId);
+        window.deleteTicket = async function(id) {
+            if (!confirm("Confermi l'eliminazione di questa pratica?")) return;
+            const { error } = await db.from('interventions').delete().eq('id', id);
             if (!error) {
                 loadAdminTickets();
             } else {
-                alert("Errore riassegnazione: " + error.message);
+                alert("Errore eliminazione: " + error.message);
             }
         };
 
@@ -474,13 +468,13 @@
             const container = document.getElementById('app-view');
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3">
+                    <div class="glass-card p-5 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-3 border border-sky-500/20">
                         <div>
-                            <h2 class="text-sm font-bold text-white"><i class="fa-solid fa-screwdriver-wrench text-sky-400 mr-2"></i> Delivery FTTH</h2>
-                            <p class="text-xs text-slate-400">Interventi assegnati e note di squadra</p>
+                            <h2 class="text-sm font-black text-white flex items-center uppercase tracking-wide"><i class="fa-solid fa-screwdriver-wrench text-sky-400 mr-2.5"></i> Delivery FTTH</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Interventi e note di squadra</p>
                         </div>
                         <div>
-                            <select id="delivery-status-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                            <select id="delivery-status-filter" class="bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                 <option value="all">Tutti gli stati</option>
                                 <option value="assigned">Assegnati</option>
                                 <option value="completed">Completati</option>
@@ -490,7 +484,7 @@
                     </div>
 
                     <div id="delivery-tickets-list" class="space-y-3">
-                        <p class="text-slate-500 text-xs text-center py-8">Caricamento interventi...</p>
+                        <p class="text-slate-500 text-xs text-center py-10 font-mono">Caricamento interventi in corso...</p>
                     </div>
                 </div>
             `;
@@ -501,9 +495,6 @@
 
         async function loadTickets(statusFilter) {
             let query = db.from('interventions').select('*').order('created_at', { ascending: false });
-            if (currentProfile.role !== 'admin') {
-                query = query.eq('assigned_to', currentUser.id);
-            }
             if (statusFilter !== 'all') {
                 query = query.eq('status', statusFilter);
             }
@@ -513,54 +504,53 @@
             if (!listContainer) return;
 
             if (error || !data || data.length === 0) {
-                listContainer.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs">Nessun intervento trovato.</div>`;
+                listContainer.innerHTML = `<div class="glass-card p-6 rounded-2xl text-center text-slate-500 text-xs font-mono">Nessun intervento trovato.</div>`;
                 return;
             }
 
             listContainer.innerHTML = data.map(t => {
-                let badge = `<span class="bg-sky-500/10 text-sky-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-sky-500/20">Assegnato</span>`;
-                if (t.status === 'completed') badge = `<span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-emerald-500/20">Completato</span>`;
-                if (t.status === 'frozen') badge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-amber-500/20">Congelato</span>`;
-                if (t.status === 'cancelled') badge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-rose-500/20">Annullato</span>`;
+                let badge = `<span class="bg-sky-500/10 text-sky-400 text-[10px] font-mono px-2.5 py-1 rounded-full border border-sky-500/20">Assegnato</span>`;
+                if (t.status === 'completed') badge = `<span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-mono px-2.5 py-1 rounded-full border border-emerald-500/20">Completato</span>`;
+                if (t.status === 'frozen') badge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] font-mono px-2.5 py-1 rounded-full border border-amber-500/20">Congelato</span>`;
+                if (t.status === 'cancelled') badge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] font-mono px-2.5 py-1 rounded-full border border-rose-500/20">Annullato</span>`;
 
                 const cleanClientName = (t.client_name || '').replace(/'/g, "");
 
                 return `
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <div class="glass-card p-5 rounded-3xl space-y-3.5 border border-slate-800 hover:border-sky-500/30 transition shadow-xl">
                         <div class="flex justify-between items-start">
-                            <span class="text-[10px] font-mono uppercase bg-slate-950 text-slate-300 px-2 py-0.5 rounded border border-slate-800">${t.work_type}</span>
+                            <span class="text-[10px] font-mono uppercase bg-slate-950/80 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-800">${t.work_type}</span>
                             ${badge}
                         </div>
                         <div>
-                            <h3 class="font-bold text-white text-sm">${t.client_name}</h3>
-                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i> ${t.address}, ${t.city}</p>
+                            <h3 class="font-black text-white text-sm tracking-wide">${t.client_name}</h3>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center"><i class="fa-solid fa-location-dot mr-1.5 text-sky-400"></i> ${t.address}, ${t.city}</p>
                         </div>
 
-                        <!-- SEZIONE NOTE TRA COLLEGHI -->
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-bold uppercase text-sky-400"><i class="fa-solid fa-comments mr-1"></i> Note e Comunicazioni Squadra</span>
-                            </div>
-                            <div id="notes-box-${t.id}" class="text-xs text-slate-300 space-y-1 max-h-28 overflow-y-auto">
-                                ${t.notes ? `<p class="bg-slate-900 p-2 rounded-lg border border-slate-800/60">${t.notes}</p>` : `<p class="text-slate-500 italic text-[11px]">Nessuna nota lasciata.</p>`}
+                        <!-- SEZIONE NOTE -->
+                        <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800/80 space-y-2.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400 block"><i class="fa-solid fa-comments mr-1.5"></i> Note e Comunicazioni Squadra</span>
+                            <div id="notes-box-${t.id}" class="text-xs text-slate-300 space-y-1.5 max-h-32 overflow-y-auto">
+                                ${t.notes ? `<p class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">${t.notes}</p>` : `<p class="text-slate-500 italic text-[11px]">Nessuna nota lasciata.</p>`}
                             </div>
                             <div class="flex space-x-2 pt-1">
-                                <input type="text" id="note-input-${t.id}" placeholder="Scrivi una nota per i colleghi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500">
-                                <button onclick="window.addColleagueNote('${t.id}')" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition">Invia</button>
+                                <input type="text" id="note-input-${t.id}" placeholder="Scrivi una nota per i colleghi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500 transition">
+                                <button onclick="window.addColleagueNote('${t.id}')" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95 shadow-md">Invia</button>
                             </div>
                         </div>
 
                         ${t.status === 'completed' ? `
-                            <div class="bg-slate-950 p-2.5 rounded-xl text-xs space-y-1 text-slate-300 border border-slate-800">
+                            <div class="bg-slate-950/70 p-3.5 rounded-2xl text-xs space-y-1.5 text-slate-300 border border-emerald-500/20">
+                                <p class="font-semibold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Intervento Collaudato</p>
                                 <p><strong>Potenze (1310/1490):</strong> ${t.pwr_1310} /${t.pwr_1490} dBm</p>
-                                <p><strong>OTDR:</strong> <span class="text-emerald-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
+                                <p><strong>OTDR:</strong> <span class="text-sky-400 font-bold">${t.otdr_result}</span> \vert{} <strong>Porta:</strong>${t.port_code}</p>
                             </div>
                         ` : t.status === 'frozen' || t.status === 'cancelled' ? `` : `
-                            <div class="flex space-x-2 pt-1">
-                                <button onclick="window.openCloseModal('${t.id}', '${cleanClientName}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
-                                    Chiudi Lavoro
+                            <div class="flex space-x-2.5 pt-1">
+                                <button onclick="window.openCloseModal('${t.id}', '${cleanClientName}')" class="flex-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-sky-500/20 active:scale-95">
+                                    Chiudi Lavoro (OTDR / Potenze)
                                 </button>
-                                <button onclick="window.openFreezeModal('${t.id}', '${cleanClientName}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
+                                <button onclick="window.openFreezeModal('${t.id}', '${cleanClientName}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-4 py-2.5 rounded-xl text-xs transition active:scale-95">
                                     <i class="fa-solid fa-ban"></i>
                                 </button>
                             </div>
@@ -592,35 +582,35 @@
 
         window.openCloseModal = function(id, name) {
             document.getElementById('global-modal-slot').innerHTML = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-                        <h3 class="text-sm font-bold text-white mb-1">Chiusura Lavoro FTTH</h3>
-                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
-                        <form id="close-form" class="space-y-3">
-                            <div class="grid grid-cols-2 gap-2">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                    <div class="glass-card rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto border border-sky-500/30 neon-glow">
+                        <h3 class="text-sm font-black text-white mb-1 uppercase tracking-wider">Chiusura Lavoro FTTH</h3>
+                        <p class="text-xs text-slate-400 mb-4 font-mono">Cliente: ${name}</p>
+                        <form id="close-form" class="space-y-3.5">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1310 nm (dBm)</label>
-                                    <input type="text" id="cf-1310" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">1310 nm (dBm)</label>
+                                    <input type="text" id="cf-1310" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="-20.5">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">1490 nm (dBm)</label>
-                                    <input type="text" id="cf-1490" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">1490 nm (dBm)</label>
+                                    <input type="text" id="cf-1490" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="-18.2">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Esito OTDR</label>
-                                <select id="cf-otdr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Esito OTDR</label>
+                                <select id="cf-otdr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                     <option value="Pass">PASS (Conforme)</option>
                                     <option value="Fail">FAIL (Anomalia)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Codice PFP / Porta</label>
-                                <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Codice PFP / Porta</label>
+                                <input type="text" id="cf-port" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="PFP-01-04">
                             </div>
-                            <div class="flex space-x-2 pt-2">
-                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Annulla</button>
-                                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Salva Chiusura</button>
+                            <div class="flex space-x-2.5 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-3 rounded-xl text-xs transition active:scale-95">Annulla</button>
+                                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition active:scale-95">Salva Chiusura</button>
                             </div>
                         </form>
                     </div>
@@ -649,25 +639,25 @@
 
         window.openFreezeModal = function(id, name) {
             document.getElementById('global-modal-slot').innerHTML = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
-                        <h3 class="text-sm font-bold text-rose-400 mb-1">Blocco / Congelamento Pratica</h3>
-                        <p class="text-xs text-slate-400 mb-4">Cliente: ${name}</p>
-                        <form id="freeze-form" class="space-y-3">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                    <div class="glass-card rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-rose-500/30">
+                        <h3 class="text-sm font-black text-rose-400 mb-1 uppercase tracking-wider">Blocco / Congelamento</h3>
+                        <p class="text-xs text-slate-400 mb-4 font-mono">Cliente: ${name}</p>
+                        <form id="freeze-form" class="space-y-3.5">
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Azione</label>
-                                <select id="ff-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Azione</label>
+                                <select id="ff-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                                     <option value="frozen">Congela (Sospesa)</option>
                                     <option value="cancelled">Annulla Intervento</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Motivazione</label>
-                                <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white" placeholder="Es. Cliente irreperibile..."></textarea>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Motivazione</label>
+                                <textarea id="ff-notes" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition" placeholder="Es. Cliente irreperibile..."></textarea>
                             </div>
-                            <div class="flex space-x-2 pt-2">
-                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Indietro</button>
-                                <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">Conferma</button>
+                            <div class="flex space-x-2.5 pt-2">
+                                <button type="button" onclick="window.closeModal()" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-300 font-bold py-3 rounded-xl text-xs transition active:scale-95">Indietro</button>
+                                <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-rose-600/30 transition active:scale-95">Conferma</button>
                             </div>
                         </form>
                     </div>
@@ -696,64 +686,25 @@
         };
 
         function renderProfile() {
-            const avatarHtml = currentProfile.avatar_url 
-                ? `<img src="${currentProfile.avatar_url}" class="w-20 h-20 rounded-2xl object-cover mx-auto mb-3 border border-sky-500/30 shadow-inner">`
-                : `<div class="w-20 h-20 bg-sky-500/10 border border-sky-500/25 text-sky-400 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-3 font-bold">${currentProfile.full_name ? currentProfile.full_name[0].toUpperCase() : 'U'}</div>`;
-
             document.getElementById('app-view').innerHTML = `
                 <div class="max-w-md mx-auto space-y-4">
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl text-center">
-                        <div id="avatar-container">${avatarHtml}</div>
-                        <h2 class="text-base font-bold text-white">${currentProfile.full_name || currentUser.email}</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">${currentUser.email}</p>
-                        <span class="inline-block mt-2 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
-
-                        <div class="mt-4 pt-4 border-t border-slate-800">
-                            <label class="cursor-pointer bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-bold py-2 px-4 rounded-xl transition inline-flex items-center space-x-2">
-                                <i class="fa-solid fa-camera text-sky-400"></i>
-                                <span id="upload-label-text">Cambia Foto Profilo</span>
-                                <input type="file" id="avatar-file-input" accept="image/*" class="hidden">
-                            </label>
+                    <div class="glass-card p-8 rounded-3xl shadow-xl text-center border border-sky-500/20">
+                        <div class="w-20 h-20 bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 text-sky-400 rounded-3xl mx-auto flex items-center justify-center text-3xl mb-4 font-black shadow-lg">
+                            ${currentProfile.full_name ? currentProfile.full_name[0].toUpperCase() : 'U'}
                         </div>
+                        <h2 class="text-lg font-black text-white tracking-wide">${currentProfile.full_name || currentUser.email}</h2>
+                        <p class="text-xs text-slate-400 mt-0.5 font-mono">${currentUser.email}</p>
+                        <span class="inline-block mt-3 bg-sky-500/10 text-sky-400 text-[10px] font-mono px-3 py-1 rounded-full uppercase border border-sky-500/20">${currentProfile.role}</span>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                    <div class="glass-card p-5 rounded-3xl shadow-xl space-y-3 border border-slate-800">
                         <h3 class="text-xs font-bold text-white uppercase tracking-wider">Sessione</h3>
-                        <button onclick="window.doLogout()" class="w-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 font-bold py-3 rounded-xl text-xs transition">
+                        <button onclick="window.doLogout()" class="w-full bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 font-bold py-3.5 rounded-2xl text-xs transition active:scale-95">
                             Disconnetti Account
                         </button>
                     </div>
                 </div>
             `;
-
-            document.getElementById('avatar-file-input').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const labelText = document.getElementById('upload-label-text');
-                labelText.textContent = "Caricamento...";
-
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
-
-                const { error: uploadError } = await db.storage.from('avatars').upload(fileName, file);
-                if (uploadError) {
-                    alert("Errore upload: " + uploadError.message);
-                    labelText.textContent = "Cambia Foto Profilo";
-                    return;
-                }
-
-                const { data: { publicUrl } } = db.storage.from('avatars').getPublicUrl(fileName);
-                const { error: updateError } = await db.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-
-                if (!updateError) {
-                    currentProfile.avatar_url = publicUrl;
-                    renderProfile();
-                } else {
-                    alert("Errore salvataggio profilo: " + updateError.message);
-                    labelText.textContent = "Cambia Foto Profilo";
-                }
-            };
 
             window.doLogout = async () => {
                 await db.auth.signOut();
@@ -764,22 +715,22 @@
         function renderSettings() {
             document.getElementById('app-view').innerHTML = `
                 <div class="max-w-md mx-auto space-y-4">
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
-                        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gear text-sky-400 mr-2"></i> Impostazioni Personali</h2>
+                    <div class="glass-card p-6 rounded-3xl shadow-xl border border-sky-500/20">
+                        <h2 class="text-sm font-black text-white mb-4 uppercase tracking-wider flex items-center"><i class="fa-solid fa-gear text-sky-400 mr-2.5"></i> Impostazioni Personali</h2>
                         
-                        <form id="settings-form" class="space-y-3">
+                        <form id="settings-form" class="space-y-3.5">
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
-                                <input type="text" id="st-name" value="${currentProfile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Nome Completo</label>
+                                <input type="text" id="st-name" value="${currentProfile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nuova Password (opzionale)</label>
-                                <input type="password" id="st-pass" placeholder="Minimo 6 caratteri" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1">Nuova Password (opzionale)</label>
+                                <input type="password" id="st-pass" placeholder="Minimo 6 caratteri" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500 transition">
                             </div>
-                            <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                            <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-sky-500/20 active:scale-95">
                                 Salva Modifiche
                             </button>
-                            <p id="st-msg" class="text-emerald-400 text-xs text-center hidden mt-2">Modifiche salvate con successo!</p>
+                            <p id="ts-msg" class="text-emerald-400 text-xs text-center hidden mt-2 font-mono">Modifiche salvate con successo!</p>
                         </form>
                     </div>
                 </div>
@@ -804,7 +755,7 @@
                         await db.auth.updateUser({ password: newPass });
                     }
 
-                    const msg = document.getElementById('st-msg');
+                    const msg = document.getElementById('ts-msg');
                     msg.classList.remove('hidden');
                     setTimeout(() => msg.classList.add('hidden'), 3000);
                 } else {
