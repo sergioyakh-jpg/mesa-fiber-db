@@ -1,5 +1,5 @@
 import { core } from './core.js';
-import { supabase, AuthPlugin } from './auth-plugin.js';
+import { supabase } from './auth-plugin.js';
 
 const DeliveryPlugin = {
     name: 'delivery',
@@ -17,7 +17,7 @@ const DeliveryPlugin = {
                     <div>
                         <select id="delivery-status-filter" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
                             <option value="all">Tutti gli stati</option>
-                            <option value="assigned">Assegnati (Oggi)</option>
+                            <option value="assigned">Assegnati</option>
                             <option value="completed">Completati</option>
                             <option value="frozen">Congelati / Annullati</option>
                         </select>
@@ -39,10 +39,16 @@ const DeliveryPlugin = {
     },
 
     async loadTickets() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        const role = profile ? profile.role : 'technician';
+
         let query = supabase.from('interventions').select('*').order('created_at', { ascending: false });
 
-        if (AuthPlugin.profile.role !== 'admin') {
-            query = query.eq('assigned_to', AuthPlugin.user.id);
+        if (role !== 'admin') {
+            query = query.eq('assigned_to', user.id);
         }
 
         if (this.filterStatus !== 'all') {
