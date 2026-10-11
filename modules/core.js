@@ -15,29 +15,34 @@ class Core {
     }
 
     async init() {
-        // Проверка авторизации
-        for (const name in this.plugins) {
-            if (this.plugins[name].preInit) await this.plugins[name].preInit();
+        try {
+            for (const name in this.plugins) {
+                if (typeof this.plugins[name].preInit === 'function') {
+                    await this.plugins[name].preInit();
+                }
+            }
+            window.router = (route) => this.navigate(route);
+        } catch (err) {
+            console.error("Errore Core:", err);
+            document.getElementById('app-view-container').innerHTML = `
+                <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-2xl text-center text-rose-400 text-xs mt-10">
+                    Errore caricamento moduli. Apri la console (F12).
+                </div>
+            `;
         }
-        
-        window.router = (route) => this.navigate(route);
     }
 
     navigate(route) {
         this.currentRoute = route;
-        
-        // Подсветка кнопок мобильного меню
         document.querySelectorAll('.nav-btn').forEach(btn => {
             if(btn.dataset.target === route) {
-                btn.classList.add('text-blue-500');
+                btn.classList.add('text-sky-400');
                 btn.classList.remove('text-slate-400');
             } else {
-                btn.classList.remove('text-blue-500');
+                btn.classList.remove('text-sky-400');
                 btn.classList.add('text-slate-400');
             }
         });
-
-        // Запуск рендера нужного плагина
         if (this.plugins[route] && typeof this.plugins[route].render === 'function') {
             this.plugins[route].render();
         }
