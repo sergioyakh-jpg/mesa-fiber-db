@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MESA Fiber - Field Manager</title>
+    <title>MESA Fiber - WRM Workflow Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -26,7 +26,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
 
-    <!-- HEADER STILE TELEGRAM -->
+    <!-- HEADER WRM SYSTEM -->
     <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center space-x-3">
             <div class="w-9 h-9 rounded-full bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold">
@@ -34,7 +34,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm tracking-tight text-white">MESA Fiber</h1>
-                <p id="header-subtitle" class="text-[10px] text-sky-400 font-medium">Field Manager</p>
+                <p id="header-subtitle" class="text-[10px] text-sky-400 font-medium">Workflow Management System (WRM)</p>
             </div>
         </div>
         <div id="header-user-slot" class="flex items-center space-x-2"></div>
@@ -45,7 +45,7 @@
         <div id="app-view">
             <div class="flex flex-col items-center justify-center mt-24 space-y-3">
                 <div class="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-xs text-slate-400">Caricamento sistema in corso...</p>
+                <p class="text-xs text-slate-400">Caricamento WRM in corso...</p>
             </div>
         </div>
     </main>
@@ -62,7 +62,7 @@
         </button>
         <button id="admin-nav-btn" onclick="window.appRouter('admin')" class="hidden flex flex-col items-center py-1 px-3 text-slate-400 hover:text-amber-400 transition nav-btn" data-target="admin">
             <i class="fa-solid fa-user-shield text-lg"></i>
-            <span class="text-[10px] mt-0.5 font-medium">Admin</span>
+            <span class="text-[10px] mt-0.5 font-medium">Admin & WRM</span>
         </button>
         <button onclick="window.appRouter('profile')" class="flex flex-col items-center py-1 px-3 text-slate-400 hover:text-sky-400 transition nav-btn" data-target="profile">
             <i class="fa-solid fa-user text-lg"></i>
@@ -77,7 +77,7 @@
     <!-- SLOT MODALI GLOBALI -->
     <div id="global-modal-slot"></div>
 
-    <!-- LOGICA APPLICATIVA INTEGRATA -->
+    <!-- LOGICA APPLICATIVA INTEGRATA WRM -->
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -97,7 +97,6 @@
                 if (session) {
                     currentUser = session.user;
                     
-                    // Recupero profilo utente loggato
                     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
                     currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
 
@@ -105,7 +104,6 @@
 
                     document.getElementById('telegram-nav').classList.remove('hidden');
                     
-                    // Controllo rigoroso del ruolo admin (gestisce eventuali spazi o minuscole)
                     const role = (currentProfile.role || '').trim().toLowerCase();
                     if (role === 'admin') {
                         document.getElementById('admin-nav-btn').classList.remove('hidden');
@@ -117,7 +115,7 @@
                     renderLogin();
                 }
             } catch (err) {
-                console.error("Errore inizializzazione:", err);
+                console.error("Errore inizializzazione WRM:", err);
             }
         }
 
@@ -129,10 +127,12 @@
         function renderHeaderUser() {
             const slot = document.getElementById('header-user-slot');
             if (!slot) return;
+            const nameToShow = currentProfile.full_name || currentUser.email;
+            const roleToShow = currentProfile.role || 'technician';
             slot.innerHTML = `
                 <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${currentProfile.full_name || currentUser.email} (${currentProfile.role})</span>
+                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${nameToShow} (${roleToShow})</span>
                 </div>
             `;
         }
@@ -145,8 +145,8 @@
                         <div class="w-14 h-14 bg-sky-500/10 border border-sky-500/20 rounded-2xl mx-auto flex items-center justify-center text-sky-400 text-xl mb-3">
                             <i class="fa-solid fa-lock"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">Accesso Riservato</h2>
-                        <p class="text-xs text-slate-400 mt-1">Inserisci le credenziali MESA</p>
+                        <h2 class="text-lg font-bold text-white">MESA Fiber WRM</h2>
+                        <p class="text-xs text-slate-400 mt-1">Accesso riservato personale tecnico</p>
                     </div>
                     <form id="login-form" class="space-y-4">
                         <div>
@@ -158,7 +158,7 @@
                             <input type="password" id="l-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500">
                         </div>
                         <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-sky-500/20">
-                            Accedi
+                            Accedi al Sistema
                         </button>
                         <p id="l-err" class="text-rose-400 text-xs text-center hidden mt-2"></p>
                     </form>
@@ -200,11 +200,31 @@
 
         async function renderDashboard() {
             const container = document.getElementById('app-view');
+            const welcomeName = currentProfile.full_name || currentUser.email;
+            
+            let adminCardHtml = '';
+            if (currentProfile.role === 'admin') {
+                adminCardHtml = `
+                    <div onclick="window.appRouter('admin')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-amber-500/50 transition cursor-pointer flex items-center justify-between group">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Pannello Admin & WRM</h4>
+                                <p class="text-xs text-slate-400">Utenze, TT, pratiche e flussi di rete</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
+                    </div>
+                `;
+            }
+
             container.innerHTML = `
                 <div class="space-y-6">
                     <div class="bg-gradient-to-r from-sky-900/30 via-slate-900 to-slate-900 border border-sky-500/20 p-6 rounded-3xl shadow-xl">
-                        <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${currentProfile.full_name || currentUser.email}</h2>
-                        <p class="text-xs text-slate-400">Sistema operativo di gestione campi FTTH attivo.</p>
+                        <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${welcomeName}</h2>
+                        <p class="text-xs text-slate-400">Workflow Management System - Modena & Emilia Romagna</p>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -234,26 +254,12 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Delivery FTTH</h4>
-                                    <p class="text-xs text-slate-400">Gestione interventi e note colleghi</p>
+                                    <p class="text-xs text-slate-400">Interventi, misure OTDR e note squadra</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-sky-400 transition text-sm"></i>
                         </div>
-
-                        ${currentProfile.role === 'admin' ? `
-                        <div onclick="window.appRouter('admin')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-amber-500/50 transition cursor-pointer flex items-center justify-between group">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-user-shield"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-white text-sm">Pannello Admin</h4>
-                                    <p class="text-xs text-slate-400">Utenti, pratiche e assegnazioni</p>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-amber-400 transition text-sm"></i>
-                        </div>
-                        ` : ''}
+                        ${adminCardHtml}
                     </div>
                 </div>
             `;
@@ -280,12 +286,23 @@
             await refreshTechniciansList();
 
             const container = document.getElementById('app-view');
+            const myId = currentUser.id;
+            const myName = currentProfile.full_name || currentUser.email;
+
+            let techOptionsHtml = `<option value="${myId}">-- Assegna a me stesso (${myName}) --</option>`;
+            allTechnicians.forEach(t => {
+                if (t.id !== myId) {
+                    const tName = t.full_name || t.id;
+                    techOptionsHtml += `<option value="${t.id}">${tName} (${t.role})</option>`;
+                }
+            });
+
             container.innerHTML = `
                 <div class="space-y-6">
-                    <!-- Sezione Nuova Pratica -->
+                    <!-- Sezione Nuova Pratica / Workflow -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
                         <h2 class="text-sm font-bold text-white mb-3 flex items-center">
-                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica & Assegnazione
+                            <i class="fa-solid fa-plus-circle text-sky-400 mr-2"></i> Nuova Pratica FTTH & Assegnazione WRM
                         </h2>
                         <form id="new-ticket-form" class="space-y-3">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -309,21 +326,43 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico</label>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assegna Tecnico On-Field</label>
                                 <select id="nt-technician" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
-                                    <option value="${currentUser.id}">-- Assegna a me stesso (${currentProfile.full_name || currentUser.email}) --</option>
-                                    ${allTechnicians.filter(t => t.id !== currentUser.id).map(t => `<option value="${t.id}">${t.full_name \vert{}\vert{} t.id} (${t.role})</option>`).join('')}
+                                    ${techOptionsHtml}
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition shadow-lg">
-                                Crea e Assegna Pratica
+                                Registra e Invia in Workflow
                             </button>
                         </form>
                     </div>
 
+                    <!-- Sezione Gestione Utenze / Ruoli del Team -->
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
+                        <h3 class="text-sm font-bold text-white flex items-center">
+                            <i class="fa-solid fa-users-gear text-amber-400 mr-2"></i> Gestione Utenze & Ruoli Squadra
+                        </h3>
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            ${allTechnicians.map(tech => `
+                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                    <div>
+                                        <p class="font-bold text-white">${tech.full_name || 'Senza Nome'} <span class="text-slate-500 font-normal">(${tech.id.substring(0,8)}...)</span></p>
+                                        <p class="text-[10px] text-sky-400 uppercase font-mono mt-0.5">Ruolo: ${tech.role}</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <select onchange="window.updateUserRole('${tech.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">
+                                            <option value="technician" ${tech.role === 'technician' ? 'selected' : ''}>Tecnico</option>
+                                            <option value="admin" ${tech.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
                     <!-- Gestione pratiche esistenti -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
-                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel Sistema</h3>
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel WRM</h3>
                         <div id="admin-tickets-list" class="space-y-3">
                             <p class="text-slate-500 text-xs text-center py-4">Caricamento...</p>
                         </div>
@@ -343,7 +382,7 @@
                 }]);
 
                 if (!error) {
-                    alert("Pratica creata e assegnata con successo!");
+                    alert("Pratica creata e inserita nel workflow con successo!");
                     renderAdminPanel();
                 } else {
                     alert("Errore: " + error.message);
@@ -352,6 +391,17 @@
 
             loadAdminTickets();
         }
+
+        window.updateUserRole = async function(userId, newRole) {
+            const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+            if (!error) {
+                alert("Ruolo utente aggiornato con successo!");
+                await refreshTechniciansList();
+                renderAdminPanel();
+            } else {
+                alert("Errore aggiornamento ruolo: " + error.message);
+            }
+        };
 
         async function loadAdminTickets() {
             const { data } = await supabase.from('interventions').select('*').order('created_at', { ascending: false });
@@ -367,6 +417,14 @@
                 const assignedTech = allTechnicians.find(tc => tc.id === t.assigned_to);
                 const techName = assignedTech ? (assignedTech.full_name || assignedTech.id) : 'Non assegnato';
 
+                let selectOptions = `<option value="${t.assigned_to}">Riassegna...</option>`;
+                selectOptions += `<option value="${currentUser.id}">A me (${currentProfile.full_name || currentUser.email})</option>`;
+                allTechnicians.forEach(tc => {
+                    if (tc.id !== t.assigned_to) {
+                        selectOptions += `<option value="${tc.id}">${tc.full_name || tc.id}</option>`;
+                    }
+                });
+
                 return `
                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
@@ -376,9 +434,7 @@
                         </div>
                         <div class="flex items-center space-x-2 w-full md:w-auto">
                             <select onchange="window.reassignTicket('${t.id}', this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-white">
-                                <option value="${t.assigned_to}">Riassegna...</option>
-                                <option value="${currentUser.id}">A me (${currentProfile.full_name || currentUser.email})</option>
-                                ${allTechnicians.filter(tc => tc.id !== t.assigned_to).map(tc => `<option value="${tc.id}">${tc.full_name || tc.id}</option>`).join('')}
+                                ${selectOptions}
                             </select>
                         </div>
                     </div>
@@ -448,6 +504,8 @@
                 if (t.status === 'frozen') badge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-amber-500/20">Congelato</span>`;
                 if (t.status === 'cancelled') badge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-rose-500/20">Annullato</span>`;
 
+                const cleanClientName = (t.client_name || '').replace(/'/g, "");
+
                 return `
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
                         <div class="flex justify-between items-start">
@@ -480,10 +538,10 @@
                             </div>
                         ` : t.status === 'frozen' || t.status === 'cancelled' ? `` : `
                             <div class="flex space-x-2 pt-1">
-                                <button onclick="window.openCloseModal('${t.id}', '${t.client_name.replace(/'/g, "")}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
+                                <button onclick="window.openCloseModal('${t.id}', '${cleanClientName}')" class="flex-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-xl text-xs transition">
                                     Chiudi Lavoro
                                 </button>
-                                <button onclick="window.openFreezeModal('${t.id}', '${t.client_name.replace(/'/g, "")}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
+                                <button onclick="window.openFreezeModal('${t.id}', '${cleanClientName}')" class="bg-slate-950 border border-slate-800 hover:border-rose-500/50 text-rose-400 px-3 py-2 rounded-xl text-xs transition">
                                     <i class="fa-solid fa-ban"></i>
                                 </button>
                             </div>
@@ -713,7 +771,6 @@
                 const newName = document.getElementById('st-name').value.trim();
                 const newPass = document.getElementById('st-pass').value;
 
-                // Esegue upsert per evitare errori se il record del profilo non esiste ancora in tabella
                 const { error } = await supabase.from('profiles').upsert({
                     id: currentUser.id,
                     full_name: newName,
