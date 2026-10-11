@@ -99,7 +99,6 @@
                     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
                     currentProfile = profile || { full_name: currentUser.email, role: 'technician' };
 
-                    // Carica lista tecnici per le assegnazioni admin
                     const { data: techs } = await supabase.from('profiles').select('*');
                     allTechnicians = techs || [];
 
@@ -187,7 +186,6 @@
             else if (route === 'settings') renderSettings();
         };
 
-        // 1. DASHBOARD
         async function renderDashboard() {
             const container = document.getElementById('app-view');
             container.innerHTML = `
@@ -261,7 +259,6 @@
             }
         }
 
-        // 2. PANNELLO ADMIN (Crea pratiche e assegna tecnici)
         async function renderAdminPanel() {
             if (currentProfile.role !== 'admin') {
                 window.appRouter('dashboard');
@@ -309,7 +306,6 @@
                         </form>
                     </div>
 
-                    <!-- Gestione pratiche esistenti -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-3">
                         <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Tutte le Pratiche nel Sistema</h3>
                         <div id="admin-tickets-list" class="space-y-3">
@@ -382,7 +378,6 @@
             }
         };
 
-        // 3. DELIVERY FTTH & NOTE TRA COLLEGHI
         async function renderDelivery() {
             const container = document.getElementById('app-view');
             container.innerHTML = `
@@ -481,15 +476,12 @@
             }).join('');
         }
 
-        // Funzione per aggiungere note tra colleghi in tempo reale
         window.addColleagueNote = async function(ticketId) {
             const input = document.getElementById(`note-input-${ticketId}`);
             const noteText = input.value.trim();
             if (!noteText) return;
 
             const formattedNote = `[${currentProfile.full_name}]: ${noteText}`;
-
-            // Preleva le note esistenti
             const { data: ticket } = await supabase.from('interventions').select('notes').eq('id', ticketId).single();
             const existingNotes = ticket && ticket.notes ? ticket.notes : '';
             const updatedNotes = existingNotes ? `${existingNotes}\n${formattedNote}` : formattedNote;
@@ -608,7 +600,6 @@
             document.getElementById('global-modal-slot').innerHTML = '';
         };
 
-        // 4. PROFILO
         function renderProfile() {
             const avatarHtml = currentProfile.avatar_url 
                 ? `<img src="${currentProfile.avatar_url}" class="w-20 h-20 rounded-2xl object-cover mx-auto mb-3 border border-sky-500/30 shadow-inner">`
@@ -675,7 +666,6 @@
             };
         }
 
-        // 5. IMPOSTAZIONI
         function renderSettings() {
             document.getElementById('app-view').innerHTML = `
                 <div class="max-w-md mx-auto space-y-4">
@@ -703,7 +693,7 @@
             document.getElementById('settings-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const newName = document.getElementById('st-name').value;
-                const newPass = document.getElementById('st-pass'].value;
+                const newPass = document.getElementById('st-pass').value;
 
                 await supabase.from('profiles').update({ full_name: newName }).eq('id', currentUser.id);
                 if (newPass && newPass.trim().length >= 6) {
