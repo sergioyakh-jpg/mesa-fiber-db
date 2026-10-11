@@ -1,10 +1,16 @@
 import { core } from './core.js';
-import { supabase, AuthPlugin } from './auth-plugin.js';
+import { supabase } from './auth-plugin.js';
 
 const SettingsPlugin = {
     name: 'settings',
 
-    render() {
+    async render() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        const fullName = profile ? profile.full_name : '';
+
         document.getElementById('app-view-container').innerHTML = `
             <div class="max-w-md mx-auto space-y-4">
                 <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
@@ -13,7 +19,7 @@ const SettingsPlugin = {
                     <form id="settings-form" class="space-y-3">
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nome Completo</label>
-                            <input type="text" id="st-name" value="${AuthPlugin.profile.full_name || ''}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
+                            <input type="text" id="st-name" value="${fullName}" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Nuova Password (opzionale)</label>
@@ -33,13 +39,12 @@ const SettingsPlugin = {
             const newName = document.getElementById('st-name').value;
             const newPass = document.getElementById('st-pass').value;
 
-            await supabase.from('profiles').update({ full_name: newName }).eq('id', AuthPlugin.user.id);
+            await supabase.from('profiles').update({ full_name: newName }).eq('id', user.id);
             
             if (newPass.trim().length >= 6) {
                 await supabase.auth.updateUser({ password: newPass });
             }
 
-            AuthPlugin.profile.full_name = newName;
             const msg = document.getElementById('st-msg');
             msg.classList.remove('hidden');
             setTimeout(() => msg.classList.add('hidden'), 3000);
