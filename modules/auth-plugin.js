@@ -12,28 +12,37 @@ const AuthPlugin = {
     async preInit() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            document.getElementById('telegram-nav').classList.remove('hidden');
+            const nav = document.getElementById('telegram-nav');
+            if (nav) nav.classList.remove('hidden');
             
             // Recupera profilo utente
             const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
             const fullName = profile ? profile.full_name : session.user.email;
             const role = profile ? profile.role : 'technician';
 
-            document.getElementById('header-user-slot').innerHTML = `
-                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-medium text-slate-200 hidden sm:inline">${fullName} (${role})</span>
-                </div>
-            `;
-            window.router('dashboard');
+            const userSlot = document.getElementById('header-user-slot');
+            if (userSlot) {
+                userSlot.innerHTML = `
+                    <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-xs font-medium text-slate-200 hidden sm:inline">${fullName} (${role})</span>
+                    </div>
+                `;
+            }
+            if (window.router) window.router('dashboard');
         } else {
             this.renderLoginScreen();
         }
     },
 
     renderLoginScreen() {
-        document.getElementById('telegram-nav').classList.add('hidden');
-        document.getElementById('app-view-container').innerHTML = `
+        const nav = document.getElementById('telegram-nav');
+        if (nav) nav.classList.add('hidden');
+        
+        const container = document.getElementById('app-view-container');
+        if (!container) return;
+
+        container.innerHTML = `
             <div class="max-w-sm mx-auto mt-16 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl">
                 <div class="text-center mb-6">
                     <div class="w-14 h-14 bg-sky-500/10 border border-sky-500/20 rounded-2xl mx-auto flex items-center justify-center text-sky-400 text-xl mb-3">
@@ -62,7 +71,7 @@ const AuthPlugin = {
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('l-email').value;
-            const password = document.getElementById('l-pass').value;
+            const password = document.getElementById('l-pass'].value;
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (!error) {
                 window.location.reload();
@@ -74,4 +83,5 @@ const AuthPlugin = {
     }
 };
 
+// Registrazione sicura nel core
 core.register('auth', AuthPlugin);
