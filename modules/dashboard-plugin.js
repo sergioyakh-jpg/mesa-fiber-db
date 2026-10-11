@@ -1,5 +1,5 @@
 import { core } from './core.js';
-import { supabase, AuthPlugin } from './auth-plugin.js';
+import { supabase } from './auth-plugin.js';
 
 const DashboardPlugin = {
     name: 'dashboard',
@@ -8,13 +8,11 @@ const DashboardPlugin = {
         const container = document.getElementById('app-view-container');
         container.innerHTML = `
             <div class="space-y-6">
-                <!-- Welcome Banner -->
                 <div class="bg-gradient-to-r from-sky-900/30 via-slate-900 to-slate-900 border border-sky-500/20 p-6 rounded-3xl shadow-xl">
-                    <h2 class="text-xl font-bold text-white mb-1">Benvenuto, ${AuthPlugin.profile.full_name || 'Tecnico'}</h2>
+                    <h2 class="text-xl font-bold text-white mb-1">MESA Fiber Field</h2>
                     <p class="text-xs text-slate-400">Sistema operativo di gestione campi FTTH attivo.</p>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
                         <span class="text-[10px] uppercase font-bold text-slate-400">Assegnati</span>
@@ -34,7 +32,6 @@ const DashboardPlugin = {
                     </div>
                 </div>
 
-                <!-- Quick Module Access -->
                 <div>
                     <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Moduli Operativi</h3>
                     <div onclick="window.router('delivery')" class="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-sky-500/50 transition cursor-pointer flex items-center justify-between group">
@@ -57,9 +54,15 @@ const DashboardPlugin = {
     },
 
     async loadStats() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        const role = profile ? profile.role : 'technician';
+
         let query = supabase.from('interventions').select('*');
-        if (AuthPlugin.profile.role !== 'admin') {
-            query = query.eq('assigned_to', AuthPlugin.user.id);
+        if (role !== 'admin') {
+            query = query.eq('assigned_to', user.id);
         }
         const { data } = await query;
         if (!data) return;
